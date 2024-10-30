@@ -35,9 +35,7 @@ export default function DataInsightSection() {
       <div className="container mx-auto px-6 sm:px-8 lg:px-36 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
           {/* Image Section */}
-          <div
-            className="flex justify-center order-1 md:order-2"
-          >
+          <div className="flex justify-center order-1 md:order-2">
             <Image
               src={CTAImg}
               alt="CTA Image"
@@ -49,8 +47,8 @@ export default function DataInsightSection() {
 
           {/* Text Section */}
           <div className="text-center md:text-left order-2 md:order-1">
-            <h2 className="text-2xl font-bold mb-4">
-              Unlock Powerful Data Insights Today
+            <h2 className="text-2xl font-bold mb-4 text-center">
+              Unlock Powerful Data Insights with a<br /> 14-Day Free Trial
             </h2>
             <ul
               data-aos="flip-down"
@@ -63,9 +61,9 @@ export default function DataInsightSection() {
                 </li>
               ))}
             </ul>
-            <Link href="/get-started">
+            <Link href="/signup">
               <button className="bg-blue-600 text-white font-bold py-2 px-5 rounded-lg hover:bg-blue-700">
-                Get Started
+                Request Demo
               </button>
             </Link>
           </div>

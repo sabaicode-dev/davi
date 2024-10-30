@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import Logo from "@/public/images/navBar/logo.png";
 import Link from "next/link";
-import { MenuList } from "./menu";
+import { MenuList, MenuListPhone } from "./menu";
 import { usePathname } from "next/navigation";
 
 export default function NavbarComponent() {
@@ -131,7 +131,7 @@ export default function NavbarComponent() {
           </svg>
         </button>
         <div className="flex flex-col items-start space-y-6 mt-10 p-6">
-          {MenuList.map((item, index) => (
+          {MenuListPhone.map((item, index) => (
             <Link
               key={index}
               href={item.path}

@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function Qoute() {
   return (
     <>
@@ -18,9 +20,11 @@ export default function Qoute() {
                 <span className="text-blue-700">DAVI</span>, and unlock the true
                 potential of real-time insights for smarter decision-making.
               </h2>
-              <button className="mt-6 bg-[#443DFF] text-white font-semibold py-3 px-8 rounded-lg hover:bg-purple-700 transition">
-                Get Started
-              </button>
+              <Link href="/signup">
+                <button className="mt-6 bg-[#443DFF] text-white font-semibold py-3 px-8 rounded-lg hover:bg-blue-700 transition">
+                  Request Demo
+                </button>
+              </Link>
             </div>
           </div>
         </div>
