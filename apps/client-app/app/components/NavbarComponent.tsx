@@ -79,11 +79,6 @@ export default function NavbarComponent() {
           >
             Sign Up
           </Link>
-          <Link href="/signup">
-            <span className="bg-blue-600 text-white text-base font-bold px-4 py-3 rounded-md hover:bg-blue-700">
-              Get Started
-            </span>
-          </Link>
         </div>
         {/* Hamburger Menu for Mobile */}
         <div className="md:hidden">
@@ -136,53 +131,16 @@ export default function NavbarComponent() {
           </svg>
         </button>
         <div className="flex flex-col items-start space-y-6 mt-10 p-6">
-          <Link
-            href="/"
-            className="text-white hover:text-gray-200 font-medium"
-            onClick={() => setIsMenuOpen(false)}
-          >
-            Home
-          </Link>
-          <Link
-            href="/service"
-            className="text-white hover:text-gray-200 font-medium"
-            onClick={() => setIsMenuOpen(false)}
-          >
-            Service
-          </Link>
-          <Link
-            href="/about"
-            className="text-white hover:text-gray-200 font-medium"
-            onClick={() => setIsMenuOpen(false)}
-          >
-            About
-          </Link>
-          <Link
-            href="/contact"
-            className="text-white hover:text-gray-200 font-medium"
-            onClick={() => setIsMenuOpen(false)}
-          >
-            Contact
-          </Link>
-          <Link
-            href="/login"
-            className="text-white hover:text-gray-200 font-medium"
-            onClick={() => setIsMenuOpen(false)}
-          >
-            Login
-          </Link>
-          <Link
-            href="/signup"
-            className="text-white hover:text-gray-200 font-medium"
-            onClick={() => setIsMenuOpen(false)}
-          >
-            Sign Up
-          </Link>
-          <Link href="/signup" onClick={() => setIsMenuOpen(false)}>
-            <span className="bg-blue-600 text-white text-base font-bold py-2 px-4 rounded-lg hover:bg-blue-700">
-              Get Started
-            </span>
-          </Link>
+          {MenuList.map((item, index) => (
+            <Link
+              key={index}
+              href={item.path}
+              className="text-white hover:text-gray-200 font-medium"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              {item.name}
+            </Link>
+          ))}
         </div>
       </div>
     </nav>
