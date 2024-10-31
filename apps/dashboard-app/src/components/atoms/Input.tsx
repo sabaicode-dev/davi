@@ -1,5 +1,6 @@
-import React, { FC } from "react";
+import { FC } from "react";
 import classNames from "classnames";
+import { AIIcon } from "./icons/Icon";
 
 export interface InputProps {
   type?: string;
@@ -15,7 +16,7 @@ export interface InputProps {
     | "warning"
     | "danger";
   variant?: "flat" | "bordered" | "underlined" | "faded";
-  radius?: "none" | "sm" | "md" | "lg"|"2xl" | "full";
+  radius?: "none" | "sm" | "md" | "lg" | "2xl" | "full";
   labelPlacement?: "inside" | "outside" | "outside-left";
   isDisabled?: boolean;
   isReadOnly?: boolean;
@@ -41,32 +42,18 @@ const Input: FC<InputProps> = ({
   description = "",
   ...props
 }) => {
-  const baseStyles = "px-4 py-3 w-full outline-none";
+  const baseStyles = "px-4 py-2 w-full outline-none";
   const sizeClasses = {
     sm: "text-sm",
-    md: "text-base",
+    md: "text-base py-2",
     lg: "text-lg",
-  };
-  const colorClasses = {
-    default: "text-black border-gray-300",
-    primary: "text-blue-500 border-blue-500",
-    secondary: "text-gray-500 border-gray-500",
-    success: "text-green-500 border-green-500",
-    warning: "text-yellow-500 border-yellow-500",
-    danger: "text-red-500 border-red-500",
-  };
-  const variantClasses = {
-    flat: "bg-white",
-    bordered: "border",
-    underlined: "border-b",
-    faded: "bg-gray-100",
   };
   const radiusClasses = {
     none: "rounded-none",
     sm: "rounded-sm",
     md: "rounded-md",
     lg: "rounded-lg",
-    "2xl": "rounded-[14px]",
+    "2xl": "rounded-[10px]",
     full: "rounded-full",
   };
 
@@ -98,25 +85,28 @@ const Input: FC<InputProps> = ({
           {isRequired && <span className="text-red-500 ml-1">*</span>}
         </label>
       )}
-      <input
-        type={type}
-        placeholder={labelInside ? label : placeholder}
-        defaultValue={defaultValue}
-        disabled={isDisabled}
-        readOnly={isReadOnly}
-        required={isRequired}
-        className={classNames(
-          baseStyles,
-          sizeClasses[size],
-          colorClasses[color],
-          variantClasses[variant],
-          radiusClasses[radius],
-          {
-            "opacity-50 cursor-not-allowed": isDisabled,
-            "bg-gray-100 cursor-not-allowed": isReadOnly,
-          }
-        )}
-      />
+      <div className="flex justify-start items-center border-2 rounded-[10px]">
+        <div className="pl-3">
+          <AIIcon />
+        </div>  
+        <input
+          type={type}
+          placeholder={labelInside ? label : placeholder}
+          defaultValue={defaultValue}
+          disabled={isDisabled}
+          readOnly={isReadOnly}
+          required={isRequired}
+          className={classNames(
+            baseStyles,
+            sizeClasses[size],
+            radiusClasses[radius],
+            {
+              "opacity-50 cursor-not-allowed": isDisabled,
+              "bg-gray-100 cursor-not-allowed": isReadOnly,
+            }
+          )}
+        />
+      </div>
       {label && labelInside && (
         <label
           className={classNames(

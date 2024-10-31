@@ -13,7 +13,7 @@ export interface ButtonProps
     | "3xl"
     | "full"
     | "none";
-  color?: "primary" | "secondary" | "danger" | "outline";
+  color?: "primary" | "secondary" | "danger" | "outline"|"none";
   isLoading?: boolean;
   isDisabled?: boolean;
   isIconOnly?: boolean;
@@ -26,7 +26,7 @@ export interface ButtonProps
 const Button: React.FC<ButtonProps> = ({
   size = "medium",
   radius = "none",
-  color = "default",
+  color = "primary",
   isLoading = false,
   isDisabled = false,
   isIconOnly = false,
@@ -38,29 +38,33 @@ const Button: React.FC<ButtonProps> = ({
   ...props
 }) => {
   const baseStyles =
-    "bg-blue-500 inline-flex items-center justify-center font-medium transition-colors duration-200  px-8 py-2";
+    "bg-blue-500 inline-flex items-center justify-center font-medium transition-colors duration-200 py-2";
 
   const sizeStyles = {
     small: "px-4 py-1 text-sm",
-    medium: "px-6 py-3 text-base",
+    medium: "px-3 py-2 text-base",
     large: "px-12 py-3 text-lg",
   }[size];
+
   const radiusStyles = {
     small: "rounded-sm",
     medium: "rounded-md",
     large: "rounded-lg",
     xl: "rounded-xl",
-    "2xl": "rounded-[14px]",
+    "2xl": "rounded-[10px]",
     "3xl": "rounded-3xl",
     full: "rounded-full",
     none: "rounded-none",
   }[radius];
+
   const colorStyles = {
-    primary: "bg-gray-500 text-white border-gray-300 hover:bg-gray-600", // gray
-    danger: "bg-red-500 text-white border-blue-500 hover:bg-red-600", // red
-    secondary: "bg-blue-500 text-white border-2 border-blue-500 hover:bg-blue-600 hover:border-blue-600", // blue
+    primary: "bg-gray-500 text-white border-gray-300 hover:bg-gray-600",
+    danger: "bg-red-500 text-white border-2 border-red-500 hover:bg-red-600",
+    secondary:
+      "bg-blue-500 text-white border-2 border-blue-500 hover:bg-blue-600 hover:border-blue-600",
     outline:
-      "bg-white text-black border-gray-500 border-2 border-gray-500 hover:bg-gray-100", // outline
+      "bg-white text-black border-gray-500 border-2 border-gray-500 hover:bg-gray-100",
+      none:"!bg-[#E6EDFF] text-gray-900 px-2 py-2"
   }[color];
 
   const loadingSpinner = (
@@ -84,6 +88,7 @@ const Button: React.FC<ButtonProps> = ({
       />
     </svg>
   );
+
   return (
     <button
       className={classNames(
@@ -92,7 +97,7 @@ const Button: React.FC<ButtonProps> = ({
         radiusStyles,
         colorStyles,
         (isLoading || isDisabled) && "opacity-50 cursor-not-allowed",
-        isIconOnly && "p-2",
+        isIconOnly ? "px-2 py-0" : "px-8",
         className
       )}
       disabled={isDisabled || isLoading}

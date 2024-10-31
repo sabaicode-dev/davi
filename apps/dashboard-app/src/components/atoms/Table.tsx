@@ -89,6 +89,8 @@ const Table: React.FC<ITableProps> = ({
     }
   };
 
+  const cellWidth = showCheckbox ? "210px" : "20px";
+
   return (
     <div className="flex flex-col">
       <div className="overflow-auto" style={{ maxHeight: "890px", maxWidth: "100%" }}>
@@ -96,15 +98,19 @@ const Table: React.FC<ITableProps> = ({
           <thead className="border-2 border-gray-300 bg-[#E6EDFF]">
             <tr>
               {showIndex && (
-                <th className="flex px-6 py-4 text-left text-[22px] justify-center items-center font-bold text-gray-500 uppercase tracking-wider border-1 border-gray-300 bg-[#E6EDFF]">
+                <th
+                  style={{ width: cellWidth }}
+                  className="flex px-6 py-3 text-left text-[22px] justify-center items-center font-bold text-gray-500 tracking-wider border-1 border-gray-300 bg-[#E6EDFF]"
+                >
                   #
                 </th>
               )}
               {headers.map((header) => (
                 <th
                   key={header.key}
+                  style={{ width: cellWidth }}
                   onClick={() => handleColumnClick(header.key)}
-                  className={`px-6 py-4 text-left text-[22px] font-bold text-gray-500 uppercase tracking-wider border-2 border-gray-300 bg-[#E6EDFF] ${
+                  className={`px-6 py-1 text-left text-[16px] font-bold text-gray-700 tracking-wider border-2 border-gray-300 bg-[#E6EDFF] ${
                     selectedColumns.includes(header.key) ? "bg-blue-200" : ""
                   } ${allowColumnSelection && isColumnSelectable(header.key) ? "cursor-pointer" : "cursor-default"}`}
                 >
@@ -116,9 +122,16 @@ const Table: React.FC<ITableProps> = ({
           <tbody className="bg-white divide-y divide-gray-200 border-2 border-gray-300">
             {rows.map((row, rowIndex) => (
               <React.Fragment key={rowIndex}>
-                <tr className={`transition duration-200 ${checkedItems[rowIndex] ? "bg-blue-200" : "hover:bg-gray-200"}`}>
+                <tr
+                  className={`transition duration-200 ${
+                    checkedItems[rowIndex] ? "bg-blue-200 " : "hover:bg-gray-200 justify-center items-center"
+                  }`}
+                >
                   {!(firstRowHasChildren && rowIndex === 0) && showCheckbox && (
-                    <td className="px-6 py-2 border-2 border-gray-300">
+                    <td
+                      style={{ width: cellWidth }}
+                      className="flex border-gray-300 justify-center items-center"
+                    >
                       <input
                         id={`checkbox-${rowIndex}`}
                         type="checkbox"
@@ -130,8 +143,8 @@ const Table: React.FC<ITableProps> = ({
                   )}
                   {!(firstRowHasChildren && rowIndex === 0) && showIndex && (
                     <td
-                      className={`px-6 py-2 text-[18px] font-semibold text-gray-700 border-2 border-gray-300`}
-                      style={{ width: showCheckbox ? "auto" : "30px" }} // Conditional width for index column
+                      style={{ width: cellWidth }}
+                      className="px-6 py-2 text-[14px] font-semibold text-gray-700 border-2 border-gray-300"
                     >
                       {rowIndex + 1}
                     </td>
@@ -139,7 +152,8 @@ const Table: React.FC<ITableProps> = ({
                   {headers.map((header) => (
                     <td
                       key={header.key}
-                      className={`px-4 text-[18px] text-gray-900 cursor-pointer w-[300px] h-[45px] border-2 border-gray-300 ${
+                      style={{ width: cellWidth }}
+                      className={`pl-4 text-[14px] text-gray-900 cursor-pointer border-2 border-gray-300 ${
                         selectedColumns.includes(header.key) ? "bg-gray-200" : ""
                       } ${editCell?.rowIndex === rowIndex && editCell.key === header.key ? "text-indigo-500" : ""}`}
                       onClick={() => handleCellClick(rowIndex, header.key)}
@@ -153,7 +167,8 @@ const Table: React.FC<ITableProps> = ({
                           onChange={(e) => handleCellChange(e, rowIndex, header.key)}
                           onBlur={handleSaveCell}
                           onKeyDown={handleKeyDown}
-                          className="border rounded mx-1 p-2 border-none outline-none bg-transparent"
+                          style={{ width: "190px" }} // Width of input itself
+                          className="border rounded border-none outline-none bg-transparent"
                           autoFocus
                         />
                       ) : (

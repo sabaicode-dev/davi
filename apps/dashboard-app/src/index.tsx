@@ -7,7 +7,7 @@ const root = createRoot(container!);
 root.render(
   <React.StrictMode>
     <App />
-  </React.StrictMode>,
+  </React.StrictMode>
 );
-console.log("NODE_ENV:",process.env.NODE_ENV)
-console.log(process.env.name)
+console.log("NODE_ENV:", process.env.NODE_ENV);
+console.log(process.env.name);

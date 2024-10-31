@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-
+import { Link } from "react-router-dom";
 interface MenuItem {
   name: string;
   icon: React.ReactNode;
@@ -128,22 +128,22 @@ const menuItems: MenuItem[] = [
   {
     name: "Project",
     icon: <GraphIcon />,
-    link: "#",
+    link: "/",
   },
   {
     name: "Visualize",
     icon: <VisualizeIcon />,
-    link: "#",
+    link: "/visualize",
   },
   {
     name: "Dataset",
     icon: <DatasetIcon />,
-    link: "#",
+    link: "dataset",
   },
   {
     name: "Helps",
     icon: <HelpIcon />,
-    link: "#",
+    link: "helps",
   },
 ];
 
@@ -156,18 +156,16 @@ const Sidebar: React.FC = () => {
         <ul>
           {menuItems.map((item, index) => (
             <li key={index} className="mb-6">
-              <a
-                href={item.link}
+              <Link
+                to={item.link}
                 onClick={() => setActiveItem(item.name)}
                 className={`flex flex-col items-center p-2 rounded transition-colors duration-300 ${
-                  activeItem === item.name
-                    ? "text-[#443DFF]"
-                    : "text-black hover:text-[#443DFF]"
+                  activeItem === item.name ? "text-[#443DFF]" : "text-black hover:text-[#443DFF]"
                 }`}
               >
                 {item.icon}
                 <span className="mt-2 text-sm font-medium">{item.name}</span>
-              </a>
+              </Link>
             </li>
           ))}
         </ul>
