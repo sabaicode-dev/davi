@@ -17,7 +17,7 @@ export const Step1 = function ({ onNext }: StepProps) {
           />
         </div>
 
-        {/* Right Text Section */}
+        {/* Right Text Sectionn */}
         <div className="flex-1 p-8">
           <h1 className="text-2xl font-bold text-gray-800">Welcome to DAVI!</h1>
           <p className="text-gray-600 mt-2">
