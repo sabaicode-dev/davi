@@ -21,7 +21,7 @@ export default function Qoute() {
                 potential of real-time insights for smarter decision-making.
               </h2>
               <Link href="/signup">
-                <button className="mt-6 bg-[#443DFF] text-white font-semibold py-3 px-8 rounded-lg hover:bg-blue-700 transition">
+                <button className="mt-6 bg-[#443DFF] text-white font-semibold py-3 px-8 rounded-lg hover:opacity-90 transition">
                   Request Demo
                 </button>
               </Link>

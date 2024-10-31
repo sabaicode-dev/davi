@@ -62,7 +62,7 @@ export default function DataInsightSection() {
               ))}
             </ul>
             <Link href="/signup">
-              <button className="bg-blue-600 text-white font-bold py-2 px-5 rounded-lg hover:bg-blue-700">
+              <button className="bg-[#443DFF] text-white font-bold py-2 px-5 rounded-lg hover:opacity-90">
                 Request Demo
               </button>
             </Link>

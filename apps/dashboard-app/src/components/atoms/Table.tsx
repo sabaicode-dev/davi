@@ -9,7 +9,7 @@ interface TableRowData {
   [key: string]: string | number;
 }
 
-interface DataTableProps {
+interface ITableProps {
   headers: TableHeader[];
   data: TableRowData[];
   showCheckbox?: boolean;
@@ -21,7 +21,7 @@ interface DataTableProps {
   childrenContent?: React.ReactNode;
 }
 
-const DataTable: React.FC<DataTableProps> = ({
+const Table: React.FC<ITableProps> = ({
   headers,
   data,
   showCheckbox = true,
@@ -91,23 +91,12 @@ const DataTable: React.FC<DataTableProps> = ({
 
   return (
     <div className="flex flex-col">
-      {/* Setting max height and width with overflow to enable scrolling */}
-      <div className="overflow-auto" style={{ maxHeight: "500px", maxWidth: "100%" }}>
+      <div className="overflow-auto" style={{ maxHeight: "890px", maxWidth: "100%" }}>
         <table className="min-w-full border-collapse border-2 border-gray-300">
           <thead className="border-2 border-gray-300 bg-[#E6EDFF]">
             <tr>
-              {showCheckbox && (
-                <th className="px-6 py-4 border-2 border-gray-300 bg-[#E6EDFF]">
-                  <input
-                    type="checkbox"
-                    checked={allChecked}
-                    onChange={handleAllCheckboxChange}
-                    className="w-6 h-6 appearance-none border cursor-pointer border-gray-300 rounded-md checked:bg-indigo-500 checked:border-indigo-500 focus:ring-indigo-300 focus:ring-offset-2"
-                  />
-                </th>
-              )}
               {showIndex && (
-                <th className="px-6 py-4 text-left text-[22px] font-bold text-gray-500 uppercase tracking-wider border-2 border-gray-300 bg-[#E6EDFF]">
+                <th className="flex px-6 py-4 text-left text-[22px] justify-center items-center font-bold text-gray-500 uppercase tracking-wider border-1 border-gray-300 bg-[#E6EDFF]">
                   #
                 </th>
               )}
@@ -127,11 +116,7 @@ const DataTable: React.FC<DataTableProps> = ({
           <tbody className="bg-white divide-y divide-gray-200 border-2 border-gray-300">
             {rows.map((row, rowIndex) => (
               <React.Fragment key={rowIndex}>
-                <tr
-                  className={`transition duration-200 ${
-                    checkedItems[rowIndex] ? "bg-blue-200" : "hover:bg-gray-200"
-                  }`}
-                >
+                <tr className={`transition duration-200 ${checkedItems[rowIndex] ? "bg-blue-200" : "hover:bg-gray-200"}`}>
                   {!(firstRowHasChildren && rowIndex === 0) && showCheckbox && (
                     <td className="px-6 py-2 border-2 border-gray-300">
                       <input
@@ -144,7 +129,10 @@ const DataTable: React.FC<DataTableProps> = ({
                     </td>
                   )}
                   {!(firstRowHasChildren && rowIndex === 0) && showIndex && (
-                    <td className="px-6 py-2 text-[18px] font-semibold text-gray-700 border-2 border-gray-300">
+                    <td
+                      className={`px-6 py-2 text-[18px] font-semibold text-gray-700 border-2 border-gray-300`}
+                      style={{ width: showCheckbox ? "auto" : "30px" }} // Conditional width for index column
+                    >
                       {rowIndex + 1}
                     </td>
                   )}
@@ -183,5 +171,4 @@ const DataTable: React.FC<DataTableProps> = ({
   );
 };
 
-export default DataTable;
-  
+export default Table;

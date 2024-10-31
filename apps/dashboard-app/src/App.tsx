@@ -1,11 +1,14 @@
-import Layout from "./layout/MainLayout";
-import "./styles.css";
+import Layout from "@/src/components/organisms/layout/MainLayout";
+import "@/src/styles.css";
+import CleaningPage from "./components/pages/CleaningPage";
+
+// Test my UI_Chart
+
 export const App = () => {
   return (
     <Layout>
       <div className="ml-[110px]">
-        {/* Content goes here */}
-        <h1 className="text-2xl font-bold">Welcome to my Team</h1>
+        <CleaningPage />
       </div>
     </Layout>
   );

@@ -1,6 +1,6 @@
 import React from "react";
-import Header from "../components/Header";
-import Sidebar from "../components/Sidebar";
+import Header from "@/src/components/organisms/Header";
+import Sidebar from "@/src/components/organisms/Sidebar";
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (

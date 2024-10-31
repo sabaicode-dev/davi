@@ -1,10 +1,16 @@
 import React from "react";
 import Chart from "react-apexcharts";
+import { ApexOptions } from "apexcharts"; // Import ApexOptions type
 
-export const Number = () => {
-  const chartOptions = {
+// Define props interface for the Number component
+interface NumberProps {
+  data: number[]; // Explicitly typing data as an array of numbers
+}
+
+export const Number: React.FC<NumberProps> = ({ data }) => {
+  const chartOptions: ApexOptions = {
     chart: {
-      type: "bar" as const,
+      type: "bar", // Set the type directly as "bar"
       toolbar: {
         show: false,
       },
@@ -41,7 +47,7 @@ export const Number = () => {
   const chartSeries = [
     {
       name: "Height",
-      data: [40, 60, 60, 20, 80, 40, 100, 60], // Data values for each bar
+      data: data, // Use the passed-in data prop here
     },
   ];
 
@@ -57,9 +63,9 @@ export const Number = () => {
       {/* Chart */}
       <div className="h-full">
         <Chart
-          options={chartOptions}
-          series={chartSeries}
-          type="bar"
+          options={chartOptions} // Pass the correctly typed options
+          series={chartSeries} // Pass the series data
+          type="bar" // Explicitly set type here for clarity
           width="100%"
           height="100%"
         />
