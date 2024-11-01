@@ -1,4 +1,4 @@
-import ShowTable from "@/src/components/Templates/ShowTable";
+import ShowTable from "@/src/components/templates/ShowTable";
 import { useState } from "react";
 import DisplayTable from "@/src/components/templates/DisplayTable";
 const initialList = [
