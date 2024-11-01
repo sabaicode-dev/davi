@@ -34,7 +34,7 @@ const menuItems: MenuItem[] = [
 
 const Sidebar: React.FC = () => {
   return (
-    <aside className="bg-white shadow-md text-currentColor fixed left-0 top-14 px-8 mt-6" style={{width:"7%",height:"100%"}}>
+    <aside className="bg-white shadow-md text-currentColor fixed left-0 top-14 px-8 mt-6">
       <nav className="">
         <ul>
           {menuItems.map((item, index) => (
