@@ -41,9 +41,9 @@ const Button: React.FC<ButtonProps> = ({
     "bg-blue-500 inline-flex items-center justify-center font-medium transition-colors duration-200 py-2";
 
   const sizeStyles = {
-    small: "px-4 py-1 text-sm",
-    medium: "px-3 py-2 text-base",
-    large: "px-12 py-3 text-lg",
+    small: "px-1 py-1 text-sm",
+    medium: "px-[14px] py-2 text-base",
+    large: "px-6 py-3 text-lg",
   }[size];
 
   const radiusStyles = {
@@ -58,12 +58,12 @@ const Button: React.FC<ButtonProps> = ({
   }[radius];
 
   const colorStyles = {
-    primary: "bg-gray-500 text-white border-gray-300 hover:bg-gray-600",
+    primary: "bg-[#9593A1] text-white border-[#9593A1] hover:bg-[#9593A1]",
     danger: "bg-red-500 text-white border-2 border-red-500 hover:bg-red-600",
     secondary:
       "bg-blue-500 text-white border-2 border-blue-500 hover:bg-blue-600 hover:border-blue-600",
     outline:
-      "bg-white text-black border-gray-500 border-2 border-gray-500 hover:bg-gray-100",
+      "bg-white text-black border-gray-500 border-2 border-gray-200 hover:bg-gray-100",
       none:"!bg-[#E6EDFF] text-gray-900 px-2 py-2"
   }[color];
 
@@ -96,7 +96,7 @@ const Button: React.FC<ButtonProps> = ({
         sizeStyles,
         radiusStyles,
         colorStyles,
-        (isLoading || isDisabled) && "opacity-50 cursor-not-allowed",
+        (isLoading || isDisabled) && "opacity-50 bg cursor-not-allowed",
         isIconOnly ? "px-2 py-0" : "px-8",
         className
       )}

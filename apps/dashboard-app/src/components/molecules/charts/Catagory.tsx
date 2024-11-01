@@ -70,7 +70,7 @@ export const Category: React.FC<CategoryProps> = ({ data }) => {
   const processedData = processData(data);
 
   return (
-    <div className="w-full bg-slate-100 px-4 py-5 space-y-1">
+    <div className="w-full space-y-1">
       <div className="w-full flex items-center justify-start">
         <div className="text-blue-800 text-xs bg-blue-300 rounded-md p-1 mb-2">
           <h1>Category</h1>

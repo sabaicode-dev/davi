@@ -1,4 +1,4 @@
-import TableTest from "../atoms/TableTest";
+import TableTest from "../molecules/tables/CleaningPage";
 
 interface ShowTableProps {
   selectedTable: { table: string } | null;

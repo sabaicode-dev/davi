@@ -1,7 +1,9 @@
+import ShowResuleCleaning from "../project/ShowResultCleaning";
+
 export default function Project() {
-    return (
-      <div className="h-screen flex justify-center items-center">
-        <h1>Project Page</h1>
-      </div>
-    );
-  }
+  return (
+    <div className="h-auto flex justify-center items-center">
+      <ShowResuleCleaning />
+    </div>
+  );
+}

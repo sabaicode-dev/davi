@@ -7,7 +7,7 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ onSelect, selectedSection }) => {
   return (
-    <div className="p-6 md:fixed md:top-16 md:left-96">
+    <div className="p-6 md:fixed md:top-16 md:left-64">
       <h2 className="text-[16px] font-bold mb-4">DAVI Documentation</h2>
 
       <div className="space-y-2 text-[14px]">

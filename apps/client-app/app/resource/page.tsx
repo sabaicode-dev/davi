@@ -10,11 +10,11 @@ const ResourcePage = () => {
 
   return (
     <div>
-      <div className="px-4 py-14 md:px-[200px] my-8">
+      <div className="py-14 my-8 px-4">
         {/* Responsive layout: stacked on mobile, side-by-side on desktop */}
         <div className="flex flex-col md:flex-row md:justify-between">
           {/* Sidebar with 100% width on mobile, 30% width on desktop */}
-          <div className="w-full md:w-1/3 my-8 md:mb-0 md:mr-8">
+          <div className="w-full md:w-1/3 my-8 md:mb-0 md:mr-4">
             <Sidebar onSelect={setSection} selectedSection={section} />
           </div>
 

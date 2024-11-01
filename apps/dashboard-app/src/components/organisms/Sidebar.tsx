@@ -34,8 +34,8 @@ const menuItems: MenuItem[] = [
 
 const Sidebar: React.FC = () => {
   return (
-    <aside className="w-[120px] h-full bg-white shadow-md text-currentColor fixed left-0 top-14 px-8">
-      <nav className="mt-8">
+    <aside className="bg-white shadow-md text-currentColor fixed left-0 top-14 px-8 mt-6" style={{width:"7%",height:"100%"}}>
+      <nav className="">
         <ul>
           {menuItems.map((item, index) => (
             <li key={index} className="mb-6">

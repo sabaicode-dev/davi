@@ -1,11 +1,8 @@
-import React from "react";
-import { BarChart } from "../molecules/charts/BarChart";
-import CleaningPage from "../VisualizeComponents/CleaningPage";
 
 export default function Visualize() {
   return (
-    <div className="h-screen flex justify-center items-center">
-      <CleaningPage/>
+    <div className="flex justify-center items-center w-auto h-full">
+      <h1>Visualize Page</h1>
     </div>
   );
 }

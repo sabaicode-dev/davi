@@ -14,10 +14,7 @@ interface BarChartProps {
 }
 
 // Define the BarChart component
-export const BarChart: React.FC<BarChartProps> = ({
-  data,
-  show_category = false,
-}) => {
+const BarChart: React.FC<BarChartProps> = ({ data, show_category = false }) => {
   // Count occurrences for each category
   const categoryCounts = data.reduce<Record<string, number>>((acc, item) => {
     acc[item.category] = (acc[item.category] || 0) + 1;
@@ -105,7 +102,7 @@ export const BarChart: React.FC<BarChartProps> = ({
   ];
 
   return (
-    <div>
+    <div className="h-32">
       <Chart
         options={chartOptions}
         series={chartSeries}
@@ -115,3 +112,5 @@ export const BarChart: React.FC<BarChartProps> = ({
     </div>
   );
 };
+
+export default BarChart;

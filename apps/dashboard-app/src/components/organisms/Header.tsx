@@ -34,11 +34,11 @@ const Header: React.FC = () => {
 
   const closeDropdown = () => {
     // Close both dropdowns
-    setIsDropdownOpen(false);
+    setIsDropdownOpen(false); 
     setIsProfileDropdownOpen(false);
   };
   return (
-    <header className="bg-white shadow-md flex items-center justify-between py-3 px-8 fixed top-0 left-0 w-full z-50">
+    <header className="bg-white shadow-md flex items-center justify-between py-3 px-8 fixed top-0 left-0 z-50" style={{width:"100%",height:"6.5%"}}>
       <div className="flex items-center cursor-pointer">
         <a href="/">
           <img src={Logo} alt="Logo" className="h-8 w-auto mr-4" />

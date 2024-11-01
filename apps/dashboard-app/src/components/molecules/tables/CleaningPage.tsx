@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 import Table from "./Table";
 
-const TableTest: React.FC = () => {
+const CleaningPage: React.FC = () => {
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -43,14 +43,16 @@ const TableTest: React.FC = () => {
     <div>
       <Table
         headers={headers}
-        editable={true}
+        editable={false}
         data={data}
-        showCheckbox={false}
+        showCheckbox={true}  
         showIndex={true}
         selectableColumns={"all"}
+        firstRowHasChildren={true}
+        childrenContent="ff"
       />
     </div>
   );
 };
 
-export default TableTest;
+export default CleaningPage;
