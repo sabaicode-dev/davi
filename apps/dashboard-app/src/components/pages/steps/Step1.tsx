@@ -6,8 +6,8 @@ interface StepProps {
 
 export const Step1 = function ({ onNext }: StepProps) {
   return (
-    <div className="flex justify-center items-center h-screen bg-gray-100">
-      <div className="flex w-full max-w-4xl bg-white rounded-lg shadow-md">
+    <div className="flex justify-center items-center ">
+      <div className="flex w-full max-w-4xl  rounded-lg">
         {/* Left Image Section */}
         <div className="flex-1 p-8">
           <img
@@ -18,7 +18,7 @@ export const Step1 = function ({ onNext }: StepProps) {
         </div>
 
         {/* Right Text Sectionn */}
-        <div className="flex-1 p-8">
+        <div className="flex-1 p-8 mt-24">
           <h1 className="text-2xl font-bold text-gray-800">Welcome to DAVI!</h1>
           <p className="text-gray-600 mt-2">
             Start Your First ETL Pipeline with DAVI

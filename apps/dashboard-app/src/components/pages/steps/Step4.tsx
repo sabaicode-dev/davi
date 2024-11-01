@@ -1,6 +1,6 @@
 // src/components/Step4.tsx
 import React from "react";
-import Logo from "@/public/images/step/step1_pic.png";
+import Logo from "@/public/images/step/step4_pic.png";
 
 interface Step4Props {
   onNext: () => void;
@@ -10,7 +10,7 @@ interface Step4Props {
 
 const Step4: React.FC<Step4Props> = ({ onNext, onBack, selectedSource }) => {
   return (
-    <div className="mx-auto max-w-4xl bg-white rounded-lg shadow-md p-10">
+    <div className="mx-auto max-w-4xl bg-white  p-10">
       <div className="flex w-full ">
         {/* Left Image Section */}
         <div className="flex-1 p-8">

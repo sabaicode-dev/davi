@@ -1,7 +1,5 @@
 import Layout from "@/src/components/organisms/layout/MainLayout";
 import "./styles.css";
-import Button from "./components/atoms/Button";
-import { InputTest } from "./components/atoms/Input";
 import {
   BrowserRouter as Router,
   Route,

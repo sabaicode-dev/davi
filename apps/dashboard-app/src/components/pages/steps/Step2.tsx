@@ -1,6 +1,6 @@
 // Step2.tsx
 import React from "react";
-import Logo from "@/public/images/step/step1_pic.png";
+import Logo from "@/public/images/step/step2_pic.png";
 
 interface Step2Props {
   onNext: () => void;
@@ -9,7 +9,7 @@ interface Step2Props {
 
 const Step2: React.FC<Step2Props> = ({ onNext, onBack }) => {
   return (
-    <div className="mx-auto  max-w-4xl bg-white rounded-lg shadow-md p-10">
+    <div className="mx-auto  max-w-4xl  p-10">
       <div className="flex ">
         {/* Left Image Section */}
         <div className="flex-1 p-8">
