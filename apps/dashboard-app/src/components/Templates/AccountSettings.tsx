@@ -170,7 +170,7 @@ const AccountSettings: React.FC = () => {
           <h3 className="text-lg font-medium text-gray-700">
             Login Management
           </h3>
-          <button className="bg-[#443DFF] text-white px-4 py-2 rounded-md text-sm font-medium flex items-center hover:bg-blue-600 transition">
+          <button className="bg-[#F21616] text-white px-4 py-2 rounded-md text-sm font-medium flex items-center hover:bg-red-600 transition">
             <AiOutlineLogout size={16} className="mt-[3px] mr-1" />
             Log Out
           </button>
