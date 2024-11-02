@@ -21,7 +21,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: ./apps/client-app # Adjust to client-app directory
-        run: npm install
+        run: npm install --legacy-peer-deps
 
       # - name: Run tests
       #   working-directory: ./apps/client-app # Adjust to client-app directory
