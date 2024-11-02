@@ -43,7 +43,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: ./apps/client-app # Adjust to client-app directory
-        run: npm install
+        run: npm install --legacy-peer-deps
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
