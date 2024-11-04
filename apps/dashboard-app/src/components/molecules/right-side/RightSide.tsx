@@ -67,7 +67,7 @@ const RightSide: React.FC<RightSideProps> = ({ onClose }) => {
       <div className="pt-2">
         <h1 className="text-[16px] font-bold">Visualize Overview</h1>
       </div>
-      <div className="flex h-full w-full justify-center items-center bg-slate-300">
+      <div className="flex h-full w-full justify-center items-center">
         {renderChart()}
       </div>
     </div>
