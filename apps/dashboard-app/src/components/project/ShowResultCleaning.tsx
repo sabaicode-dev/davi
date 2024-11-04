@@ -141,7 +141,7 @@ const ShowResuleCleaning: React.FC = () => {
       {isRightSideVisible && (
         <div
           ref={rightSideRef}
-          className="fixed top-16 right-2 w-[400px] h-screen bg-white shadow-lg z-50"
+          className="fixed top-16 right-2 w-[400px] h-screen bg-white shadow-lg z-50 overflow-y-scroll"
         >
           <RightSide onClose={hideRightSide} />
         </div>
