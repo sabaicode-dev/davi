@@ -3,11 +3,7 @@ import Button from "@/src/components/atoms/Button";
 import icon from "@/public/images/icon-cleaning.png";
 import TableTest from "@/src/components/molecules/tables/ShowCleaningResult";
 import Input from "@/src/components/atoms/Input";
-import {
-  DeleteIcon,
-  DownloadIcon,
-  VisualizeIcon,
-} from "@/src/components/atoms/icons/Icon";
+import { DeleteIcon, DownloadIcon, VisualizeIcon } from "@/src/components/atoms/icons/Icon";
 import { CiFilter } from "react-icons/ci";
 import RightSide from "../molecules/right-side/RightSide";
 
@@ -41,7 +37,7 @@ const ShowResuleCleaning: React.FC = () => {
     if (isRightSideVisible) {
       document.addEventListener("mousedown", handleClickOutside);
     }
-
+    
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
@@ -133,15 +129,15 @@ const ShowResuleCleaning: React.FC = () => {
         </div>
       </div>
       {/* Wrap TableTest in a scrollable container */}
-      {/* <div className="overflow-x-auto">
+      <div className="overflow-x-auto">
         <TableTest />
-      </div> */}
+      </div>
 
       {/* Conditionally render RightSide based on visibility state */}
       {isRightSideVisible && (
         <div
           ref={rightSideRef}
-          className="fixed top-16 right-2 w-[400px] h-screen bg-white shadow-lg z-50"
+          className="absolute -top-5 right-0"
         >
           <RightSide onClose={hideRightSide} />
         </div>
