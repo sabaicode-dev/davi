@@ -38,7 +38,7 @@ const Header: React.FC = () => {
     setIsProfileDropdownOpen(false);
   };
   return (
-    <header className="bg-white shadow-md flex items-center justify-between py-3 px-8 fixed top-0 left-0 z-50" style={{width:"100%",height:"6.5%"}}>
+    <header className="bg-white shadow-md flex items-center justify-between py-3 px-8 fixed top-0 left-0 z-50">
       <div className="flex items-center cursor-pointer">
         <a href="/">
           <img src={Logo} alt="Logo" className="h-8 w-auto mr-4" />
