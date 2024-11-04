@@ -52,6 +52,7 @@ const ShowCleaningResult: React.FC = () => {
         firstRowHasChildren={true}
         childrenContent={<CategoryMock/>}
       />
+      <h1>Hello</h1>
     </div>
   );
 };

@@ -12,7 +12,7 @@ import Visualize from "./components/pages/Visualize";
 import Dataset from "./components/pages/Dataset";
 import Project from "./components/pages/Project";
 import Helps from "./components/pages/Helps";
-import AccountSettings from "./components/templates/AccountSetting";
+import AccountSettings from "./components/Templates/AccountSettings";
 
 export const App = () => {
   return (

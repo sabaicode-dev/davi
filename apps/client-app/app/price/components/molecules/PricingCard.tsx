@@ -29,7 +29,7 @@ const PricingCard: React.FC<PricingCardProps> = ({
         active
           ? "bg-blue-700 border-blue-500 text-white"
           : "bg-white border-gray-300"
-      } w-full px-4 py-6 md:w-1/2 lg:w-1/4 border shadow-md rounded-[10px] transition-transform transform hover:scale-105`}
+      } w-full px-4 py-6 md:w-1/2 lg:w-1/4 border shadow-md rounded-[10px] transition-transform transform hover:scale-100 md:hover:scale-105`}
     >
       <div className="relative overflow-hidden p-5 pt-8">
         <span className="text-lg font-semibold text-primary">{type}</span>

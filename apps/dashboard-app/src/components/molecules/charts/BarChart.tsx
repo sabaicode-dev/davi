@@ -113,4 +113,24 @@ const BarChart: React.FC<BarChartProps> = ({ data, show_category = false }) => {
   );
 };
 
-export default BarChart;
+const BarChartTest: React.FC = () => {
+  // Sample data for the bar chart
+  const sampleData = [
+    { category: "Electronics" },
+    { category: "Clothing" },
+    { category: "Electronics" },
+    { category: "Food" },
+    { category: "Clothing" },
+    { category: "Food" },
+    { category: "Food" },
+  ];
+
+  return (
+    <div className="w-full h-full mt-24">
+      <h1>Category Distribution</h1>
+      <BarChart data={sampleData} show_category={true} />
+    </div>
+  );
+};
+
+export { BarChart, BarChartTest };
