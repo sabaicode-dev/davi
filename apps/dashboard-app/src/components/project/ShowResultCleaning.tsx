@@ -3,7 +3,11 @@ import Button from "@/src/components/atoms/Button";
 import icon from "@/public/images/icon-cleaning.png";
 import TableTest from "@/src/components/molecules/tables/ShowCleaningResult";
 import Input from "@/src/components/atoms/Input";
-import { DeleteIcon, DownloadIcon, VisualizeIcon } from "@/src/components/atoms/icons/Icon";
+import {
+  DeleteIcon,
+  DownloadIcon,
+  VisualizeIcon,
+} from "@/src/components/atoms/icons/Icon";
 import { CiFilter } from "react-icons/ci";
 import RightSide from "../molecules/right-side/RightSide";
 
@@ -37,7 +41,7 @@ const ShowResuleCleaning: React.FC = () => {
     if (isRightSideVisible) {
       document.addEventListener("mousedown", handleClickOutside);
     }
-    
+
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
@@ -137,7 +141,7 @@ const ShowResuleCleaning: React.FC = () => {
       {isRightSideVisible && (
         <div
           ref={rightSideRef}
-          className="absolute -top-5 right-0"
+          className="fixed top-16 right-2 w-[400px] h-screen bg-white shadow-lg z-50"
         >
           <RightSide onClose={hideRightSide} />
         </div>
