@@ -3,8 +3,8 @@ import PricingCard from "../molecules/PricingCard";
 
 const PricingCart_Blog = () => {
   return (
-    <div className="md:absolute md:top-[33%] md:transform md:-translate-y-1/2 w-full flex justify-center sm:px-5 py-3 px-9 md:px-[15%] lg:px-2 xl:px-36">
-      <div className="flex flex-row justify-center space-x-5">
+    <div className="relative md:absolute md:top-[33%] md:transform md:-translate-y-1/2 w-full flex flex-col items-center px-4 py-6 sm:px-5 md:px-[15%] lg:px-2 xl:px-36">
+      <div className="flex flex-col md:flex-row justify-center space-y-5 md:space-y-0 md:space-x-5">
         {/* Free Trial - Bg-white */}
         <PricingCard
           type="Free Trial 14-Day"
