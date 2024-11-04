@@ -1,17 +1,48 @@
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Button from "@/src/components/atoms/Button";
 import icon from "@/public/images/icon-cleaning.png";
-import TableTest from "@/src/components/molecules/tables/ShowCleaningResult"; // Ensure this component supports your needs
+import TableTest from "@/src/components/molecules/tables/ShowCleaningResult";
 import Input from "@/src/components/atoms/Input";
-import {
-  DeleteIcon,
-  DownloadIcon,
-  VisualizeIcon,
-} from "@/src/components/atoms/icons/Icon";
+import { DeleteIcon, DownloadIcon, VisualizeIcon } from "@/src/components/atoms/icons/Icon";
 import { CiFilter } from "react-icons/ci";
 import RightSide from "../molecules/right-side/RightSide";
 
 const ShowResuleCleaning: React.FC = () => {
+  // State to manage the visibility of RightSide
+  const [isRightSideVisible, setIsRightSideVisible] = useState(false);
+  const rightSideRef = useRef<HTMLDivElement | null>(null);
+
+  // Function to handle showing the RightSide component
+  const showRightSide = () => {
+    setIsRightSideVisible(true);
+  };
+
+  // Function to handle hiding the RightSide component
+  const hideRightSide = () => {
+    setIsRightSideVisible(false);
+  };
+
+  // Event listener to detect clicks outside RightSide to hide it
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        rightSideRef.current &&
+        !rightSideRef.current.contains(event.target as Node)
+      ) {
+        hideRightSide();
+      }
+    };
+
+    // Attach the event listener when RightSide is visible
+    if (isRightSideVisible) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isRightSideVisible]);
+
   return (
     <div className="relative flex flex-col mt-8" style={{ width: "100%" }}>
       <div className="flex flex-row justify-between items-center mb-3">
@@ -51,7 +82,7 @@ const ShowResuleCleaning: React.FC = () => {
             radius="2xl"
             isLoading={false}
             color="primary"
-            isDisabled={true}
+            onClick={showRightSide} // Show RightSide on click
             startContent={<VisualizeIcon />}
           />
         </div>
@@ -98,12 +129,19 @@ const ShowResuleCleaning: React.FC = () => {
         </div>
       </div>
       {/* Wrap TableTest in a scrollable container */}
-      <div className="overflow-x-auto">
+      {/* <div className="overflow-x-auto">
         <TableTest />
-      </div>
-      <div className="absolute top-0 right-0">
-        <RightSide />
-      </div>
+      </div> */}
+
+      {/* Conditionally render RightSide based on visibility state */}
+      {isRightSideVisible && (
+        <div
+          ref={rightSideRef}
+          className="absolute -top-5 right-0"
+        >
+          <RightSide onClose={hideRightSide} />
+        </div>
+      )}
     </div>
   );
 };

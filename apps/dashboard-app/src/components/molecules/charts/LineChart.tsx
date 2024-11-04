@@ -14,7 +14,7 @@ interface LineChartProps {
   show_category?: boolean;
 }
 
-export const LineChart: React.FC<LineChartProps> = ({
+const LineChart: React.FC<LineChartProps> = ({
   data,
   show_category = false,
 }) => {
@@ -73,3 +73,24 @@ export const LineChart: React.FC<LineChartProps> = ({
     </div>
   );
 };
+
+const LineChartTest: React.FC = () => {
+  // Sample data for the line chart
+  const sampleData = [
+    { month: "Jan", sales: 30, expenses: 20, profit: 10 },
+    { month: "Feb", sales: 40, expenses: 25, profit: 15 },
+    { month: "Mar", sales: 35, expenses: 22, profit: 13 },
+    { month: "Apr", sales: 50, expenses: 30, profit: 20 },
+    { month: "May", sales: 55, expenses: 35, profit: 20 },
+    { month: "Jun", sales: 60, expenses: 40, profit: 20 },
+  ];
+
+  return (
+    <div className="w-full h-full mt-24">
+      <h1>Monthly Performance</h1>
+      <LineChart data={sampleData} show_category={true} />
+    </div>
+  );
+};
+
+export { LineChart, LineChartTest };
