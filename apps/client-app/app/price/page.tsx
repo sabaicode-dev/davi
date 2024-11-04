@@ -15,7 +15,7 @@ export default function Pricing() {
         <PricingCart_Blog />
 
         {/* Block 1 Solutions Section */}
-        <div className="pt-0 md:pt-[30%]">
+        <div className="pt-0 md:pt-[30%] ">
           <PricingInform />
         </div>
       </div>
