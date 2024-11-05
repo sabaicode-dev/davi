@@ -6,6 +6,12 @@ import Link from "next/link";
 import { MenuList, MenuListPhone } from "./menu";
 import { usePathname } from "next/navigation";
 
+// Importing icons from react-icons
+import { AiOutlineHome, AiOutlineAppstore, AiOutlineDollarCircle, AiOutlineLogin, AiOutlineUserAdd } from "react-icons/ai";
+
+// Define type for menu items to match with icon keys
+type MenuItemName = "Service" | "Resource" | "Pricing" | "Login" | "Sign Up";
+
 export default function NavbarComponent() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [navBg, setNavBg] = useState(false);
@@ -27,6 +33,15 @@ export default function NavbarComponent() {
     };
   }, []);
 
+  // Mapping icons to menu items
+  const icons: Record<MenuItemName, JSX.Element> = {
+    Service: <AiOutlineAppstore />,
+    Resource: <AiOutlineHome />,
+    Pricing: <AiOutlineDollarCircle />,
+    Login: <AiOutlineLogin />,
+    "Sign Up": <AiOutlineUserAdd />,
+  };
+
   return (
     <nav
       className={`text-white fixed top-0 left-0 w-full z-20 transition-all duration-300 ${
@@ -35,7 +50,7 @@ export default function NavbarComponent() {
     >
       <div className="container mx-auto px-8 lg:px-36 flex justify-between items-center py-4">
         <div className="flex items-center space-x-4">
-          {/* Logo */}
+          {/* Logo - always visible */}
           <div className="text-xl font-bold">
             <Link href="/" className="flex items-center">
               <Image
@@ -110,6 +125,19 @@ export default function NavbarComponent() {
           isMenuOpen ? "translate-x-0" : "translate-x-full"
         } transition-transform duration-300 ease-in-out z-20`}
       >
+        {/* Logo in Sidebar */}
+        <div className="flex items-center justify-start mx-6 pt-8">
+          <Link href="/" className="flex items-center">
+            <Image 
+              src={Logo}
+              alt="logo"
+              width={80} // Adjust width for smaller size on mobile
+              height={80}
+              unoptimized
+            />
+          </Link>
+        </div>
+        
         {/* Close Button */}
         <button
           onClick={() => setIsMenuOpen(false)}
@@ -130,15 +158,19 @@ export default function NavbarComponent() {
             />
           </svg>
         </button>
-        <div className="flex flex-col items-start space-y-6 mt-10 p-6">
+        
+        {/* Mobile Menu Links with Icons */}
+        <div className="flex flex-col items-start space-y-6 mt-2 p-6">
           {MenuListPhone.map((item, index) => (
             <Link
               key={index}
               href={item.path}
-              className="text-white hover:text-gray-200 font-medium"
+              className="flex items-center space-x-2 text-white hover:text-gray-200 font-medium"
               onClick={() => setIsMenuOpen(false)}
             >
-              {item.name}
+              {/* Display icon if it exists */}
+              {icons[item.name as MenuItemName] || <span />} 
+              <span>{item.name}</span>
             </Link>
           ))}
         </div>

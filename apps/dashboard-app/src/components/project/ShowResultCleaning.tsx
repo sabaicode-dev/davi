@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Button from "@/src/components/atoms/Button";
 import icon from "@/public/images/icon-cleaning.png";
-import TableTest from "@/src/components/molecules/tables/ShowCleaningResult"; // Ensure this component supports your needs
+import TableTest from "@/src/components/molecules/tables/ShowCleaningResult";
 import Input from "@/src/components/atoms/Input";
 import {
   DeleteIcon,
@@ -10,8 +10,39 @@ import {
 } from "@/src/components/atoms/icons/Icon";
 import { CiFilter } from "react-icons/ci";
 import RightSide from "../molecules/right-side/RightSide";
+import Modal from "../molecules/modals/Modal";
 
 const ShowResuleCleaning: React.FC = () => {
+  // State to manage the visibility of RightSide
+  const [isRightSideVisible, setIsRightSideVisible] = useState(false);
+  const rightSideRef = useRef<HTMLDivElement | null>(null);
+  const showRightSide = () => {
+    setIsRightSideVisible(true);
+  };
+
+  const hideRightSide = () => {
+    setIsRightSideVisible(false);
+  };
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        rightSideRef.current &&
+        !rightSideRef.current.contains(event.target as Node)
+      ) {
+        hideRightSide();
+      }
+    };
+
+    // Attach the event listener when RightSide is visible
+    if (isRightSideVisible) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isRightSideVisible]);
+
   return (
     <div className="relative flex flex-col mt-8" style={{ width: "100%" }}>
       <div className="flex flex-row justify-between items-center mb-3">
@@ -51,7 +82,7 @@ const ShowResuleCleaning: React.FC = () => {
             radius="2xl"
             isLoading={false}
             color="primary"
-            isDisabled={true}
+            onClick={showRightSide} // Show RightSide on click
             startContent={<VisualizeIcon />}
           />
         </div>
@@ -74,6 +105,7 @@ const ShowResuleCleaning: React.FC = () => {
             isDisabled={false}
             isReadOnly={false}
             isRequired={false}
+            isIconLeft={true}
             className="max-w-input w-full"
           />
           <Button
@@ -101,9 +133,19 @@ const ShowResuleCleaning: React.FC = () => {
       <div className="overflow-x-auto">
         <TableTest />
       </div>
-      <div className="absolute top-0 right-0">
-        <RightSide />
-      </div>
+
+      {/* Conditionally render RightSide based on visibility state */}
+      {isRightSideVisible && (
+        <div
+          ref={rightSideRef}
+          className="fixed top-16 right-2 w-[400px] h-screen bg-white shadow-lg z-50 overflow-y-scroll"
+        >
+          <RightSide onClose={hideRightSide} />
+        </div>
+      )}
+      {/* <div className="flex justify-center items-center ">
+        <Modal />
+      </div> */}
     </div>
   );
 };
