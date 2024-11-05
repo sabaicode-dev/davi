@@ -8,6 +8,11 @@ import {
   DownloadIcon,
   VisualizeIcon,
 } from "@/src/components/atoms/icons/Icon";
+import {
+  DeleteIcon,
+  DownloadIcon,
+  VisualizeIcon,
+} from "@/src/components/atoms/icons/Icon";
 import { CiFilter } from "react-icons/ci";
 import RightSide from "../molecules/right-side/RightSide";
 import DataTransformCard from "../atoms/DataTransformCard";
@@ -26,7 +31,6 @@ const ShowResuleCleaning: React.FC = () => {
     setIsRightSideVisible(true);
   };
 
-  // Function to handle hiding the RightSide component
   const hideRightSide = () => {
     setIsRightSideVisible(false);
   };
@@ -62,6 +66,7 @@ const ShowResuleCleaning: React.FC = () => {
     if (isRightSideVisible || isDataTransformVisible) {
       document.addEventListener("mousedown", handleClickOutside);
     }
+
 
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
@@ -130,6 +135,7 @@ const ShowResuleCleaning: React.FC = () => {
             isDisabled={false}
             isReadOnly={false}
             isRequired={false}
+            isIconLeft={true}
             className="max-w-input w-full"
           />
           <Button

@@ -21,6 +21,7 @@ export interface InputProps {
   isDisabled?: boolean;
   isReadOnly?: boolean;
   isRequired?: boolean;
+  isIconLeft?: boolean; // New prop for showing/hiding the icon
   className?: string;
   description?: string;
 }
@@ -38,6 +39,7 @@ const Input: FC<InputProps> = ({
   isDisabled = false,
   isReadOnly = false,
   isRequired = false,
+  isIconLeft = false, // Default value
   className = "",
   description = "",
   ...props
@@ -86,9 +88,12 @@ const Input: FC<InputProps> = ({
         </label>
       )}
       <div className="flex justify-start items-center border-2 rounded-[10px]">
-        <div className="pl-3">
-          <AIIcon />
-        </div>  
+        {/* Conditionally render the AIIcon based on isIconLeft prop */}
+        {isIconLeft && (
+          <div className="pl-3">
+            <AIIcon />
+          </div>
+        )}
         <input
           type={type}
           placeholder={labelInside ? label : placeholder}
@@ -134,7 +139,7 @@ export function InputTest() {
   return (
     <div className="flex flex-col mx-32">
       <Input
-        type="text-area"
+        type="text"
         label="Full name"
         placeholder="Enter full name..."
         defaultValue=""
@@ -145,6 +150,7 @@ export function InputTest() {
         labelPlacement="outside"
         isDisabled={false}
         isReadOnly={false}
+        isIconLeft={true} // Change this to true or false to test
         isRequired={false}
         className="max-w-full"
         // description="Please enter your fullname"
