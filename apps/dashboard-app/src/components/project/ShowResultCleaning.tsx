@@ -3,26 +3,26 @@ import Button from "@/src/components/atoms/Button";
 import icon from "@/public/images/icon-cleaning.png";
 import TableTest from "@/src/components/molecules/tables/ShowCleaningResult";
 import Input from "@/src/components/atoms/Input";
-import { DeleteIcon, DownloadIcon, VisualizeIcon } from "@/src/components/atoms/icons/Icon";
+import {
+  DeleteIcon,
+  DownloadIcon,
+  VisualizeIcon,
+} from "@/src/components/atoms/icons/Icon";
 import { CiFilter } from "react-icons/ci";
 import RightSide from "../molecules/right-side/RightSide";
+import Modal from "../molecules/modals/Modal";
 
 const ShowResuleCleaning: React.FC = () => {
   // State to manage the visibility of RightSide
   const [isRightSideVisible, setIsRightSideVisible] = useState(false);
   const rightSideRef = useRef<HTMLDivElement | null>(null);
-
-  // Function to handle showing the RightSide component
   const showRightSide = () => {
     setIsRightSideVisible(true);
   };
 
-  // Function to handle hiding the RightSide component
   const hideRightSide = () => {
     setIsRightSideVisible(false);
   };
-
-  // Event listener to detect clicks outside RightSide to hide it
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -37,7 +37,7 @@ const ShowResuleCleaning: React.FC = () => {
     if (isRightSideVisible) {
       document.addEventListener("mousedown", handleClickOutside);
     }
-    
+
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
@@ -105,6 +105,7 @@ const ShowResuleCleaning: React.FC = () => {
             isDisabled={false}
             isReadOnly={false}
             isRequired={false}
+            isIconLeft={true}
             className="max-w-input w-full"
           />
           <Button
@@ -142,6 +143,9 @@ const ShowResuleCleaning: React.FC = () => {
           <RightSide onClose={hideRightSide} />
         </div>
       )}
+      {/* <div className="flex justify-center items-center ">
+        <Modal />
+      </div> */}
     </div>
   );
 };
