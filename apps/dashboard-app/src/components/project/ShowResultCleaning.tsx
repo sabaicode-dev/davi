@@ -8,11 +8,7 @@ import {
   DownloadIcon,
   VisualizeIcon,
 } from "@/src/components/atoms/icons/Icon";
-import {
-  DeleteIcon,
-  DownloadIcon,
-  VisualizeIcon,
-} from "@/src/components/atoms/icons/Icon";
+
 import { CiFilter } from "react-icons/ci";
 import RightSide from "../molecules/right-side/RightSide";
 import DataTransformCard from "../atoms/DataTransformCard";
@@ -66,7 +62,6 @@ const ShowResuleCleaning: React.FC = () => {
     if (isRightSideVisible || isDataTransformVisible) {
       document.addEventListener("mousedown", handleClickOutside);
     }
-
 
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
@@ -181,9 +176,7 @@ const ShowResuleCleaning: React.FC = () => {
           className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
         >
           <div>
-            <DataTransformCard
-              hideDataTransform={hideDataTransform}
-            />
+            <DataTransformCard hideDataTransform={hideDataTransform} />
           </div>
         </div>
       )}
