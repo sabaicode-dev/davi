@@ -181,7 +181,7 @@ const ShowResuleCleaning: React.FC = () => {
         </div>
       )}
 
-      <div className="flex justify-end items-end space-x-5">
+      <div className="flex justify-end items-end space-x-5 mt-5">
         <Button
           color="outline"
           radius="medium"

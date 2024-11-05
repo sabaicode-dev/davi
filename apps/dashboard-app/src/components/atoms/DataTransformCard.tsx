@@ -1,7 +1,7 @@
 import React from "react";
 import Button from "./Button";
-import CloseIcon from "@/public/images/Close-Icon.png";
 import CandleICon from "@/public/images/candle-2.png";
+import { CloseModalIcon } from "./icons/Icon";
 interface DataTransformCardProps {
   hideDataTransform: () => void;
 }
@@ -30,9 +30,16 @@ const DataTransformCard: React.FC<DataTransformCardProps> = ({
               </p>
             </header>
             <div>
-              <button onClick={hideDataTransform}>
+              <Button
+                type="button"
+                onClick={hideDataTransform}
+                children={<CloseModalIcon />}
+                color="none"
+                className="text-red-500 !p-0 !bg-transparent"
+              />
+              {/* <button onClick={hideDataTransform}>
                 <img src={CloseIcon} alt="" width={20} />
-              </button>
+              </button> */}
             </div>
           </div>
 
