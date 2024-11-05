@@ -86,10 +86,9 @@ export class GoogleAuthController extends Controller {
       // Save or update user data in MongoDB
       try {
         await saveUserToDB({
-          id: decodedIdToken.sub, // Unique identifier from Google (assuming 'sub' is the ID)
           email: decodedIdToken.email,
-          cognitoUserId: decodedIdToken.sub, // Optional: you could omit this if it's the same as 'id'
-          confirmed: true, // Set as confirmed since email is verified
+          cognitoUserId: decodedIdToken.sub,
+          confirmed: true,
         });
         console.log("User data saved or updated in MongoDB successfully.");
       } catch (mongoError: any) {

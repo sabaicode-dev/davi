@@ -27,5 +27,6 @@
   // Allow ts-node to run with tsconfig-paths
   "ts-node": {
     "require": ["tsconfig-paths/register"]
-  }
+  },
+  "noImplicitAdditionalProperties": "throw-on-extras"
 }

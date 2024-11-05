@@ -6,7 +6,6 @@ import User, { IUser } from "../models/user.models";
  * @returns The saved or updated user document.
  */
 export const saveUserToDB = async (userData: {
-  id?: string; // Make 'id' optional
   email: string;
   cognitoUserId?: string;
   confirmed?: boolean;
@@ -15,8 +14,8 @@ export const saveUserToDB = async (userData: {
     let user = await User.findOne({ email: userData.email });
 
     if (!user) {
+      // Create a new user
       user = new User({
-        id: userData.id,
         email: userData.email,
         cognitoUserId: userData.cognitoUserId,
         confirmed: userData.confirmed ?? false,
@@ -24,6 +23,7 @@ export const saveUserToDB = async (userData: {
       await user.save();
       console.log("New user saved to MongoDB:", user);
     } else {
+      // Update existing user
       user.cognitoUserId = userData.cognitoUserId || user.cognitoUserId;
       user.confirmed = userData.confirmed ?? user.confirmed;
       await user.save();

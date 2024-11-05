@@ -4,7 +4,7 @@ import mongoose, { Schema, Document, Model } from "mongoose";
 // Define the User schema
 export interface IUser extends Document {
   email: string;
-  password?: string; // You might not want to store passwords if using Cognito
+  password?: string; // Optional if not storing locally
   cognitoUserId?: string;
   confirmed: boolean;
   createdAt: Date;
@@ -14,17 +14,16 @@ export interface IUser extends Document {
 const UserSchema: Schema<IUser> = new Schema(
   {
     email: { type: String, required: true, unique: true },
-    password: { type: String }, // Optional: Only if you're storing hashed passwords locally
-    cognitoUserId: { type: String, unique: true }, // Store Cognito User ID if available
+    password: { type: String },
+    cognitoUserId: { type: String, unique: true },
     confirmed: { type: Boolean, default: false },
   },
   {
     timestamps: true,
-    versionKey: false, // This disables the __v field in the documents
+    versionKey: false,
   }
 );
 
-// Create the User model
-const User: Model<IUser> = mongoose.model<IUser>("userByEmail", UserSchema);
+const User: Model<IUser> = mongoose.model<IUser>("User", UserSchema);
 
 export default User;
