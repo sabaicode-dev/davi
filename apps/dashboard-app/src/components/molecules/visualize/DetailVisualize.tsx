@@ -33,9 +33,9 @@ const DetailVisualize: React.FC = () => {
         </div>
       </div>
       <div className="border-t-2 border-[#443DFF] my-4" />
-      <div className="grid grid-cols-3 w-full justify-around items-center gap-3">
+      <div className="grid grid-cols-3 w-full justify-around items-center space-x-6">
         {/* Card 1 */}
-        <div className="bg-slate-100 w-[380px] h-[430px] rounded-xl border-[1px] border-gray-300 duration-150 shadow-lg hover:shadow-xl hover:scale">
+        <div className="bg-slate-100 rounded-xl border-[1px] border-gray-300 duration-150 shadow-lg hover:shadow-xl hover:scale">
           {/* Card Title */}
           <div className="flex justify-between px-4 pt-3">
             <h1 className="text-[16px] font-bold">Visualize Overview</h1>
@@ -57,7 +57,7 @@ const DetailVisualize: React.FC = () => {
           </div>
         </div>
         {/* Card 2 */}
-        <div className="bg-slate-100 w-[380px] h-[430px] rounded-xl border-[1px] border-gray-300 duration-150 shadow-lg hover:shadow-xl hover:scale">
+        <div className="bg-slate-100 rounded-xl border-[1px] border-gray-300 duration-150 shadow-lg hover:shadow-xl hover:scale">
           {/* Card Title */}
           <div className="flex justify-between px-4 pt-3">
             <h1 className="text-[16px] font-bold">Visualize Overview</h1>
@@ -79,7 +79,7 @@ const DetailVisualize: React.FC = () => {
           </div>
         </div>
         {/* Card 3 */}
-        <div className="bg-slate-100 w-[380px] h-[430px] rounded-xl border-[1px] border-gray-300 duration-150 shadow-lg hover:shadow-xl hover:scale">
+        <div className="bg-slate-100 rounded-xl border-[1px] border-gray-300 duration-150 shadow-lg hover:shadow-xl hover:scale">
           {/* Card Title */}
           <div className="flex justify-between px-4 pt-3">
             <h1 className="text-[16px] font-bold">Visualize Overview</h1>
