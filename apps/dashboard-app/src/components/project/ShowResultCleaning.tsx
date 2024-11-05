@@ -115,7 +115,7 @@ const ShowResuleCleaning: React.FC = () => {
             color="none"
             isIconOnly={true}
             startContent={<CiFilter className="w-6 h-6" />}
-            className="border-2 border-[#E6EDFF]"
+            className="border-2 border-[#21242c]"
           />
         </div>
         <div>

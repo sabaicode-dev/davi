@@ -9,17 +9,20 @@ interface CardProps {
 
 const Card: React.FC<CardProps> = ({ index, onDelete }) => {
   return (
-    <div className="container w-full bg-[#EBF1FF] p-5 flex space-x-10 rounded-lg px-10">
+    <div className="w-full bg-[#EBF1FF] p-5 flex space-x-10 rounded-lg">
+      {/* Left Section */}
       <div className="space-x-5 flex justify-center items-center text-center text-[18px]">
         <span>#{index + 1}</span>
         <span>|</span>
-        <span className="bg-[#F4EBFF] rounded-full w-10 h-10 flex justify-center items-center text-center">
+        <span className="bg-[#F4EBFF] rounded-full w-10 h-10 flex justify-center items-center">
           <img src={FileIcon} alt="File Icon" width={20} />
         </span>
       </div>
-      <div className="w-full flex justify-between">
+      
+      {/* Middle Section */}
+      <div className="flex justify-between w-full">
         <div
-          onClick={() => alert(`Card ${index+1} has been Clicked`)}
+          onClick={() => alert(`Card ${index + 1} has been Clicked`)}
           className="font-medium text-[14px] cursor-pointer"
         >
           <p>Tech requirements.csv</p>
