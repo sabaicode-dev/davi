@@ -10,23 +10,19 @@ import {
 } from "@/src/components/atoms/icons/Icon";
 import { CiFilter } from "react-icons/ci";
 import RightSide from "../molecules/right-side/RightSide";
+import Modal from "../molecules/modals/Modal";
 
 const ShowResuleCleaning: React.FC = () => {
   // State to manage the visibility of RightSide
   const [isRightSideVisible, setIsRightSideVisible] = useState(false);
   const rightSideRef = useRef<HTMLDivElement | null>(null);
-
-  // Function to handle showing the RightSide component
   const showRightSide = () => {
     setIsRightSideVisible(true);
   };
 
-  // Function to handle hiding the RightSide component
   const hideRightSide = () => {
     setIsRightSideVisible(false);
   };
-
-  // Event listener to detect clicks outside RightSide to hide it
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -109,6 +105,7 @@ const ShowResuleCleaning: React.FC = () => {
             isDisabled={false}
             isReadOnly={false}
             isRequired={false}
+            isIconLeft={true}
             className="max-w-input w-full"
           />
           <Button
@@ -133,19 +130,22 @@ const ShowResuleCleaning: React.FC = () => {
         </div>
       </div>
       {/* Wrap TableTest in a scrollable container */}
-      {/* <div className="overflow-x-auto">
+      <div className="overflow-x-auto">
         <TableTest />
-      </div> */}
+      </div>
 
       {/* Conditionally render RightSide based on visibility state */}
       {isRightSideVisible && (
         <div
           ref={rightSideRef}
-          className="fixed top-16 right-2 w-[400px] h-screen bg-white shadow-lg z-50"
+          className="fixed top-16 right-2 w-[400px] h-screen bg-white shadow-lg z-50 overflow-y-scroll"
         >
           <RightSide onClose={hideRightSide} />
         </div>
       )}
+      {/* <div className="flex justify-center items-center ">
+        <Modal />
+      </div> */}
     </div>
   );
 };
