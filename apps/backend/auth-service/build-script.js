@@ -44,37 +44,53 @@ esbuild
   })
   .then(() => {
     // Copy swagger.json after successful build
-    fs.copySync(
-      path.resolve(__dirname, "src/docs/swagger.json"),
-      path.resolve(__dirname, "build/docs/swagger.json")
-    );
-    console.log("Swagger JSON copied successfully!");
+    try {
+      fs.copySync(
+        path.resolve(__dirname, "src/docs/swagger.json"),
+        path.resolve(__dirname, "build/docs/swagger.json")
+      );
+      console.log("Swagger JSON copied successfully!");
+    } catch (error) {
+      console.error("Error copying swagger.json:", error);
+    }
 
     // Copy package.json for dependency reference in production
-    fs.copySync(
-      path.resolve(__dirname, "package.json"),
-      path.resolve(__dirname, "build/package.json")
-    );
-    console.log("Package.json copied successfully!");
+    try {
+      fs.copySync(
+        path.resolve(__dirname, "package.json"),
+        path.resolve(__dirname, "build/package.json")
+      );
+      console.log("Package.json copied successfully!");
+    } catch (error) {
+      console.error("Error copying package.json:", error);
+    }
 
     // Copy .env.production
     const envFilePath = path.resolve(__dirname, "src/configs/.env.development");
     if (fs.existsSync(envFilePath)) {
-      fs.copySync(
-        envFilePath,
-        path.resolve(__dirname, "build/configs/.env.production")
-      );
-      console.log("Environment file copied successfully!");
+      try {
+        fs.copySync(
+          envFilePath,
+          path.resolve(__dirname, "build/configs/.env.production")
+        );
+        console.log(".env.development file copied successfully!");
+      } catch (error) {
+        console.error("Error copying .env.development:", error);
+      }
     } else {
       console.error("Environment file does not exist:", envFilePath);
     }
 
     // Copy ecosystem.config.js for PM2 configuration in production
-    fs.copySync(
-      path.resolve(__dirname, "ecosystem.config.js"),
-      path.resolve(__dirname, "build/ecosystem.config.js")
-    );
-    console.log("Ecosystem Config copied successfully!");
+    try {
+      fs.copySync(
+        path.resolve(__dirname, "ecosystem.config.js"),
+        path.resolve(__dirname, "build/ecosystem.config.js")
+      );
+      console.log("Ecosystem Config copied successfully!");
+    } catch (error) {
+      console.error("Error copying ecosystem.config.js:", error);
+    }
   })
   .catch((error) => {
     console.error("Build failed:", error);
