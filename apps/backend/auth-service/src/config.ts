@@ -21,17 +21,18 @@ type Config = {
 
 // Function to load and validate environment variables
 function loadConfig(): Config {
-  // Determine the environment and set the appropriate .env file
+  // Force NODE_ENV to 'production' in the production build
   const env = process.env.NODE_ENV || "development";
-  const envPath = path.resolve(__dirname, `./configs/.env.${env}`);
+  const envFileName = env === "production" ? ".env.production" : `.env.${env}`;
+  const envPath = path.resolve(__dirname, `./configs/${envFileName}`);
 
-  // Attempt to load environment variables
+  // Load environment variables
   const result = dotenv.config({ path: envPath });
   if (result.error) {
     throw new Error(`Failed to load .env file at ${envPath}: ${result.error}`);
   }
 
-  // Define a schema for the environment variables
+  // Define schema for validation
   const envVarsSchema = Joi.object({
     NODE_ENV: Joi.string().valid("development", "production").required(),
     PORT: Joi.number().default(3000),
@@ -44,14 +45,14 @@ function loadConfig(): Config {
     AWS_COGNITO_DOMAIN: Joi.string().required(),
     AWS_REDIRECT_URI: Joi.string().required(),
     CLIENT_URL: Joi.string().required(),
-    USER_SERVICE_URL: Joi.string(),
+    USER_SERVICE_URL: Joi.string().optional(), // Optional
     AWS_ACCESS_KEY_ID: Joi.string().required(),
     AWS_SECRET_ACCESS_KEY: Joi.string().required(),
   })
     .unknown()
     .required();
 
-  // Validate the environment variables
+  // Validate environment variables
   const { value: envVars, error } = envVarsSchema.validate(process.env, {
     abortEarly: false,
   });
