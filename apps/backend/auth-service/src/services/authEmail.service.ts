@@ -74,7 +74,7 @@ export const signInUser = async (email: string, password: string) => {
 
     const command = new AdminInitiateAuthCommand({
       AuthFlow: "ADMIN_NO_SRP_AUTH",
-      UserPoolId: process.env.COGNITO_USER_POOL_ID!,
+      UserPoolId: process.env.AWS_COGNITO_USER_POOL_ID!,
       ClientId: clientId,
       AuthParameters: {
         USERNAME: email,
@@ -124,7 +124,7 @@ export const confirmSignUp = async (
 export const deleteUser = async (email: string) => {
   try {
     const command = new AdminDeleteUserCommand({
-      UserPoolId: process.env.COGNITO_USER_POOL_ID!,
+      UserPoolId: process.env.AWS_COGNITO_USER_POOL_ID!,
       Username: email,
     });
     const response = await cognitoClient.send(command);

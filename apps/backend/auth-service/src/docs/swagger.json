@@ -139,7 +139,7 @@
 				"description": "Initiate Google Sign-In",
 				"summary": "Initiates the Google Sign-In process and redirects to Google's authorization page.",
 				"tags": [
-					"GoogleAuth"
+					"Google Intergrate AWS Cognito"
 				],
 				"security": [],
 				"parameters": []
@@ -174,7 +174,7 @@
 				"description": "Google Callback",
 				"summary": "Handles the callback from Google with the authorization code.",
 				"tags": [
-					"GoogleAuth"
+					"Google Intergrate AWS Cognito"
 				],
 				"security": [],
 				"parameters": [
@@ -219,7 +219,7 @@
 				"description": "Sign Out",
 				"summary": "Signs out the user by revoking the refresh token and clearing cookies.",
 				"tags": [
-					"GoogleAuth"
+					"Google Intergrate AWS Cognito"
 				],
 				"security": [],
 				"parameters": [],

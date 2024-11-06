@@ -25,7 +25,7 @@ import { saveUserToDB } from "../database/services/user.service"; // MongoDB ser
  * Controller for handling Google authentication.
  */
 @Route("/v1/auth")
-@Tags("GoogleAuth")
+@Tags("Google Intergrate AWS Cognito")
 export class GoogleAuthController extends Controller {
   /**
    * Initiate Google Sign-In
