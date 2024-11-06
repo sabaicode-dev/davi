@@ -80,10 +80,10 @@ const Footer: React.FC = () => {
               <Link href="/service">Service </Link>
             </li>
             <li className="pt-2">
-              <Link href="/service">Resource </Link>
+              <Link href="/resource">Resource </Link>
             </li>
             <li className="pt-2">
-              <Link href="/service">Pricing</Link>
+              <Link href="/pricing">Pricing</Link>
             </li>
             {/* <li className="pt-2">
               <Link href="/service">Data Analyst </Link>
@@ -93,19 +93,13 @@ const Footer: React.FC = () => {
 
         {/* About Section - Hidden on Mobile */}
         <div className="hidden sm:block text-left">
-          <h3 className="text-xl font-bold mb-3">Resource</h3>
+          <h3 className="text-xl font-bold mb-3">Quickly</h3>
           <ul className="space-y-2 text-sm">
             <li className="pt-2">
               <Link href="/about">About </Link>
             </li>
             <li className="pt-2">
-              <Link href="/about">Blog </Link>
-            </li>
-            <li className="pt-2">
-              <Link href="/about">Docs </Link>
-            </li>
-            <li className="pt-2">
-              <Link href="/contact">Contact </Link>
+              <Link href="/contact">Contact Us </Link>
             </li>
           </ul>
         </div>
