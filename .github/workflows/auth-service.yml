@@ -77,14 +77,14 @@ jobs:
         uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.EC2_IP }}
-          username: ${{ secrets.EC2_USERNAME }} # Update as per your setup
+          username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           source: "./apps/backend/auth-service/build/*"
           target: "/home/ubuntu/apps/auth-service/build"
           strip_components: 4
 
-      - name: Configure npm to use GitHub Packages
+      - name: Configure npm to use GitHub Packages on EC2
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.EC2_IP }}
@@ -92,7 +92,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
-            echo "@sokritha-sabaicode:registry=https://npm.pkg.github.com/" > /home/ubuntu/apps/auth-service/build/.npmrc
+            echo "@datacatalog2024:registry=https://npm.pkg.github.com" > /home/ubuntu/apps/auth-service/build/.npmrc
             echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" >> /home/ubuntu/apps/auth-service/build/.npmrc
 
       - name: Create .env File
@@ -103,6 +103,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
+            rm -f /home/ubuntu/apps/auth-service/build/configs/.env.production
             echo "NODE_ENV=${{ secrets.NODE_ENV }}" > /home/ubuntu/apps/auth-service/build/configs/.env.production
             echo "PORT=${{ secrets.AUTH_PORT }}" >> /home/ubuntu/apps/auth-service/build/configs/.env.production
             echo "AWS_COGNITO_REGION=${{ secrets.AWS_COGNITO_REGION }}" >> /home/ubuntu/apps/auth-service/build/configs/.env.production
@@ -125,12 +126,11 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
-            # Initialize NVM if it's installed
+            # Initialize NVM if it's installed, or install it if missing
             export NVM_DIR="$HOME/.nvm"
             if [ -s "$NVM_DIR/nvm.sh" ]; then
               . "$NVM_DIR/nvm.sh"
             else
-              # Install NVM if it’s not already installed
               curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
               . "$NVM_DIR/nvm.sh"
             fi
@@ -139,6 +139,7 @@ jobs:
             nvm install 20
             nvm use 20
             npm install -g yarn pm2
+            . ~/.bashrc  # Ensure the environment is updated for non-interactive shells
 
             # Navigate to the application directory and install production dependencies
             cd /home/ubuntu/apps/auth-service/build
