@@ -58,7 +58,7 @@ const Button: React.FC<ButtonProps> = ({
   }[radius];
 
   const colorStyles = {
-    primary: "bg-[#9593A1] text-white border-[#9593A1] hover:bg-[#9593A1]",
+    primary: "bg-[#9593A1] text-white border-[#9593A1] hover:bg-blue-600",
     danger: "bg-red-500 text-white border-2 border-red-500 hover:bg-red-600",
     secondary:
       "bg-blue-500 text-white border-2 border-blue-500 hover:bg-blue-600 hover:border-blue-600",
