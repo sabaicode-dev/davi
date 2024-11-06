@@ -16,25 +16,23 @@ esbuild
     },
     plugins: [
       copy({
-        assets: [
-          {
-            from: "./node_modules/swagger-ui-dist/*.css",
-            to: "./build/swagger-ui-dist",
-          },
-          {
-            from: "./node_modules/swagger-ui-dist/*.js",
-            to: "./build/swagger-ui-dist",
-          },
-          {
-            from: "./node_modules/swagger-ui-dist/*.png",
-            to: "./build/swagger-ui-dist",
-          },
-          {
-            from: "./src/configs/.env.production",
-            to: "./build/configs/.env.production",
-          },
-        ],
+        assets: {
+          from: [
+            "./node_modules/swagger-ui-dist/*.css",
+            "./node_modules/swagger-ui-dist/*.js",
+            "./node_modules/swagger-ui-dist/*.png",
+          ],
+          to: ["./"],
+        },
       }),
+      {
+        name: "log-success-after-copy",
+        setup(build) {
+          build.onEnd(() => {
+            console.log("Assets copied successfully");
+          });
+        },
+      },
     ],
     resolveExtensions: [".ts", ".js"],
     define: {
@@ -58,6 +56,18 @@ esbuild
       path.resolve(__dirname, "build/package.json")
     );
     console.log("Package.json copied successfully!");
+
+    // Copy .env.production
+    const envFilePath = path.resolve(__dirname, "src/configs/.env.development");
+    if (fs.existsSync(envFilePath)) {
+      fs.copySync(
+        envFilePath,
+        path.resolve(__dirname, "build/configs/.env.production")
+      );
+      console.log("Environment file copied successfully!");
+    } else {
+      console.error("Environment file does not exist:", envFilePath);
+    }
 
     // Copy ecosystem.config.js for PM2 configuration in production
     fs.copySync(
