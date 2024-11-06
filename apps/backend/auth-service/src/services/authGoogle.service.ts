@@ -4,7 +4,13 @@ import path from "path";
 // import { fetch } from "undici"; // Use fetch from undici
 
 // Specify the path to your .env file
-dotenv.config({ path: path.resolve(__dirname, `../configs/.env.development`) });
+const env = process.env.NODE_ENV || "development";
+const envPath =
+  env === "production"
+    ? path.resolve(__dirname, `./configs/.env.${env}`)
+    : path.resolve(__dirname, `../configs/.env.${env}`);
+
+dotenv.config({ path: envPath });
 
 const {
   AWS_COGNITO_DOMAIN,
@@ -13,7 +19,7 @@ const {
   AWS_REDIRECT_URI,
 } = process.env;
 
-console.log("AWS_COGNITO_DOMAIN:", AWS_COGNITO_DOMAIN);
+console.log("AWS_COGNITO_DOMAIN kk:", AWS_COGNITO_DOMAIN);
 console.log("AWS_COGNITO_CLIENT_ID:", AWS_COGNITO_CLIENT_ID);
 console.log("AWS_COGNITO_CLIENT_SECRET:", AWS_COGNITO_CLIENT_SECRET);
 console.log("AWS_REDIRECT_URI:", AWS_REDIRECT_URI);

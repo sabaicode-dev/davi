@@ -65,8 +65,8 @@ esbuild
       console.error("Error copying package.json:", error);
     }
 
-    // Copy .env.production file to build directory
-    const envFilePath = path.resolve(__dirname, "src/configs/.env.production");
+    // Copy .env.development file to build directory
+    const envFilePath = path.resolve(__dirname, "src/configs/.env.development");
     if (fs.existsSync(envFilePath)) {
       try {
         fs.copySync(
