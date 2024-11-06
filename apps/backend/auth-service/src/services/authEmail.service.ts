@@ -55,8 +55,12 @@ export const signUpUser = async (email: string, password: string) => {
 
     const response = await cognitoClient.send(command);
 
-    // Save the user in MongoDB
-    await UserRepository.createUser(email, response.UserSub!);
+    // Save the user in MongoDB with unconfirmed status
+    if (response.UserSub) {
+      await UserRepository.createUser(email, response.UserSub, {
+        confirmed: false,
+      });
+    }
 
     return response;
   } catch (error: any) {
@@ -110,7 +114,7 @@ export const confirmSignUp = async (
 
     const response = await cognitoClient.send(command);
 
-    // Mark user as confirmed in MongoDB
+    // Update user to confirmed status in MongoDB
     await UserRepository.confirmUser(email);
 
     return response;

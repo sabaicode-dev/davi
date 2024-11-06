@@ -2,7 +2,11 @@
 import User, { IUser } from "../models/user.models";
 
 class UserRepository {
-  async createUser(email: string, cognitoUserId: string): Promise<IUser> {
+  async createUser(
+    email: string,
+    cognitoUserId: string,
+    _p0: { confirmed: boolean }
+  ): Promise<IUser> {
     const user = new User({ email, cognitoUserId, confirmed: false });
     return await user.save();
   }
