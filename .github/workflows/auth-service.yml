@@ -3,12 +3,12 @@ name: CI/CD Pipeline for Auth Service
 on:
   pull_request:
     branches:
-      - main
+      - google-conito
     paths:
       - "apps/backend/auth-service/**"
   push:
     branches:
-      - main
+      - google-conito
     paths:
       - "apps/backend/auth-service/**"
 
@@ -51,7 +51,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: build
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/google-conito'
 
     steps:
       - name: Checkout code
