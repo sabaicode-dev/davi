@@ -42,7 +42,7 @@ function loadConfig(): Config {
     AWS_COGNITO_DOMAIN: Joi.string().required(),
     AWS_REDIRECT_URI: Joi.string().required(),
     CLIENT_URL: Joi.string().required(),
-    USER_SERVICE_URL: Joi.string().required(),
+    USER_SERVICE_URL: Joi.string(),
     AWS_ACCESS_KEY_ID: Joi.string().required(),
     AWS_SECRET_ACCESS_KEY: Joi.string().required(),
   })
