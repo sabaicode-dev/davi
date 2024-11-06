@@ -1,7 +1,7 @@
 import React from "react";
 import FileIcon from "@/public/images/file.png";
-import TrashBin from "@/public/images/trash-01.png";
-
+import Button from "./Button";
+import { DeleteIcon } from "./icons/Icon";
 interface CardProps {
   index: number;
   onDelete: () => void;
@@ -28,13 +28,21 @@ const Card: React.FC<CardProps> = ({ index, onDelete }) => {
           <p>Tech requirements.csv</p>
           <p>200 KB</p>
         </div>
-        <button
+        <Button
           type="button"
           onClick={onDelete}
-          className="flex justify-center items-center"
+          children={<DeleteIcon />}
+          color="none"
+          className="text-red-500 !bg-transparent"
+        />
+        {/* <button
+          type="button"
+          onClick={onDelete}
+          className="flex justify-center items-center text-red-500"
+          
         >
-          <img src={TrashBin} alt="Delete Icon" width={24} />
-        </button>
+          <DeleteIcon/>
+        </button> */}
       </div>
     </div>
   );

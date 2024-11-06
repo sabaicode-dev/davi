@@ -8,14 +8,21 @@ import {
   DownloadIcon,
   VisualizeIcon,
 } from "@/src/components/atoms/icons/Icon";
+
 import { CiFilter } from "react-icons/ci";
 import RightSide from "../molecules/right-side/RightSide";
-import Modal from "../molecules/modals/Modal";
+import DataTransformCard from "../atoms/DataTransformCard";
 
 const ShowResuleCleaning: React.FC = () => {
   // State to manage the visibility of RightSide
   const [isRightSideVisible, setIsRightSideVisible] = useState(false);
+  // State to manage the visibility of DataTransformCard
+  const [isDataTransformVisible, setIsDataTransformVisible] = useState(false);
+
   const rightSideRef = useRef<HTMLDivElement | null>(null);
+  const dataTransformRef = useRef<HTMLDivElement | null>(null);
+
+  // Function to handle showing the RightSide component
   const showRightSide = () => {
     setIsRightSideVisible(true);
   };
@@ -23,6 +30,18 @@ const ShowResuleCleaning: React.FC = () => {
   const hideRightSide = () => {
     setIsRightSideVisible(false);
   };
+
+  // Function to show DataTransformCard
+  const showDataTransform = () => {
+    setIsDataTransformVisible(true);
+  };
+
+  // Function to hide DataTransformCard
+  const hideDataTransform = () => {
+    setIsDataTransformVisible(false);
+  };
+
+  // Event listener to detect clicks outside RightSide or DataTransformCard to hide them
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -31,18 +50,29 @@ const ShowResuleCleaning: React.FC = () => {
       ) {
         hideRightSide();
       }
+      if (
+        dataTransformRef.current &&
+        !dataTransformRef.current.contains(event.target as Node)
+      ) {
+        hideDataTransform();
+      }
     };
 
-    // Attach the event listener when RightSide is visible
-    if (isRightSideVisible) {
+    // Attach the event listener when either component is visible
+    if (isRightSideVisible || isDataTransformVisible) {
       document.addEventListener("mousedown", handleClickOutside);
     }
 
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [isRightSideVisible]);
+  }, [isRightSideVisible, isDataTransformVisible]);
 
+  //mock data for column and row in table
+  const ColandRowNumber = {
+    columnNumber: 100,
+    rowNumber: 200,
+  };
   return (
     <div className="relative flex flex-col mt-8" style={{ width: "100%" }}>
       <div className="flex flex-row justify-between items-center mb-3">
@@ -143,9 +173,35 @@ const ShowResuleCleaning: React.FC = () => {
           <RightSide onClose={hideRightSide} />
         </div>
       )}
-      {/* <div className="flex justify-center items-center ">
-        <Modal />
-      </div> */}
+
+      {/* Conditionally render DataTransformCard as a pop-up */}
+      {isDataTransformVisible && (
+        <div
+          ref={dataTransformRef}
+          className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+        >
+          <div>
+            <DataTransformCard
+              hideDataTransform={hideDataTransform}
+              numbers={ColandRowNumber}
+            />
+          </div>
+        </div>
+      )}
+
+      <div className="flex justify-end items-end space-x-5 mt-5">
+        <Button
+          color="outline"
+          radius="medium"
+          size="medium"
+          onClick={showDataTransform} // Show DataTransformCard on click
+        >
+          Transform
+        </Button>
+        <Button radius="medium" size="medium" color="secondary">
+          Next
+        </Button>
+      </div>
     </div>
   );
 };
