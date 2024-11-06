@@ -1,6 +1,11 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
-import { DatasetIcon, GraphIcon, HelpIcon, ProjectIcon } from "@/src/components/atoms/icons/Icon";
+import {
+  DatasetIcon,
+  GraphIcon,
+  HelpIcon,
+  ProjectIcon,
+} from "@/src/components/atoms/icons/Icon";
 
 interface MenuItem {
   name: string;
@@ -34,8 +39,9 @@ const menuItems: MenuItem[] = [
 
 const Sidebar: React.FC = () => {
   return (
-    <aside className="bg-white shadow-md text-currentColor fixed left-0 top-14 px-8 mt-6">
-      <nav className="">
+    // Change here
+    <aside className="w-[120px] h-full bg-white shadow-md text-currentColor fixed left-0 top-14 px-8">
+      <nav className="mt-8">
         <ul>
           {menuItems.map((item, index) => (
             <li key={index} className="mb-6">

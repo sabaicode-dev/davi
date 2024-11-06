@@ -1,11 +1,12 @@
 import React, { useState, ChangeEvent, useEffect } from "react";
+import axios from "axios";
 import { AiOutlineLogout } from "react-icons/ai";
 
 const AccountSettings: React.FC = () => {
-  // State for input values and errors
   const [user, setUser] = useState({
     firstName: "",
     lastName: "",
+    email: "", // Adding email to user state
   });
   const [errors, setErrors] = useState({
     firstName: "",
@@ -19,6 +20,24 @@ const AccountSettings: React.FC = () => {
 
   // Regex for validating name fields
   const nameRegex = /\b([A-ZÀ-ÿ][-,a-z. ']+[ ]*)+/;
+
+  // Fetch user data on component mount
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await axios.get("/api/user"); // Fetching the user's details
+        setUser({
+          firstName: response.data.firstName || "",
+          lastName: response.data.lastName || "",
+          email: response.data.email || "", // Set email from the fetched data
+        });
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
 
   // Validate inputs when they change
   const validateInputs = () => {
@@ -49,10 +68,22 @@ const AccountSettings: React.FC = () => {
     setTouched((prevTouched) => ({ ...prevTouched, [name]: true }));
   };
 
-  // Revalidate inputs whenever user data changes
   useEffect(() => {
     validateInputs();
-  }, [user]);
+  }, [user.firstName, user.lastName]);
+
+  // Function to update user name on the backend
+  const updateUser = async () => {
+    try {
+      const response = await axios.put("/api/user", {
+        firstName: user.firstName,
+        lastName: user.lastName,
+      }); // Backend route to update user details
+      console.log("User updated successfully:", response.data);
+    } catch (error) {
+      console.error("Error updating user:", error);
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,9 +96,9 @@ const AccountSettings: React.FC = () => {
 
     // If form is valid, perform the save and reset
     if (isButtonEnabled) {
-      console.log("Form submitted successfully:", user);
-      // Reset form and touched state after successful submission
+      updateUser();
       setUser({
+        ...user,
         firstName: "",
         lastName: "",
       });
@@ -75,6 +106,17 @@ const AccountSettings: React.FC = () => {
         firstName: false,
         lastName: false,
       });
+    }
+  };
+
+  // Logout function
+  const handleLogout = async () => {
+    try {
+      const response = await axios.post("/api/logout"); // Backend route to log out
+      console.log("Logged out successfully:", response.data);
+      window.location.href = "/login"; // Redirect to login page
+    } catch (error) {
+      console.error("Error logging out:", error);
     }
   };
 
@@ -153,11 +195,11 @@ const AccountSettings: React.FC = () => {
         </div>
       </form>
 
-      {/* Email Section */}
+      {/* Dynamic Email Display */}
       <div className="bg-gray-50 shadow-sm rounded-lg pt-3 mb-9 border-2 border-gray-200">
         <h3 className="text-lg font-medium text-gray-700 mb-2 px-5">Email</h3>
         <div className="bg-white px-5 py-4 border-t-2 rounded-br-lg rounded-bl-lg border-gray-200">
-          <p className="text-gray-800 mb-1">KImkim@gmail.com</p>
+          <p className="text-gray-800 mb-1">{user.email || "Loading..."}</p>
           <p className="text-sm text-gray-500 mb-1">
             Your account is authenticated through Google.
           </p>
@@ -170,7 +212,10 @@ const AccountSettings: React.FC = () => {
           <h3 className="text-lg font-medium text-gray-700">
             Login Management
           </h3>
-          <button className="bg-[#F21616] text-white px-4 py-2 rounded-md text-sm font-medium flex items-center hover:bg-red-600 transition">
+          <button
+            onClick={handleLogout}
+            className="bg-[#F21616] text-white px-4 py-2 rounded-md text-sm font-medium flex items-center hover:bg-red-600 transition"
+          >
             <AiOutlineLogout size={16} className="mt-[3px] mr-1" />
             Log Out
           </button>
