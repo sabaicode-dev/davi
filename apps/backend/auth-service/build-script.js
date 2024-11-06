@@ -10,7 +10,7 @@ esbuild
     platform: "node",
     target: "node20",
     outdir: "build",
-    external: ["express"], // Specify external packages
+    external: ["express"], // Keep external dependencies not needed in bundle
     loader: {
       ".ts": "ts",
     },
@@ -65,17 +65,17 @@ esbuild
       console.error("Error copying package.json:", error);
     }
 
-    // Copy .env.production
-    const envFilePath = path.resolve(__dirname, "src/configs/.env.development");
+    // Copy .env.production file to build directory
+    const envFilePath = path.resolve(__dirname, "src/configs/.env.production");
     if (fs.existsSync(envFilePath)) {
       try {
         fs.copySync(
           envFilePath,
           path.resolve(__dirname, "build/configs/.env.production")
         );
-        console.log(".env.development file copied successfully!");
+        console.log(".env.production file copied successfully!");
       } catch (error) {
-        console.error("Error copying .env.development:", error);
+        console.error("Error copying .env.production:", error);
       }
     } else {
       console.error("Environment file does not exist:", envFilePath);

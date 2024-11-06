@@ -2,15 +2,38 @@ import dotenv from "dotenv";
 import path from "path";
 import Joi from "joi";
 
-// Load environment variables based on NODE_ENV
+// Define a TypeScript type for the configuration
+type Config = {
+  env: string;
+  port: number;
+  mongodbURL: string;
+  awsCognitoRegion: string;
+  awsCognitoUserPoolId: string;
+  awsCognitoClientId: string;
+  awsCognitoClientSecret: string;
+  awsCognitoIdentityPoolId: string;
+  awsCognitoDomain: string;
+  awsRedirectUri: string;
+  clientUrl: string;
+  userServiceUrl?: string;
+  awsAccessKeyId: string;
+  awsSecretAccessKey: string;
+};
+
+// Determine the correct .env file based on NODE_ENV
 const envPath =
   process.env.NODE_ENV === "production"
     ? path.resolve(__dirname, "configs/.env.production")
     : path.resolve(__dirname, "configs/.env.development");
 
-dotenv.config({ path: envPath }); // Load the environment file
+// Load environment variables from the determined .env file
+dotenv.config({ path: envPath });
 
-// Define schema for validation using Joi
+// Debug log to confirm loading
+console.log("Loaded environment file from:", envPath);
+console.log("AWS_COGNITO_DOMAIN:", process.env.AWS_COGNITO_DOMAIN); // Debug check
+
+// Define schema for environment variables validation using Joi
 const envVarsSchema = Joi.object({
   NODE_ENV: Joi.string().valid("development", "production").required(),
   PORT: Joi.number().default(3000),
@@ -23,14 +46,14 @@ const envVarsSchema = Joi.object({
   AWS_COGNITO_DOMAIN: Joi.string().required(),
   AWS_REDIRECT_URI: Joi.string().required(),
   CLIENT_URL: Joi.string().required(),
-  USER_SERVICE_URL: Joi.string().optional(),
+  USER_SERVICE_URL: Joi.string().optional(), // Optional environment variable
   AWS_ACCESS_KEY_ID: Joi.string().required(),
   AWS_SECRET_ACCESS_KEY: Joi.string().required(),
 })
   .unknown()
   .required();
 
-// Validate environment variables
+// Validate the loaded environment variables against the schema
 const { value: envVars, error } = envVarsSchema.validate(process.env, {
   abortEarly: false,
 });
@@ -43,8 +66,8 @@ if (error) {
   );
 }
 
-// Export validated config
-const configs = {
+// Export the validated configuration
+const configs: Config = {
   env: envVars.NODE_ENV,
   port: envVars.PORT,
   mongodbURL: envVars.MONGODB_URL,
