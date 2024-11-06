@@ -1,6 +1,6 @@
-import ShowTable from "@/src/components/Templates/ShowTable";
+import ShowTable from "@/src/components/templates/ShowTable";
 import { useState } from "react";
-import DisplayTable from "@/src/components/Templates/DisplayTable";
+import DisplayTable from "@/src/components/templates/DisplayTable";
 const initialList = [
   { id: 1, table: "table1" },
   { id: 2, table: "table2" },

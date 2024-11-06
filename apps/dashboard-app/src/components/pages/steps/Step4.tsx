@@ -1,6 +1,8 @@
 // src/components/Step4.tsx
 import React from "react";
+import { useState } from "react";
 import Logo from "@/public/images/step/step4_pic.png";
+
 
 interface Step4Props {
   onNext: () => void;
@@ -9,8 +11,28 @@ interface Step4Props {
 }
 
 const Step4: React.FC<Step4Props> = ({ onNext, onBack, selectedSource }) => {
+  const [url, setUrl] = useState(""); // State to manage the URL input
+  const [error, setError] = useState(""); // State to manage the error message
+
+  const handleNext = () => {
+    const urlPattern = new RegExp(
+      "^(https?:\\/\\/(www\\.)?|www\\.)[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}(:[0-9]{1,5})?(\\/.*)?$"
+    );
+
+    if (url.trim() === "") {
+      setError("Please enter your URL.");
+      return; // Prevent moving to the next step if URL is empty
+    } else if (!urlPattern.test(url)) {
+      setError("Please enter a valid URL.");
+      return; // Prevent moving to the next step if URL is invalid
+    }
+
+    setError(""); // Clear error if URL is valid
+    onNext(); // Proceed to the next step
+  };
+
   return (
-    <div className="mx-auto max-w-4xl bg-white  p-10">
+    <div className="mx-auto max-w-4xl bg-white p-10">
       <div className="flex w-full ">
         {/* Left Image Section */}
         <div className="flex-1 p-8">
@@ -45,8 +67,11 @@ const Step4: React.FC<Step4Props> = ({ onNext, onBack, selectedSource }) => {
                 type="url"
                 id="shareLink"
                 placeholder="www.example.com/product"
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
                 className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
               />
+              {error && <p className="text-red-600 text-sm mt-1">{error}</p>} {/* Display error message */}
             </div>
           </div>
 
@@ -59,7 +84,7 @@ const Step4: React.FC<Step4Props> = ({ onNext, onBack, selectedSource }) => {
               Back
             </button>
             <button
-              onClick={onNext}
+              onClick={handleNext}
               className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none"
             >
               Next
@@ -69,7 +94,7 @@ const Step4: React.FC<Step4Props> = ({ onNext, onBack, selectedSource }) => {
           {/* Step indicator */}
         </div>
       </div>
-      <div className="flex justify-center mt-6">
+      <div className="flex justify-center mt-12">
         <div className="h-1 w-8 bg-blue-600 rounded-full mx-1"></div>
         <div className="h-1 w-8 bg-blue-600 rounded-full mx-1"></div>
         <div className="h-1 w-8 bg-blue-600 rounded-full mx-1"></div>

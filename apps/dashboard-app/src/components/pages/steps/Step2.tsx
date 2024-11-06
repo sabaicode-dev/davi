@@ -1,15 +1,44 @@
 // Step2.tsx
+
 import React from "react";
 import Logo from "@/public/images/step/step2_pic.png";
-
+import Button from "../../atoms/Button";
+import { useState } from "react";
 interface Step2Props {
   onNext: () => void;
   onBack: () => void;
 }
 
 const Step2: React.FC<Step2Props> = ({ onNext, onBack }) => {
+  const [projectName, setProjectName] = useState("");
+  const [description, setDescription] = useState("");
+  const [errorMessages, setErrorMessages] = useState({
+    projectName: "",
+    description: ""
+  });
+
+  const handleNext = () => {
+    let isValid = true;
+    const newErrorMessages = { projectName: "", description: "" };
+
+    if (projectName.trim() === "") {
+      newErrorMessages.projectName = "Please input your project name.";
+      isValid = false;
+    }
+    if (description.trim() === "") {
+      newErrorMessages.description = "Please input your descriptions.";
+      isValid = false;
+    }
+
+    setErrorMessages(newErrorMessages);
+
+    if (isValid) {
+      onNext(); // Proceed to the next step if both fields are valid
+    }
+  };
+
   return (
-    <div className="mx-auto  max-w-4xl  p-10">
+    <div className="mx-auto max-w-4xl p-10">
       <div className="flex ">
         {/* Left Image Section */}
         <div className="flex-1 p-8">
@@ -37,8 +66,13 @@ const Step2: React.FC<Step2Props> = ({ onNext, onBack }) => {
               type="text"
               id="projectName"
               placeholder="Enter name..."
+              value={projectName}
+              onChange={(e) => setProjectName(e.target.value)}
               className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
+            {errorMessages.projectName && (
+              <p className="text-red-600 text-sm mt-1">{errorMessages.projectName}</p>
+            )}
           </div>
 
           <div className="mb-6">
@@ -48,34 +82,48 @@ const Step2: React.FC<Step2Props> = ({ onNext, onBack }) => {
             <textarea
               id="description"
               placeholder="Enter details to visualize and showcase your product information efficiently"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
               className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
               rows={3}
             ></textarea>
+            {errorMessages.description && (
+              <p className="text-red-600 text-sm mt-1">{errorMessages.description}</p>
+            )}
           </div>
 
           <div className="flex justify-between">
-            <button
+            <Button
               onClick={onBack}
-              className="px-4 py-2 text-gray-600 bg-gray-200 rounded-md hover:bg-gray-300 focus:outline-none"
-            >
-              Back
-            </button>
-            <button
-              onClick={onNext}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none"
-            >
-              Next
-            </button>
+              children="Back"
+              size="medium"
+              radius="2xl"
+              color="outline"
+              isLoading={false}
+              isIconOnly={false}
+              isDisabled={false}
+            />
+
+            <Button
+              onClick={handleNext}
+              children="Next"
+              size="small"
+              radius="2xl"
+              color="secondary"
+              isLoading={false}
+              isIconOnly={false}
+              isDisabled={false}
+            />
           </div>
 
           {/* Step indicator */}
         </div>
       </div>
-        <div className="flex justify-center mt-6">
-          <div className="h-1 w-8 bg-blue-600 rounded-full mx-1"></div>
-          <div className="h-1 w-8 bg-blue-200 rounded-full mx-1"></div>
-          <div className="h-1 w-8 bg-blue-200 rounded-full mx-1"></div>
-        </div>
+      <div className="flex justify-center mt-6">
+        <div className="h-1 w-8 bg-blue-600 rounded-full mx-1"></div>
+        <div className="h-1 w-8 bg-blue-200 rounded-full mx-1"></div>
+        <div className="h-1 w-8 bg-blue-200 rounded-full mx-1"></div>
+      </div>
     </div>
   );
 };

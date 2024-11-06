@@ -1,5 +1,5 @@
 import Logo from "@/public/images/step/step1_pic.png";
-
+import Button from "../../atoms/Button";
 interface StepProps {
   onNext: () => void;
 }
@@ -23,16 +23,23 @@ export const Step1 = function ({ onNext }: StepProps) {
           <p className="text-gray-600 mt-2">
             Start Your First ETL Pipeline with DAVI
           </p>
-          <p className="text-gray-500 mt-4">
-            Let’s help you set up a new ETL pipeline to transform your data and
-            extract valuable insights.
+          <p className=" text-black mt-4  ">
+            Let’s help you set up a new ETL pipeline to <br /> transform your
+            data and extract valuable <br /> insights.
           </p>
-          <button
-            onClick={onNext}
-            className="mt-6 px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none"
-          >
-            + Start New Project
-          </button>
+          <div className="flex  mt-10 mr-20 ">
+            <Button
+              className="ml-auto py-3"
+              onClick={onNext}
+              children="+ Start New Project"
+              size="small"
+              radius="2xl"
+              color="secondary"
+              isLoading={false}
+              isIconOnly={false}
+              isDisabled={false}
+            />
+          </div>
         </div>
       </div>
     </div>
