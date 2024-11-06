@@ -5,16 +5,16 @@ on:
     branches:
       - google-conito
     paths:
-      - "apps/backend/auth-service/**"
+      - "./apps/backend/auth-service/**"
   push:
     branches:
       - google-conito
     paths:
-      - "apps/backend/auth-service/**"
+      - "./apps/backend/auth-service/**"
 
 defaults:
   run:
-    working-directory: apps/backend/auth-service
+    working-directory: ./apps/backend/auth-service
 
 jobs:
   build:
