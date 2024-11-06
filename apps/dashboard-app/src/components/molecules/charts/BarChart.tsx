@@ -50,9 +50,9 @@ const BarChart: React.FC<BarChartProps> = ({ data, show_category = false }) => {
     plotOptions: {
       bar: {
         horizontal: true,
-        borderRadius: 8,
+        borderRadius: 0,
         distributed: true, // Enable individual bar colors
-        barHeight: "70%",
+        barHeight: "40%",
       },
     },
     dataLabels: {
@@ -102,12 +102,12 @@ const BarChart: React.FC<BarChartProps> = ({ data, show_category = false }) => {
   ];
 
   return (
-    <div className="h-32">
+    <div className="">
       <Chart
         options={chartOptions}
         series={chartSeries}
         type="bar"
-        height={350}
+        height={270}
       />
     </div>
   );
@@ -127,7 +127,6 @@ const BarChartTest: React.FC = () => {
 
   return (
     <div className="w-full h-full mt-24">
-      <h1>Category Distribution</h1>
       <BarChart data={sampleData} show_category={true} />
     </div>
   );
