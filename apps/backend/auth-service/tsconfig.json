@@ -20,7 +20,8 @@
     // Import Files From The Root Directory Using `@` prefix
     "paths": {
       "@/*": ["./*"]
-    }
+    },
+    "skipLibCheck": true
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "**/*.spec.ts"],
