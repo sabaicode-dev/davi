@@ -19,7 +19,7 @@ export default function HomePage() {
       {/* Features Section */}
       <FeaturesSection />
 
-      <Qoute/>
+      <Qoute />
 
       {/* Solutions Section */}
       <SolutionSection />
@@ -27,14 +27,14 @@ export default function HomePage() {
       {/* Integration Section */}
       <IntergrationSection />
 
+      {/* Data Solution */}
+      <DataSolution />
+
       {/* Services Section */}
       <ServiceSection />
 
       {/* Powerful Data Insights Section */}
       <DataInsightSection />
-
-      {/* Data Solution */}
-      <DataSolution />
 
       {/* CTA Section */}
       <CTASection />

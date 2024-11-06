@@ -13,12 +13,12 @@ interface Step3Props {
 
 const Step3: React.FC<Step3Props> = ({ onBack, onSelectSource }) => {
   return (
-    <div className="container ">
+    <div className="container">
       <h2 className="text-xl font-semibold text-gray-800 mb-6 text-center">
         Pick a data source to start
       </h2>
 
-      <div className="mx-auto flex justify-between ml-28 ">
+      <div className="mx-auto flex justify-between items-center space-x-8">
         <div
           onClick={() => onSelectSource("CSV")}
           className="w-72 h-full mx-auto border rounded-lg"

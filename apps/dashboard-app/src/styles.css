@@ -10,6 +10,13 @@
   max-width: 200px;
 }
 
-.max-w{
-  width: 70%;
-} 
+
+.max-height-percentage-table {
+  max-height: 65vh;
+  overflow-y: auto;
+}
+
+
+.overflow-x-auto {
+  overflow-x: auto;
+}

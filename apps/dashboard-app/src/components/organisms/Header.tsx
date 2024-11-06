@@ -4,10 +4,17 @@ import ProfileUser from "@/public/images/header/roem-reaksmey.jpeg";
 import FileImg from "@/public/images/header/status-up.png";
 import { AiOutlineLogout } from "react-icons/ai";
 import { FiUser } from "react-icons/fi";
+import { useNavigate } from "react-router-dom";
 
 const Header: React.FC = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const handleProfileClick = () => {
+    navigate("/accountsetting");
+    closeDropdown();
+  };
 
   const toggleDropdown = () => {
     // Open the notification dropdown and close the profile dropdown if it's open
@@ -152,7 +159,10 @@ const Header: React.FC = () => {
               </button>
             </div>
             <div className="mt-4">
-              <button className="w-full flex items-center p-3 hover:bg-gray-100 rounded-sm space-x-3">
+              <button
+                onClick={handleProfileClick}
+                className="w-full flex items-center p-3 hover:bg-gray-100 rounded-sm space-x-3"
+              >
                 <FiUser size={22} />
                 <span>My Profile</span>
               </button>

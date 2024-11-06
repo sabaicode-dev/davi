@@ -1,10 +1,16 @@
+import DetailVisualize from "../molecules/visualize/DetailVisualize";
+import VisualizeCreated from "../molecules/visualize/Visualize";
+import ShowResuleCleaning from "../project/ShowResultCleaning";
 import DataFlow from "../templates/DataFlow";
-const Project = () => {
+
+
+export default function Project() {
   return (
-    <div>
-      <DataFlow />
+    <div className="h-auto flex justify-center items-center">
+      {/* <ShowResuleCleaning /> */}
+      {/* <VisualizeCreated/> */}
+      {/* <DetailVisualize/> */}
+      <DataFlow/>
     </div>
   );
-};
-
-export default Project;
+}

@@ -14,10 +14,7 @@ interface BarChartProps {
 }
 
 // Define the BarChart component
-export const BarChart: React.FC<BarChartProps> = ({
-  data,
-  show_category = false,
-}) => {
+const BarChart: React.FC<BarChartProps> = ({ data, show_category = false }) => {
   // Count occurrences for each category
   const categoryCounts = data.reduce<Record<string, number>>((acc, item) => {
     acc[item.category] = (acc[item.category] || 0) + 1;
@@ -53,9 +50,9 @@ export const BarChart: React.FC<BarChartProps> = ({
     plotOptions: {
       bar: {
         horizontal: true,
-        borderRadius: 8,
+        borderRadius: 0,
         distributed: true, // Enable individual bar colors
-        barHeight: "70%",
+        barHeight: "40%",
       },
     },
     dataLabels: {
@@ -105,13 +102,34 @@ export const BarChart: React.FC<BarChartProps> = ({
   ];
 
   return (
-    <div>
+    <div className="">
       <Chart
         options={chartOptions}
         series={chartSeries}
         type="bar"
-        height={350}
+        height={270}
       />
     </div>
   );
 };
+
+const BarChartTest: React.FC = () => {
+  // Sample data for the bar chart
+  const sampleData = [
+    { category: "Electronics" },
+    { category: "Clothing" },
+    { category: "Electronics" },
+    { category: "Food" },
+    { category: "Clothing" },
+    { category: "Food" },
+    { category: "Food" },
+  ];
+
+  return (
+    <div className="w-full h-full mt-24">
+      <BarChart data={sampleData} show_category={true} />
+    </div>
+  );
+};
+
+export { BarChart, BarChartTest };

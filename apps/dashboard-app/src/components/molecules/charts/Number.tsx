@@ -66,7 +66,7 @@ export const Number: React.FC<NumberProps> = ({ data }) => {
           options={chartOptions} // Pass the correctly typed options
           series={chartSeries} // Pass the series data
           type="bar" // Explicitly set type here for clarity
-          width="100%"
+          width="70%"
           height="100%"
         />
       </div>

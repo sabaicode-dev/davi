@@ -13,10 +13,7 @@ interface PieChartProps {
   show_category?: boolean; // Optional prop to enable/disable categories
 }
 
-export const PieChart: React.FC<PieChartProps> = ({
-  data,
-  show_category = false,
-}) => {
+const PieChart: React.FC<PieChartProps> = ({ data, show_category = false }) => {
   // Count occurrences for each category
   const categoryCounts = data.reduce<Record<string, number>>((acc, item) => {
     acc[item.category] = (acc[item.category] || 0) + 1;
@@ -66,8 +63,29 @@ export const PieChart: React.FC<PieChartProps> = ({
         options={chartOptions}
         series={series}
         type="pie"
-        height={350}
+        height={270}
       />
     </div>
   );
 };
+
+const PieChartTest: React.FC = () => {
+  // Sample data for the pie chart
+  const sampleData = [
+    { category: "Electronics" },
+    { category: "Clothing" },
+    { category: "Electronics" },
+    { category: "Food" },
+    { category: "Clothing" },
+    { category: "Food" },
+    { category: "Food" },
+  ];
+
+  return (
+    <div className="">
+      <PieChart data={sampleData} show_category={true} />
+    </div>
+  );
+};
+
+export { PieChart, PieChartTest };
