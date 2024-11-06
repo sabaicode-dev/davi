@@ -23,7 +23,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20" # Use the version of Node.js that your project requires
+          node-version: "20"
 
       - name: Configure npm to use GitHub Packages
         run: |
@@ -95,7 +95,7 @@ jobs:
             echo "@datacatalog2024:registry=https://npm.pkg.github.com" > /home/ubuntu/apps/auth-service/build/.npmrc
             echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" >> /home/ubuntu/apps/auth-service/build/.npmrc
 
-      - name: Create .env File
+      - name: Create .env.production File with Secrets
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.EC2_IP }}
@@ -106,6 +106,7 @@ jobs:
             rm -f /home/ubuntu/apps/auth-service/build/configs/.env.production
             echo "NODE_ENV=${{ secrets.NODE_ENV }}" > /home/ubuntu/apps/auth-service/build/configs/.env.production
             echo "PORT=${{ secrets.AUTH_PORT }}" >> /home/ubuntu/apps/auth-service/build/configs/.env.production
+            echo "MONGODB_URL=${{ secrets.MONGODB_URL }}" >> /home/ubuntu/apps/auth-service/build/configs/.env.production
             echo "AWS_COGNITO_REGION=${{ secrets.AWS_COGNITO_REGION }}" >> /home/ubuntu/apps/auth-service/build/configs/.env.production
             echo "AWS_COGNITO_USER_POOL_ID=${{ secrets.AWS_COGNITO_USER_POOL_ID }}" >> /home/ubuntu/apps/auth-service/build/configs/.env.production
             echo "AWS_COGNITO_CLIENT_ID=${{ secrets.AWS_COGNITO_CLIENT_ID }}" >> /home/ubuntu/apps/auth-service/build/configs/.env.production
@@ -118,7 +119,7 @@ jobs:
             echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}" >> /home/ubuntu/apps/auth-service/build/configs/.env.production
             echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> /home/ubuntu/apps/auth-service/build/configs/.env.production
 
-      - name: Install Dependencies and Restart PM2
+      - name: Install Dependencies and Restart PM2 on EC2
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.EC2_IP }}
@@ -148,8 +149,8 @@ jobs:
             # Start or restart the app using PM2 with direct PM2 commands
             if pm2 show auth-service > /dev/null; then
               echo "Application is running. Restarting..."
-              pm2 restart auth-service
+              pm2 restart auth-service --update-env
             else
               echo "Application is not running. Starting..."
-              pm2 start server.js --name auth-service
+              pm2 start server.js --name auth-service --update-env
             fi
