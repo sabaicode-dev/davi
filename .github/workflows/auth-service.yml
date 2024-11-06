@@ -125,18 +125,24 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
-            # Load the full user environment for non-interactive shells
-            source /home/ubuntu/.nvm/nvm.sh
-            source /home/ubuntu/.profile
+            # Load NVM and set up Node.js environment
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # Load nvm
+            [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # Load nvm bash_completion
 
+            # Ensure the right version of Node is active
+            nvm install node
+            nvm use node
+
+            # Navigate to the application directory and install dependencies
             cd /home/ubuntu/apps/auth-service/build
             yarn install --production
 
-            # Check if the PM2 process is running
+            # Check if the PM2 process is running and manage accordingly
             if pm2 show auth-service > /dev/null; then
               echo "Application is running. Restarting..."
-              yarn restart
+              pm2 restart auth-service
             else
               echo "Application is not running. Starting..."
-              yarn start
+              pm2 start app.js --name auth-service
             fi
