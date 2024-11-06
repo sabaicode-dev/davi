@@ -3,12 +3,8 @@ name: CI/CD Pipeline for Auth Service
 on:
   pull_request:
     branches: [google-conito]
-    paths:
-      - "./apps/backend/auth-service/**"
   push:
     branches: [google-conito]
-    paths:
-      - "./apps/backend/auth-service/**"
 
 defaults:
   run:
