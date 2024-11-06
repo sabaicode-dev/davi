@@ -3,6 +3,7 @@ import path from "path";
 import Joi from "joi";
 
 type Config = {
+  env: string;
   port: number;
   mongodbURL: string;
   awsCognitoRegion: string;
@@ -32,6 +33,7 @@ function loadConfig(): Config {
 
   // Define a schema for the environment variables
   const envVarsSchema = Joi.object({
+    NODE_ENV: Joi.string().valid("development", "production").required(),
     PORT: Joi.number().default(3000),
     MONGODB_URL: Joi.string().required(),
     AWS_COGNITO_REGION: Joi.string().required(),
@@ -62,6 +64,7 @@ function loadConfig(): Config {
   }
 
   return {
+    env: envVars.NODE_ENV,
     port: envVars.PORT,
     mongodbURL: envVars.MONGODB_URL,
     awsCognitoRegion: envVars.AWS_COGNITO_REGION,
