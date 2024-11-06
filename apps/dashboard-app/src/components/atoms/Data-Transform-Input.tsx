@@ -3,7 +3,12 @@ import Button from "./Button";
 import { CloseModalIcon } from "./icons/Icon";
 // import TableTest from "@/src/components/molecules/tables/ShowCleaningResult";
 import Table from "../molecules/tables/Table";
-const DataTransformInput = () => {
+type DataTransformInputProps = {
+  hideDataTransformInput: () => void;
+};
+const DataTransformInput = ({
+  hideDataTransformInput,
+}: DataTransformInputProps) => {
   const headers = [
     { label: "Country", key: "country" },
     { label: "Population", key: "population" },
@@ -86,13 +91,14 @@ const DataTransformInput = () => {
 
   return (
     <>
-      <div className="container max-w-[1135px] w-full z-50">
+      <div className="container w-[1135px] z-50">
         <div className="bg-slate-100 p-5 rounded-xl space-y-5 shadow">
           <header className="flex justify-between items-center">
             <h1 className="font-semibold text-[18px]">Input field empty</h1>
             <Button
               type="button"
               children={<CloseModalIcon />}
+              onClick={hideDataTransformInput}
               color="none"
               className="text-red-500 !p-0 !bg-transparent"
             />

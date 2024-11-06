@@ -1,21 +1,40 @@
-import React from "react";
+import React, { useState, useRef } from "react";
 import Button from "./Button";
 import CandleICon from "@/public/images/candle-2.png";
 import { CloseModalIcon } from "./icons/Icon";
+import DataTransformInput from "./Data-Transform-Input";
 interface DataTransformCardProps {
+  numbers: {
+    columnNumber: number;
+    rowNumber: number;
+  };
   hideDataTransform: () => void;
 }
 
 const DataTransformCard: React.FC<DataTransformCardProps> = ({
   hideDataTransform,
+  numbers,
 }) => {
+  const [isDataTransformInputVisible, setIsDataTransformInputVisible] =
+    useState(false);
+
+  const dataTransformInputRef = useRef<HTMLDivElement | null>(null);
+  // Function to show DataTransformCard
+  const showDataTransformInput = () => {
+    setIsDataTransformInputVisible(true);
+  };
+
+  // Function to hide DataTransformCard
+  const hideDataTransformInput = () => {
+    setIsDataTransformInputVisible(false);
+  };
   return (
     <>
       {/* data transform card */}
-      <div className="container w-[544px] absolute top-48 transform -translate-x-1/2 left-1/2 z-50">
-        <div className="p-5 w-full  bg-white rounded-xl  shadow  space-y-5">
+      <div className="container w-[544px] h-[300px] absolute top-72 transform -translate-x-1/2 left-1/2 z-50">
+        <div className="p-5 w-full  bg-white rounded-xl  shadow  space-y-9 h-full">
           <div className="inline-flex w-full space-x-5">
-            <div className="bg-[#ECFDF3] w-[90px] rounded-full flex justify-center items-center">
+            <div className="bg-[#ECFDF3] w-[85px] rounded-full flex justify-center items-center">
               <div className="bg-[#D1FADF] p-3 rounded-full">
                 <img src={CandleICon} alt="" width={24} />
               </div>
@@ -43,12 +62,25 @@ const DataTransformCard: React.FC<DataTransformCardProps> = ({
             </div>
           </div>
 
-          <section className="flex flex-col ml-32 text-[18px]">
-            <div>Total number of empty column: 1</div>
-            <div>Total number of empty row: 1</div>
+          <section className="flex flex-col ml-32 text-[18px] space-y-3">
+            <div>Total number of empty column: {numbers.columnNumber}</div>
+            <div>Total number of empty row: {numbers.rowNumber}</div>
           </section>
+          {isDataTransformInputVisible && (
+            <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+              <div>
+                <DataTransformInput
+                  hideDataTransformInput={hideDataTransformInput}
+                />
+              </div>
+            </div>
+          )}
           <div className="flex justify-end items-end space-x-5 text-center">
-            <Button radius="medium" color="outline">
+            <Button
+              radius="medium"
+              color="outline"
+              onClick={showDataTransformInput}
+            >
               Preview
             </Button>
             <Button radius="medium" color="secondary">

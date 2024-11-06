@@ -9,7 +9,7 @@ export default function Dataset() {
 
       {/* card1 */}
       <div className="mt-10 space-y-5">
-        <CardContainer numCards={7} />
+        <CardContainer numCards={5} />
       </div>
     </div>
   );

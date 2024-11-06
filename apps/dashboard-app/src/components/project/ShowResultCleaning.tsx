@@ -68,6 +68,11 @@ const ShowResuleCleaning: React.FC = () => {
     };
   }, [isRightSideVisible, isDataTransformVisible]);
 
+  //mock data for column and row in table
+  const ColandRowNumber = {
+    columnNumber: 100,
+    rowNumber: 200,
+  };
   return (
     <div className="relative flex flex-col mt-8" style={{ width: "100%" }}>
       <div className="flex flex-row justify-between items-center mb-3">
@@ -176,7 +181,10 @@ const ShowResuleCleaning: React.FC = () => {
           className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
         >
           <div>
-            <DataTransformCard hideDataTransform={hideDataTransform} />
+            <DataTransformCard
+              hideDataTransform={hideDataTransform}
+              numbers={ColandRowNumber}
+            />
           </div>
         </div>
       )}
