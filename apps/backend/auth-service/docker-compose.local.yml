@@ -3,13 +3,11 @@ services:
   auth-service:
     build:
       context: .
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile # Production Dockerfile
     ports:
-      - "4001:4001"
-    volumes:
-      - ./src:/project/src # Adjusted for hot reloading
-    env_file: ./src/configs/.env.development
-    command: ["npm", "run", "dev"]
+      - "4001:4001" # Map local port 4001 to container port 4001
+    env_file: ./src/configs/.env.production # Production environment variables
+    command: ["node", "server.js"] # Start the built app
     depends_on:
       - mongo_db
 
