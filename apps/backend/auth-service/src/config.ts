@@ -2,7 +2,9 @@ import dotenv from "dotenv";
 import path from "path";
 import Joi from "joi";
 
+// Define a TypeScript type for the configuration
 type Config = {
+  env: string;
   port: number;
   mongodbURL: string;
   awsCognitoRegion: string;
@@ -13,25 +15,29 @@ type Config = {
   awsCognitoDomain: string;
   awsRedirectUri: string;
   clientUrl: string;
-  userServiceUrl: string;
+  userServiceUrl?: string;
   awsAccessKeyId: string;
   awsSecretAccessKey: string;
 };
 
 // Function to load and validate environment variables
 function loadConfig(): Config {
-  // Determine the environment and set the appropriate .env file
+  // Determine the environment and set the appropriate .env file path
   const env = process.env.NODE_ENV || "development";
   const envPath = path.resolve(__dirname, `./configs/.env.${env}`);
 
-  // Attempt to load environment variables
+  // Load environment variables from the specified .env file
   const result = dotenv.config({ path: envPath });
   if (result.error) {
     throw new Error(`Failed to load .env file at ${envPath}: ${result.error}`);
   }
 
-  // Define a schema for the environment variables
+  // Debug log for confirmation
+  console.log(`Loaded environment variables from: ${envPath}`);
+
+  // Define schema for environment variables validation using Joi
   const envVarsSchema = Joi.object({
+    NODE_ENV: Joi.string().valid("development", "production").required(),
     PORT: Joi.number().default(3000),
     MONGODB_URL: Joi.string().required(),
     AWS_COGNITO_REGION: Joi.string().required(),
@@ -42,7 +48,7 @@ function loadConfig(): Config {
     AWS_COGNITO_DOMAIN: Joi.string().required(),
     AWS_REDIRECT_URI: Joi.string().required(),
     CLIENT_URL: Joi.string().required(),
-    USER_SERVICE_URL: Joi.string().required(),
+    USER_SERVICE_URL: Joi.string().optional(), // Optional environment variable
     AWS_ACCESS_KEY_ID: Joi.string().required(),
     AWS_SECRET_ACCESS_KEY: Joi.string().required(),
   })
@@ -51,17 +57,17 @@ function loadConfig(): Config {
 
   // Validate the environment variables
   const { value: envVars, error } = envVarsSchema.validate(process.env, {
-    abortEarly: false,
+    abortEarly: false, // Show all validation errors at once
   });
+
+  // Handle validation errors
   if (error) {
-    throw new Error(
-      `Config validation error: ${error.details
-        .map((err) => err.message)
-        .join(", ")}`
-    );
+    const errorMessages = error.details.map((err) => err.message).join(", ");
+    throw new Error(`Config validation error: ${errorMessages}`);
   }
 
   return {
+    env: envVars.NODE_ENV,
     port: envVars.PORT,
     mongodbURL: envVars.MONGODB_URL,
     awsCognitoRegion: envVars.AWS_COGNITO_REGION,

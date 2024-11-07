@@ -68,14 +68,14 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"DeleteUserRequest": {
+			"SignOutRequest": {
 				"properties": {
-					"email": {
+					"refreshToken": {
 						"type": "string"
 					}
 				},
 				"required": [
-					"email"
+					"refreshToken"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -372,9 +372,9 @@
 				}
 			}
 		},
-		"/v1/auth/delete": {
-			"delete": {
-				"operationId": "DeleteUser",
+		"/v1/auth/logout": {
+			"post": {
+				"operationId": "Logout",
 				"responses": {
 					"200": {
 						"description": "Ok",
@@ -388,7 +388,6 @@
 										}
 									},
 									"required": [
-										"result",
 										"message"
 									],
 									"type": "object"
@@ -397,20 +396,17 @@
 						}
 					}
 				},
-				"description": "Delete a user",
 				"tags": [
 					"Email Intergrate AWS Cognito"
 				],
 				"security": [],
 				"parameters": [],
 				"requestBody": {
-					"description": "The user email",
 					"required": true,
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "#/components/schemas/DeleteUserRequest",
-								"description": "The user email"
+								"$ref": "#/components/schemas/SignOutRequest"
 							}
 						}
 					}

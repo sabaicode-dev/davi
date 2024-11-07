@@ -6,3 +6,7 @@
 export interface GoogleSignOutRequest {
   refreshToken: string;
 }
+
+export interface SignOutRequest {
+  refreshToken: string;
+}

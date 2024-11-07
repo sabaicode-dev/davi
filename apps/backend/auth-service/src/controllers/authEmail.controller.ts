@@ -1,26 +1,18 @@
 // src/controllers/auth-aws.controller.ts
 
-import {
-  Body,
-  Controller,
-  Post,
-  Route,
-  SuccessResponse,
-  Delete,
-  Tags,
-} from "tsoa";
+import { Body, Controller, Post, Route, SuccessResponse, Tags } from "tsoa";
 import {
   signUpUser,
   signInUser,
   confirmSignUp,
-  deleteUser,
+  logoutUser,
 } from "../services/authEmail.service";
 import {
   ConfirmSignUpRequest,
-  DeleteUserRequest,
   SignInRequest,
   SignUpRequest,
 } from "./types/authEmail.type";
+import { SignOutRequest } from "./types/google-request.type";
 
 @Route("/v1/auth") // Define the base route for the controller
 @Tags("Email Intergrate AWS Cognito")
@@ -78,20 +70,22 @@ export class CognitoController extends Controller {
     }
   }
 
-  /**
-   * Delete a user
-   * @param requestBody The user email
-   */
-  @Delete("delete")
-  public async deleteUser(
-    @Body() requestBody: DeleteUserRequest
-  ): Promise<{ message: string; result: any }> {
-    const { email } = requestBody;
+  @Post("logout")
+  public async logout(
+    @Body() requestBody: SignOutRequest
+  ): Promise<{ message: string; result?: any }> {
+    const { refreshToken } = requestBody;
     try {
-      const result = await deleteUser(email);
-      return { message: "User deleted successfully", result };
+      const result = await logoutUser(refreshToken);
+      return { message: "User logged out successfully", result };
     } catch (error: any) {
-      throw new Error(error.message);
+      // Return detailed error message
+      // console.error("Error logging out user:", JSON.stringify(error, null, 2));
+      this.setStatus(500);
+      return {
+        message: "Failed to log out user",
+        result: error.message || error,
+      };
     }
   }
 }

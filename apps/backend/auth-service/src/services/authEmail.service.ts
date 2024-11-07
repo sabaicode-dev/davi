@@ -1,16 +1,18 @@
 // src/services/AwsAuth.service.ts
+
 import {
   CognitoIdentityProviderClient,
   SignUpCommand,
   AdminInitiateAuthCommand,
   ConfirmSignUpCommand,
-  AdminDeleteUserCommand,
+  RevokeTokenCommand,
 } from "@aws-sdk/client-cognito-identity-provider";
 import * as crypto from "crypto";
 import dotenv from "dotenv";
 import UserRepository from "../database/repositories/user.repository"; // Import the repository
 import path from "path";
 
+// Load environment variables
 dotenv.config({ path: path.resolve(__dirname, `../configs/.env.development`) });
 
 // Initialize Cognito client
@@ -55,8 +57,12 @@ export const signUpUser = async (email: string, password: string) => {
 
     const response = await cognitoClient.send(command);
 
-    // Save the user in MongoDB
-    await UserRepository.createUser(email, response.UserSub!);
+    // Save the user in MongoDB with unconfirmed status
+    if (response.UserSub) {
+      await UserRepository.createUser(email, response.UserSub, {
+        confirmed: false,
+      });
+    }
 
     return response;
   } catch (error: any) {
@@ -110,7 +116,7 @@ export const confirmSignUp = async (
 
     const response = await cognitoClient.send(command);
 
-    // Mark user as confirmed in MongoDB
+    // Update user to confirmed status in MongoDB
     await UserRepository.confirmUser(email);
 
     return response;
@@ -120,21 +126,33 @@ export const confirmSignUp = async (
   }
 };
 
-// Function to delete a user
-export const deleteUser = async (email: string) => {
+// Function to log out a user by revoking their refresh token
+export const logoutUser = async (refreshToken: string) => {
   try {
-    const command = new AdminDeleteUserCommand({
-      UserPoolId: process.env.AWS_COGNITO_USER_POOL_ID!,
-      Username: email,
+    const clientId = process.env.AWS_COGNITO_CLIENT_ID!;
+    if (!clientId) {
+      throw new Error(
+        "AWS_COGNITO_CLIENT_ID is missing from environment variables."
+      );
+    }
+
+    const clientSecret = process.env.AWS_COGNITO_CLIENT_SECRET!;
+
+    // console.log(`Using ClientId: ${clientId} to revoke token ${refreshToken}.`);
+
+    const command = new RevokeTokenCommand({
+      ClientId: clientId,
+      Token: refreshToken,
+      ClientSecret: clientSecret,
     });
+
     const response = await cognitoClient.send(command);
-
-    // Delete the user from MongoDB
-    await UserRepository.deleteUserByEmail(email);
-
-    return response;
+    return { message: "Token revoked successfully", response };
   } catch (error: any) {
-    console.error("Error deleting user: ", error.message || error);
+    console.error(
+      "Error logging out user (revoking token failed):",
+      JSON.stringify(error, null, 2)
+    );
     throw error;
   }
 };
