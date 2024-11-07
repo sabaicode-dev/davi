@@ -103,7 +103,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
-            rm -f /home/ubuntu/apps/auth-service/build/configs/.env.production
+            mkdir -p /home/ubuntu/apps/auth-service/build/configs
             echo "NODE_ENV=${{ secrets.NODE_ENV }}" > /home/ubuntu/apps/auth-service/build/configs/.env.production
             echo "PORT=${{ secrets.AUTH_PORT }}" >> /home/ubuntu/apps/auth-service/build/configs/.env.production
             echo "MONGODB_URL=${{ secrets.MONGODB_URL }}" >> /home/ubuntu/apps/auth-service/build/configs/.env.production

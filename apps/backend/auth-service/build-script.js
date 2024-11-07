@@ -56,26 +56,23 @@ esbuild
     );
     console.log("Package.json copied successfully!");
 
-    // Copy ecosystem.config.js after ensuring the build was successful
-    fs.copySync(
-      path.resolve(__dirname, "ecosystem.config.js"),
-      path.resolve(__dirname, "build/ecosystem.config.js")
-    );
-    console.log("Ecosystem Config copied successfully!");
-
-    // Copy .env.development to .env.production
+    // Copy .env.development if it exists
     const envSource = path.resolve(__dirname, "src/configs/.env.development");
     const envDestination = path.resolve(
       __dirname,
-      "build/configs/.env.production"
+      "build/configs/.env.development"
     );
 
     // Ensure the destination directory exists
     fs.ensureDirSync(path.dirname(envDestination));
 
-    // Copy the .env.development file
-    fs.copySync(envSource, envDestination);
-    console.log(".env.development copied successfully!");
+    // Check if the .env.development file exists before copying
+    if (fs.existsSync(envSource)) {
+      fs.copySync(envSource, envDestination);
+      console.log(".env.development copied successfully!");
+    } else {
+      console.warn(".env.development not found, skipping copy.");
+    }
   })
   .catch((error) => {
     console.error("Build failed:", error);
