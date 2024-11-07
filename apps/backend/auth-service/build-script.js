@@ -15,7 +15,7 @@ esbuild
       ".ts": "ts",
     },
     plugins: [
-      // (2) Solve: https://stackoverflow.com/questions/62136515/swagger-ui-express-plugin-issue-with-webpack-bundling-in-production-mode/63048697#63048697
+      // Copy swagger-ui assets
       copy({
         assets: [
           {
@@ -30,10 +30,6 @@ esbuild
             from: `../../../node_modules/swagger-ui-dist/*.png`,
             to: "./",
           },
-          // {
-          //   from: "./src/configs/.env.development",
-          //   to: "./configs/",
-          // },
         ],
       }),
     ],
@@ -46,7 +42,7 @@ esbuild
     },
   })
   .then(() => {
-    // (1) Solve: Copy swagger.json after successful build
+    // Copy swagger.json after successful build
     fs.copySync(
       path.resolve(__dirname, "src/docs/swagger.json"),
       path.resolve(__dirname, "build/docs/swagger.json")
@@ -67,12 +63,19 @@ esbuild
     );
     console.log("Ecosystem Config copied successfully!");
 
-    // Copy .env.development
-    fs.copySync(
-      path.resolve(__dirname, "./src/configs/.env.development"),
-      path.resolve(__dirname, "build/configs/.env.production")
+    // Copy .env.development to .env.production
+    const envSource = path.resolve(__dirname, "src/configs/.env.development");
+    const envDestination = path.resolve(
+      __dirname,
+      "build/configs/.env.production"
     );
-    console.log("Ecosystem Config copied successfully!");
+
+    // Ensure the destination directory exists
+    fs.ensureDirSync(path.dirname(envDestination));
+
+    // Copy the .env.development file
+    fs.copySync(envSource, envDestination);
+    console.log(".env.development copied successfully!");
   })
   .catch((error) => {
     console.error("Build failed:", error);
