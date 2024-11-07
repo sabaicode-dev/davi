@@ -4,90 +4,116 @@ import CSV from "@/public/images/step/CSV_logo.png";
 import Mongo from "@/public/images/step/MongoDB_logo.png";
 import URL from "@/public/images/step/URL_logo.png";
 import MySql from "@/public/images/step/MySQL_logo.png";
+import Button from "@/src/components/atoms/Button";
 
 interface Step3Props {
   onNext: () => void;
   onBack?: () => void;
-  onSelectSource: (source: string) => void; // Added for selecting a source
+  onSelectSource: (source: string) => void;
 }
 
 const Step3: React.FC<Step3Props> = ({ onBack, onSelectSource }) => {
   return (
-    <div className="container">
+    <div className="container py-6">
       <h2 className="text-xl font-semibold text-gray-800 mb-6 text-center">
         Pick a data source to start
       </h2>
 
-      <div className="mx-auto flex justify-between items-center space-x-8">
+      <div className="mx-auto flex justify-between items-center space-x-6">
+        {" "}
+        {/* Reduced spacing here */}
         <div
           onClick={() => onSelectSource("CSV")}
-          className="w-72 h-full mx-auto border rounded-lg"
+          className="w-60 h-full mx-auto border rounded-lg" // Reduced width from w-72 to w-60
         >
-          <div className="bg-green-100 cursor-pointer hover:bg-green-200 h-40 px-10 py-4 flex items-center justify-center">
-            <img src={CSV} alt="CSV Icon" className="w-20 " />
+          <div className="bg-green-100 cursor-pointer hover:bg-green-200 h-32 px-6 py-3 flex items-center justify-center rounded-tl-lg rounded-tr-lg">
+            {" "}
+            {/* Reduced height and padding */}
+            <img src={CSV} alt="CSV Icon" className="w-16" />{" "}
+            {/* Reduced image size */}
           </div>
-          <div className="flex justify-between items-center p-2">
-            <p className="text-gray-800 ">Upload File</p>
-            <button className="text-xs border-[1px] rounded-md bg-slate-200 text-gray-500 p-1">
+          <div className="flex justify-between items-center p-1">
+            {" "}
+            {/* Reduced padding */}
+            <p className="text-gray-800 text-sm">Upload File</p>{" "}
+            {/* Made font size smaller */}
+            <button className="text-xs border-[1px] rounded-md bg-slate-200 text-gray-500 px-1 py-0.5">
               CSV
-            </button>
-          </div>
-        </div>
-        <div className="w-72 h-full mx-auto border rounded-lg">
-          <div className="bg-green-100 cursor-pointer hover:bg-green-200 h-40 px-10 py-4 flex items-center justify-center">
-            <img src={Mongo} alt="CSV Icon" className="w-20" />
-          </div>
-          <div className="flex justify-between items-center p-2">
-            <p className="text-gray-800 ">From Web</p>
-            <button className="text-xs border-[1px] rounded-md bg-slate-200 text-gray-500 p-1">
-              import only
             </button>
           </div>
         </div>
         <div
           onClick={() => onSelectSource("URL")}
-          className="w-72 h-full mx-auto border rounded-lg"
+          className="w-60 h-full mx-auto border rounded-lg"
         >
-          <div className="bg-blue-100 cursor-pointer hover:bg-blue-200 h-40  px-10 py-4 flex items-center justify-center">
-            <img src={URL} alt="CSV Icon" className="w-20" />
+          <div className="bg-[#93B9FB] cursor-pointer hover:bg-blue-200 h-32 px-6 py-3 flex items-center justify-center rounded-tl-lg rounded-tr-lg">
+            <img src={URL} alt="URL Icon" className="w-16" />
           </div>
-          <div className="flex justify-between items-center p-2">
-            <p className="text-gray-800 ">MySQL</p>
-            <button className="text-xs border-[1px] rounded-md bg-slate-200 text-gray-500 p-1">
+          <div className="flex justify-between items-center p-1">
+            <p className="text-gray-800 text-sm">From Web</p>
+            <button className="text-xs border-[1px] rounded-md bg-slate-200 text-gray-500 px-1 py-0.5">
               import only
             </button>
           </div>
         </div>
-        <div className="w-72 h-full mx-auto border rounded-lg">
-          <div className="bg-blue-100 cursor-pointer hover:bg-blue-200 h-40  px-10 py-4 flex items-center justify-center">
-            <img src={MySql} alt="CSV Icon" className="w-20" />
+        <div
+          onClick={() => onSelectSource("MySQL")}
+          className="w-60 h-full mx-auto border rounded-lg"
+        >
+          <div className="bg-[#BED5FD] cursor-pointer hover:bg-blue-200 h-32 px-6 py-3 flex items-center justify-center rounded-tl-lg rounded-tr-lg">
+            <img src={MySql} alt="MySQL Icon" className="w-16" />
           </div>
-          <div className="flex justify-between items-center p-2">
-            <p className="text-gray-800 ">MongoDB</p>
-            <button className="text-xs border-[1px] rounded-md bg-slate-200 text-gray-500 p-1">
+          <div className="flex justify-between items-center p-1">
+            <p className="text-gray-800 text-sm">MySQL</p>
+            <button className="text-xs border-[1px] rounded-md bg-slate-200 text-gray-500 px-1 py-0.5">
+              import only
+            </button>
+          </div>
+        </div>
+        <div
+          onClick={() => onSelectSource("MongoDB")}
+          className="w-60 h-full mx-auto border rounded-lg"
+        >
+          <div className="bg-[#DCFAEA] cursor-pointer hover:bg-green-200 h-32 px-6 py-3 flex items-center justify-center rounded-tl-lg rounded-tr-lg">
+            <img src={Mongo} alt="MongoDB Icon" className="w-16" />
+          </div>
+          <div className="flex justify-between items-center p-1">
+            <p className="text-gray-800 text-sm">MongoDB</p>
+            <button className="text-xs border-[1px] rounded-md bg-slate-200 text-gray-500 px-1 py-0.5">
               import only
             </button>
           </div>
         </div>
       </div>
 
-      <div className="flex flex-col justify-center items-center h-auto mt-48">
-        <div className="bg-white p-8 max-w-2xl w-full text-center">
-          <div className="flex justify-center mt-4 mb-6">
-            <div className="h-1 w-8 bg-blue-600 rounded-full mx-1"></div>
-            <div className="h-1 w-8 bg-blue-600 rounded-full mx-1"></div>
-            <div className="h-1 w-8 bg-blue-200 rounded-full mx-1"></div>
+      <div className="flex flex-col justify-center items-center h-auto mt-36">
+        {" "}
+        {/* Adjusted spacing */}
+        <div className="bg-white p-6 max-w-xl w-full text-center">
+          {" "}
+          {/* Reduced padding and width */}
+          <div className="flex justify-center mt-4 mb-2">
+            <div className="h-1 w-6 bg-blue-600 rounded-full mx-1"></div>{" "}
+            {/* Reduced width */}
+            <div className="h-1 w-6 bg-blue-600 rounded-full mx-1"></div>
+            <div className="h-1 w-6 bg-blue-200 rounded-full mx-1"></div>
           </div>
-
-          {/* Back Button */}
         </div>
+      </div>
 
-        <button
+      <div className="flex justify-end">
+        {" "}
+        {/* Adjusted spacing */}
+        <Button
           onClick={onBack}
-          className="px-6 py-2 flex flex-end text-gray-600 bg-gray-200 rounded-md hover:bg-gray-300 focus:outline-none transition-all"
-        >
-          Back
-        </button>
+          children="Back"
+          size="medium"
+          radius="2xl"
+          color="outline"
+          isLoading={false}
+          isIconOnly={false}
+          isDisabled={false}
+        />
       </div>
     </div>
   );

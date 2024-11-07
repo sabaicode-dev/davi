@@ -1,9 +1,7 @@
-// Step2.tsx
-
-import React from "react";
+import React, { useState } from "react";
 import Logo from "@/public/images/step/step2_pic.png";
-import Button from "../../atoms/Button";
-import { useState } from "react";
+import Button from "@/src/components/atoms/Button";
+
 interface Step2Props {
   onNext: () => void;
   onBack: () => void;
@@ -14,7 +12,7 @@ const Step2: React.FC<Step2Props> = ({ onNext, onBack }) => {
   const [description, setDescription] = useState("");
   const [errorMessages, setErrorMessages] = useState({
     projectName: "",
-    description: ""
+    description: "",
   });
 
   const handleNext = () => {
@@ -25,15 +23,14 @@ const Step2: React.FC<Step2Props> = ({ onNext, onBack }) => {
       newErrorMessages.projectName = "Please input your project name.";
       isValid = false;
     }
-    if (description.trim() === "") {
-      newErrorMessages.description = "Please input your descriptions.";
-      isValid = false;
-    }
+
+    // Description is now optional, so no validation error is set for it
+    // You can add any additional logic here if you want to validate the description in the future
 
     setErrorMessages(newErrorMessages);
 
     if (isValid) {
-      onNext(); // Proceed to the next step if both fields are valid
+      onNext(); // Proceed to the next step if project name is valid
     }
   };
 
@@ -42,24 +39,23 @@ const Step2: React.FC<Step2Props> = ({ onNext, onBack }) => {
       <div className="flex ">
         {/* Left Image Section */}
         <div className="flex-1 p-8">
-          <img
-            src={Logo} // Update this path to your image
-            alt="Project Created"
-            className="w-full h-auto"
-          />
+          <img src={Logo} alt="Project Created" className="w-full h-auto" />
         </div>
 
         {/* Right Form Section */}
         <div className="flex-1 p-8">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">
+          <h2 className="text-lg font-semibold text-black mb-2">
             Project created
           </h2>
-          <p className="text-gray-600 mb-6">
+          <p className="text-sm text-gray-600 mb-6">
             Please enter a Name and Description for this project.
           </p>
 
           <div className="mb-4">
-            <label className="block text-gray-700 mb-2" htmlFor="projectName">
+            <label
+              className="block text-sm font-bold text-gray-700 mb-2"
+              htmlFor="projectName"
+            >
               Project name
             </label>
             <input
@@ -71,13 +67,18 @@ const Step2: React.FC<Step2Props> = ({ onNext, onBack }) => {
               className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
             {errorMessages.projectName && (
-              <p className="text-red-600 text-sm mt-1">{errorMessages.projectName}</p>
+              <p className="text-red-600 text-sm mt-1">
+                {errorMessages.projectName}
+              </p>
             )}
           </div>
 
           <div className="mb-6">
-            <label className="block text-gray-700 mb-2" htmlFor="description">
-              Description
+            <label
+              className="block text-sm font-medium text-gray-700 mb-2"
+              htmlFor="description"
+            >
+              Description (Optional)
             </label>
             <textarea
               id="description"
@@ -87,12 +88,10 @@ const Step2: React.FC<Step2Props> = ({ onNext, onBack }) => {
               className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
               rows={3}
             ></textarea>
-            {errorMessages.description && (
-              <p className="text-red-600 text-sm mt-1">{errorMessages.description}</p>
-            )}
+            {/* You can still display error for description if you want in the future */}
           </div>
 
-          <div className="flex justify-between">
+          <div className="flex justify-end space-x-3">
             <Button
               onClick={onBack}
               children="Back"
