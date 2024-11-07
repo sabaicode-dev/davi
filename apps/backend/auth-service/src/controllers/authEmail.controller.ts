@@ -1,4 +1,4 @@
-// src/controllers/auth-aws.controller.ts
+// src/controllers/authEmail.controller.ts
 
 import { Body, Controller, Post, Route, SuccessResponse, Tags } from "tsoa";
 import {

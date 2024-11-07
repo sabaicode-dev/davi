@@ -1,4 +1,4 @@
-// src/services/AwsAuth.service.ts
+// src/services/authEmail.service.ts
 
 import {
   CognitoIdentityProviderClient,
