@@ -60,7 +60,7 @@ esbuild
     const envSource = path.resolve(__dirname, "src/configs/.env.development");
     const envDestination = path.resolve(
       __dirname,
-      "build/configs/.env.development"
+      "build/configs/.env.production"
     );
 
     // Ensure the destination directory exists
