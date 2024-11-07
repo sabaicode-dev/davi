@@ -49,10 +49,10 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "DeleteUserRequest": {
+    "SignOutRequest": {
         "dataType": "refObject",
         "properties": {
-            "email": {"dataType":"string","required":true},
+            "refreshToken": {"dataType":"string","required":true},
         },
         "additionalProperties": false,
     },
@@ -259,13 +259,13 @@ export function RegisterRoutes(app: Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        app.delete('/v1/auth/delete',
+        app.post('/v1/auth/logout',
             ...(fetchMiddlewares<RequestHandler>(CognitoController)),
-            ...(fetchMiddlewares<RequestHandler>(CognitoController.prototype.deleteUser)),
+            ...(fetchMiddlewares<RequestHandler>(CognitoController.prototype.logout)),
 
-            async function CognitoController_deleteUser(request: ExRequest, response: ExResponse, next: any) {
+            async function CognitoController_logout(request: ExRequest, response: ExResponse, next: any) {
             const args: Record<string, TsoaRoute.ParameterSchema> = {
-                    requestBody: {"in":"body","name":"requestBody","required":true,"ref":"DeleteUserRequest"},
+                    requestBody: {"in":"body","name":"requestBody","required":true,"ref":"SignOutRequest"},
             };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -277,7 +277,7 @@ export function RegisterRoutes(app: Router) {
                 const controller = new CognitoController();
 
               await templateService.apiHandler({
-                methodName: 'deleteUser',
+                methodName: 'logout',
                 controller,
                 response,
                 next,
