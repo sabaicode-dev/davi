@@ -6,7 +6,81 @@
 		"parameters": {},
 		"requestBodies": {},
 		"responses": {},
-		"schemas": {},
+		"schemas": {
+			"GoogleSignOutRequest": {
+				"description": "Request type for Google Sign-Out, requiring a refresh token.",
+				"properties": {
+					"refreshToken": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"refreshToken"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"SignUpRequest": {
+				"properties": {
+					"email": {
+						"type": "string"
+					},
+					"password": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"email",
+					"password"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"SignInRequest": {
+				"properties": {
+					"email": {
+						"type": "string"
+					},
+					"password": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"email",
+					"password"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ConfirmSignUpRequest": {
+				"properties": {
+					"email": {
+						"type": "string"
+					},
+					"confirmationCode": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"email",
+					"confirmationCode"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"SignOutRequest": {
+				"properties": {
+					"refreshToken": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"refreshToken"
+				],
+				"type": "object",
+				"additionalProperties": false
+			}
+		},
 		"securitySchemes": {}
 	},
 	"info": {
@@ -18,48 +92,325 @@
 		"contact": {}
 	},
 	"paths": {
-		"/v1/products": {
+		"/v1/auth/google": {
 			"get": {
-				"operationId": "GetAllProducts",
+				"operationId": "InitiateGoogleSignIn",
+				"responses": {
+					"204": {
+						"description": "No content"
+					},
+					"302": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"url": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"url"
+									],
+									"type": "object"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"error": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"error"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"description": "Initiate Google Sign-In",
+				"summary": "Initiates the Google Sign-In process and redirects to Google's authorization page.",
+				"tags": [
+					"Google Intergrate AWS Cognito"
+				],
+				"security": [],
+				"parameters": []
+			}
+		},
+		"/v1/auth/google/callback": {
+			"get": {
+				"operationId": "GoogleCallback",
+				"responses": {
+					"204": {
+						"description": "No content"
+					},
+					"500": {
+						"description": "- Error response in case of a failure.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"error": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"error"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"description": "Google Callback",
+				"summary": "Handles the callback from Google with the authorization code.",
+				"tags": [
+					"Google Intergrate AWS Cognito"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"description": "- The authorization code provided by Google.",
+						"in": "query",
+						"name": "code",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/v1/auth/signout": {
+			"post": {
+				"operationId": "HandleSignOut",
+				"responses": {
+					"204": {
+						"description": "No content"
+					},
+					"500": {
+						"description": "- Error response in case of a failure.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"error": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"error"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"description": "Sign Out",
+				"summary": "Signs out the user by revoking the refresh token and clearing cookies.",
+				"tags": [
+					"Google Intergrate AWS Cognito"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"description": "- Contains the refresh token required for signing out.",
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/GoogleSignOutRequest",
+								"description": "- Contains the refresh token required for signing out."
+							}
+						}
+					}
+				}
+			}
+		},
+		"/v1/auth/signup": {
+			"post": {
+				"operationId": "SignUp",
+				"responses": {
+					"201": {
+						"description": "User signed up successfully",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"description": "Sign up a new user",
+				"tags": [
+					"Email Intergrate AWS Cognito"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"description": "The user email and password",
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SignUpRequest",
+								"description": "The user email and password"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/v1/auth/signin": {
+			"post": {
+				"operationId": "SignIn",
 				"responses": {
 					"200": {
 						"description": "Ok",
 						"content": {
 							"application/json": {
 								"schema": {
-									"items": {
-										"properties": {
-											"price": {
-												"type": "number",
-												"format": "double"
-											},
-											"category": {
-												"type": "string"
-											},
-											"name": {
-												"type": "string"
-											},
-											"id": {
-												"type": "number",
-												"format": "double"
-											}
-										},
-										"required": [
-											"price",
-											"category",
-											"name",
-											"id"
-										],
-										"type": "object"
+									"properties": {
+										"result": {},
+										"message": {
+											"type": "string"
+										}
 									},
-									"type": "array"
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
 								}
 							}
 						}
 					}
 				},
+				"description": "Sign in an existing user",
+				"tags": [
+					"Email Intergrate AWS Cognito"
+				],
 				"security": [],
-				"parameters": []
+				"parameters": [],
+				"requestBody": {
+					"description": "The user email and password",
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SignInRequest",
+								"description": "The user email and password"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/v1/auth/confirm": {
+			"post": {
+				"operationId": "ConfirmSignUp",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"description": "Confirm user sign up",
+				"tags": [
+					"Email Intergrate AWS Cognito"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"description": "The user email and confirmation code",
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/ConfirmSignUpRequest",
+								"description": "The user email and confirmation code"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/v1/auth/logout": {
+			"post": {
+				"operationId": "Logout",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Email Intergrate AWS Cognito"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SignOutRequest"
+							}
+						}
+					}
+				}
 			}
 		}
 	},

@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 interface SidebarProps {
   onSelect: (section: string) => void;
@@ -7,14 +7,16 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ onSelect, selectedSection }) => {
   return (
-    <div className="p-6 md:fixed md:top-16 md:left-64">
-      <h2 className="text-[16px] font-bold mb-4">DAVI Documentation</h2>
+    <div className="p-6 md:sticky md:top-0 md:py-0 md:px-32 lg:top-4">
+      <h2 className="text-lg font-bold mb-4 md:text-base">DAVI Documentation</h2>
 
-      <div className="space-y-2 text-[14px]">
-        <button 
-          onClick={() => onSelect('learn-about-davi')} 
+      <div className="space-y-2 text-base lg:text-lg">
+        <button
+          onClick={() => onSelect("learn-about-davi")}
           className={`${
-            selectedSection === 'learn-about-davi' ? 'text-blue-600 font-semibold' : 'text-gray-600'
+            selectedSection === "learn-about-davi"
+              ? "text-blue-600 font-semibold"
+              : "text-gray-600"
           } hover:text-blue-800`}
         >
           Learn about DAVI
@@ -26,9 +28,11 @@ const Sidebar: React.FC<SidebarProps> = ({ onSelect, selectedSection }) => {
         <ul className="space-y-2">
           <li>
             <button
-              onClick={() => onSelect('upload-file')}
+              onClick={() => onSelect("upload-file")}
               className={`${
-                selectedSection === 'upload-file' ? 'text-blue-600 font-semibold' : 'text-gray-600'
+                selectedSection === "upload-file"
+                  ? "text-blue-600 font-semibold"
+                  : "text-gray-600"
               } hover:text-blue-800`}
             >
               Upload File
@@ -36,9 +40,11 @@ const Sidebar: React.FC<SidebarProps> = ({ onSelect, selectedSection }) => {
           </li>
           <li>
             <button
-              onClick={() => onSelect('scraping')}
+              onClick={() => onSelect("scraping")}
               className={`${
-                selectedSection === 'scraping' ? 'text-blue-600 font-semibold' : 'text-gray-600'
+                selectedSection === "scraping"
+                  ? "text-blue-600 font-semibold"
+                  : "text-gray-600"
               } hover:text-blue-800`}
             >
               Scraping
@@ -52,9 +58,11 @@ const Sidebar: React.FC<SidebarProps> = ({ onSelect, selectedSection }) => {
         <ul className="space-y-2">
           <li>
             <button
-              onClick={() => onSelect('cleaning')}
+              onClick={() => onSelect("cleaning")}
               className={`${
-                selectedSection === 'cleaning' ? 'text-blue-600 font-semibold' : 'text-gray-600'
+                selectedSection === "cleaning"
+                  ? "text-blue-600 font-semibold"
+                  : "text-gray-600"
               } hover:text-blue-800`}
             >
               Data Cleaning
@@ -62,9 +70,11 @@ const Sidebar: React.FC<SidebarProps> = ({ onSelect, selectedSection }) => {
           </li>
           <li>
             <button
-              onClick={() => onSelect('analysis')}
+              onClick={() => onSelect("analysis")}
               className={`${
-                selectedSection === 'analysis' ? 'text-blue-600 font-semibold' : 'text-gray-600'
+                selectedSection === "analysis"
+                  ? "text-blue-600 font-semibold"
+                  : "text-gray-600"
               } hover:text-blue-800`}
             >
               Analysis
@@ -72,9 +82,11 @@ const Sidebar: React.FC<SidebarProps> = ({ onSelect, selectedSection }) => {
           </li>
           <li>
             <button
-              onClick={() => onSelect('visualize')}
+              onClick={() => onSelect("visualize")}
               className={`${
-                selectedSection === 'visualize' ? 'text-blue-600 font-semibold' : 'text-gray-600'
+                selectedSection === "visualize"
+                  ? "text-blue-600 font-semibold"
+                  : "text-gray-600"
               } hover:text-blue-800`}
             >
               Visualize

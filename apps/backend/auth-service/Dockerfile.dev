@@ -6,6 +6,7 @@ WORKDIR /app
 
 # Copy package.json
 COPY package.json ./
+COPY .npmrc ./
 
 
 # Install dependencies
@@ -17,8 +18,8 @@ COPY nodemon.json ./
 COPY src ./src
 COPY tsoa.json ./
 
-# Expose to run application port
+# Expose the application's port
 EXPOSE 4001
 
 # Command to run the application
-CMD ["npm","run","dev"]
+CMD ["npm", "run", "dev"]
