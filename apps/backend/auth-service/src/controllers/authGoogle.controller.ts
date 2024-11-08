@@ -68,7 +68,6 @@ export class GoogleAuthController extends Controller {
 
       // Exchange authorization code for tokens
       const tokens = await exchangeCodeForTokens(code);
-      console.log("Tokens received after exchange:", tokens);
 
       // Set tokens in cookies
       setCookie(response, "idToken", tokens.id_token);
@@ -82,10 +81,11 @@ export class GoogleAuthController extends Controller {
       if (!decodedIdToken.email_verified) {
         throw new Error("Email not verified by Google");
       }
-
+      const username = decodedIdToken.email.split("@")[0];
       // Save or update user data in MongoDB
       try {
         await saveUserToDB({
+          username,
           email: decodedIdToken.email,
           cognitoUserId: decodedIdToken.sub,
           confirmed: true,
