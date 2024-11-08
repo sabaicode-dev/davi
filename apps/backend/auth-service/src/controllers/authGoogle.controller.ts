@@ -104,43 +104,6 @@ export class GoogleAuthController extends Controller {
       errorResponse(500, { error: error.message || "Internal server error" });
     }
   }
-
-  /**
-   * Sign Out
-   * @summary Signs out the user by revoking the refresh token and clearing cookies.
-   * @param requestBody - Contains the refresh token required for signing out.
-   * @param req - The Express Request object to access the response.
-   * @param errorResponse - Error response in case of a failure.
-   */
-  // @Post("/signout")
-  // public async handleSignOut(
-  //   @Body() requestBody: SignOutRequest,
-  //   @Request() request: express.Request,
-  //   @Res() errorResponse: TsoaResponse<500, { error: string }>
-  // ): Promise<void> {
-  //   try {
-  //     const response = (request as any).res as Response;
-  //     const { refreshToken } = requestBody;
-
-  //     // Validate that the refresh token is present
-  //     if (!refreshToken) {
-  //       throw new Error("Refresh token not found");
-  //     }
-
-  //     // Revoke the refresh token using the service function
-  //     await signOut(refreshToken);
-
-  //     // Clear the cookies storing the tokens
-  //     response.clearCookie("accessToken");
-  //     response.clearCookie("refreshToken");
-
-  //     // Return a successful response after signing out
-  //     response.status(200).json({ message: "User signed out successfully" });
-  //   } catch (error: any) {
-  //     console.error("Error during sign out:", error);
-  //     errorResponse(500, { error: error.message });
-  //   }
-  // }
 }
 
 export default GoogleAuthController;

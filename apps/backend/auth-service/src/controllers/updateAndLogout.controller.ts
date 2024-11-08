@@ -10,7 +10,7 @@ import {
 } from "tsoa";
 import express, { Response } from "express";
 import UserRepository from "../database/repositories/user.repository";
-import { SignOutRequest } from "./types/google-request.type";
+import { SignOutRequest } from "./types/signOut.type";
 import { logoutUser } from "../services/authEmail.service";
 
 @Route("/v1/auth")

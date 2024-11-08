@@ -6,7 +6,7 @@ import {
   signInUser,
   confirmSignUp,
 } from "../services/authEmail.service";
-// import UserRepository from "../database/repositories/user.repository";
+
 import {
   ConfirmSignUpRequest,
   SignInRequest,
@@ -68,25 +68,6 @@ export class CognitoController extends Controller {
       throw new Error(error.message);
     }
   }
-
-  // @Post("logout")
-  // public async logout(
-  //   @Body() requestBody: SignOutRequest
-  // ): Promise<{ message: string; result?: any }> {
-  //   const { refreshToken } = requestBody;
-  //   try {
-  //     const result = await logoutUser(refreshToken);
-  //     return { message: "User logged out successfully", result };
-  //   } catch (error: any) {
-  //     // Return detailed error message
-  //     // console.error("Error logging out user:", JSON.stringify(error, null, 2));
-  //     this.setStatus(500);
-  //     return {
-  //       message: "Failed to log out user",
-  //       result: error.message || error,
-  //     };
-  //   }
-  // }
 }
 
 export default CognitoController;

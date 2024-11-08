@@ -12,8 +12,14 @@ import dotenv from "dotenv";
 import UserRepository from "../database/repositories/user.repository"; // Import the repository
 import path from "path";
 
-// Load environment variables
-dotenv.config({ path: path.resolve(__dirname, `../configs/.env.development`) });
+// Specify the path to your .env file
+const env = process.env.NODE_ENV || "development";
+const envPath =
+  env === "production"
+    ? path.resolve(__dirname, `./configs/.env.${env}`)
+    : path.resolve(__dirname, `../configs/.env.${env}`);
+
+dotenv.config({ path: envPath });
 
 // Initialize Cognito client
 const cognitoClient = new CognitoIdentityProviderClient({
@@ -41,6 +47,8 @@ export const signUpUser = async (
     const clientId = process.env.AWS_COGNITO_CLIENT_ID!;
     const clientSecret = process.env.AWS_COGNITO_CLIENT_SECRET!;
     const secretHash = generateSecretHash(email, clientId, clientSecret);
+
+    console.log(`clientId : ${clientId}`);
 
     const command = new SignUpCommand({
       ClientId: clientId,
