@@ -6,6 +6,7 @@ export default function Project() {
     <div className="h-auto flex justify-center items-center">
       {/* <ShowResuleCleaning /> */}
       <VisualizeCreated/>
+      
     </div>
   );
 }
