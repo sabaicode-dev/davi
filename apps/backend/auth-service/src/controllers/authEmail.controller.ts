@@ -5,7 +5,6 @@ import {
   signUpUser,
   signInUser,
   confirmSignUp,
-  logoutUser,
 } from "../services/authEmail.service";
 // import UserRepository from "../database/repositories/user.repository";
 import {
@@ -13,7 +12,6 @@ import {
   SignInRequest,
   SignUpRequest,
 } from "./types/authEmail.type";
-import { SignOutRequest } from "./types/google-request.type";
 
 @Route("/v1/auth") // Define the base route for the controller
 @Tags("Email Intergrate AWS Cognito")
@@ -36,22 +34,6 @@ export class CognitoController extends Controller {
       throw new Error(error.message);
     }
   }
-
-  // /**
-  //  * Update username of an existing user
-  //  */
-  // @Put("updateUsername")
-  // public async updateUsername(
-  //   @Body() requestBody: { email: string; newUsername: string }
-  // ): Promise<{ message: string; result: any }> {
-  //   const { email, newUsername } = requestBody;
-  //   try {
-  //     const result = await UserRepository.updateUsername(email, newUsername);
-  //     return { message: "Username updated successfully", result };
-  //   } catch (error: any) {
-  //     throw new Error(error.message);
-  //   }
-  // }
 
   /**
    * Sign in an existing user
@@ -87,24 +69,24 @@ export class CognitoController extends Controller {
     }
   }
 
-  @Post("logout")
-  public async logout(
-    @Body() requestBody: SignOutRequest
-  ): Promise<{ message: string; result?: any }> {
-    const { refreshToken } = requestBody;
-    try {
-      const result = await logoutUser(refreshToken);
-      return { message: "User logged out successfully", result };
-    } catch (error: any) {
-      // Return detailed error message
-      // console.error("Error logging out user:", JSON.stringify(error, null, 2));
-      this.setStatus(500);
-      return {
-        message: "Failed to log out user",
-        result: error.message || error,
-      };
-    }
-  }
+  // @Post("logout")
+  // public async logout(
+  //   @Body() requestBody: SignOutRequest
+  // ): Promise<{ message: string; result?: any }> {
+  //   const { refreshToken } = requestBody;
+  //   try {
+  //     const result = await logoutUser(refreshToken);
+  //     return { message: "User logged out successfully", result };
+  //   } catch (error: any) {
+  //     // Return detailed error message
+  //     // console.error("Error logging out user:", JSON.stringify(error, null, 2));
+  //     this.setStatus(500);
+  //     return {
+  //       message: "Failed to log out user",
+  //       result: error.message || error,
+  //     };
+  //   }
+  // }
 }
 
 export default CognitoController;

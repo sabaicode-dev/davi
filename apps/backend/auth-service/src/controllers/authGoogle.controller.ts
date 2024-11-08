@@ -1,12 +1,10 @@
 import {
   Controller,
   Get,
-  Post,
   Query,
   Route,
   Tags,
   Res,
-  Body,
   Request,
   TsoaResponse,
 } from "tsoa";
@@ -14,9 +12,7 @@ import express, { Response } from "express";
 import {
   googleSignIn,
   exchangeCodeForTokens,
-  signOut,
 } from "../services/authGoogle.service";
-import { GoogleSignOutRequest } from "./types/google-request.type";
 import { setCookie } from "../utils/cookie";
 import { jwtDecode } from "jwt-decode";
 import { saveUserToDB } from "../database/services/user.service"; // MongoDB service function to save user data
@@ -116,35 +112,35 @@ export class GoogleAuthController extends Controller {
    * @param req - The Express Request object to access the response.
    * @param errorResponse - Error response in case of a failure.
    */
-  @Post("/signout")
-  public async handleSignOut(
-    @Body() requestBody: GoogleSignOutRequest,
-    @Request() request: express.Request,
-    @Res() errorResponse: TsoaResponse<500, { error: string }>
-  ): Promise<void> {
-    try {
-      const response = (request as any).res as Response;
-      const { refreshToken } = requestBody;
+  // @Post("/signout")
+  // public async handleSignOut(
+  //   @Body() requestBody: SignOutRequest,
+  //   @Request() request: express.Request,
+  //   @Res() errorResponse: TsoaResponse<500, { error: string }>
+  // ): Promise<void> {
+  //   try {
+  //     const response = (request as any).res as Response;
+  //     const { refreshToken } = requestBody;
 
-      // Validate that the refresh token is present
-      if (!refreshToken) {
-        throw new Error("Refresh token not found");
-      }
+  //     // Validate that the refresh token is present
+  //     if (!refreshToken) {
+  //       throw new Error("Refresh token not found");
+  //     }
 
-      // Revoke the refresh token using the service function
-      await signOut(refreshToken);
+  //     // Revoke the refresh token using the service function
+  //     await signOut(refreshToken);
 
-      // Clear the cookies storing the tokens
-      response.clearCookie("accessToken");
-      response.clearCookie("refreshToken");
+  //     // Clear the cookies storing the tokens
+  //     response.clearCookie("accessToken");
+  //     response.clearCookie("refreshToken");
 
-      // Return a successful response after signing out
-      response.status(200).json({ message: "User signed out successfully" });
-    } catch (error: any) {
-      console.error("Error during sign out:", error);
-      errorResponse(500, { error: error.message });
-    }
-  }
+  //     // Return a successful response after signing out
+  //     response.status(200).json({ message: "User signed out successfully" });
+  //   } catch (error: any) {
+  //     console.error("Error during sign out:", error);
+  //     errorResponse(500, { error: error.message });
+  //   }
+  // }
 }
 
 export default GoogleAuthController;
