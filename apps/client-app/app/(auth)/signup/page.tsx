@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import axiosInstance from "@/app/utils/axios";
 import Image from "next/image";
 import { RiEyeCloseFill, RiEyeCloseLine } from "react-icons/ri";
 import { BiArrowBack } from "react-icons/bi";
@@ -12,19 +13,48 @@ export default function SignUpPage() {
   const [username, setUsername] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [error, setError] = useState<string | null>(null);
+
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (password !== cpassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+
     setIsLoading(true);
-    console.log("Signing up with:", email, password, username);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setIsLoading(false);
-    router.push("/signup/verify-email");
+    setError(null);
+
+    try {
+      const response = await axiosInstance.post("/v1/auth/signup", {
+        email,
+        password,
+        username,
+      });
+      if (response.status === 200) {
+        router.push("/signup/verify-email"); // Redirect on successful verification
+      } else {
+        setError("Failed to verify code. Please try again.");
+      }
+      router.push(""); // Adjust as needed for verification page
+    } catch (err) {
+      setError("Sign-up failed. Please try again.");
+      console.error("Sign-up error:", err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleGoogleSignUp = () => {
-    console.log("Signing up with Google");
+  const handleGoogleSignUp = async () => {
+    try {
+      const response = await axiosInstance.get("/v1/auth/google");
+      window.location.href = response.data.url;
+    } catch (err) {
+      console.error("Google Sign-up error:", err);
+    }
   };
 
   const togglePasswordVisibility = () => {
@@ -32,7 +62,7 @@ export default function SignUpPage() {
   };
 
   const handleBack = () => {
-    router.push('/'); 
+    router.push("/");
   };
   return (
     <div className="min-h-screen flex">

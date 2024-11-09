@@ -1,28 +1,50 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import axiosInstance from "@/app/utils/axios";
 import Image from "next/image";
 import { RiEyeCloseFill, RiEyeCloseLine } from "react-icons/ri";
-import { BiArrowBack } from "react-icons/bi"; 
+import { BiArrowBack } from "react-icons/bi";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    console.log("Signing up with:", email, password);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setIsLoading(false);
-    router.push("/dashboard");
+    setError(null);
+
+    try {
+      const response = await axiosInstance.post("/v1/auth/login", {
+        email,
+        password,
+      });
+      if (response.status === 200) {
+        router.push("/www.google.com"); // Adjust as needed for the post-login route
+      } else {
+        setError("Failed to verify code. Please try again.");
+      }
+    } catch (err) {
+      setError("Login failed. Please try again.");
+      console.error("Login error:", err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleGoogleSignUp = () => {
-    console.log("Signing up with Google");
+  const handleGoogleSignUp = async () => {
+    try {
+      const response = await axiosInstance.get("/v1/auth/google");
+      window.location.href = response.data.url;
+    } catch (err) {
+      console.error("Google Sign-up error:", err);
+    }
   };
 
   const togglePasswordVisibility = () => {
@@ -30,7 +52,7 @@ export default function LoginPage() {
   };
 
   const handleBack = () => {
-    router.push('/'); 
+    router.push("/");
   };
 
   return (
