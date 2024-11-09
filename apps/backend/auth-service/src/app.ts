@@ -24,14 +24,14 @@ app.use(express.json()); // Help to get the json from request body
 const allowedOrigins =
   process.env.NODE_ENV === "production"
     ? ["https://d3llp4uth9m31o.cloudfront.net"]
-    : ["http://localhost:3000"];
+    : ["http://localhost:3000"]; // Adjust the origin if needed
+
 app.use(
   cors({
     origin: allowedOrigins,
-    // origin: "http://localhost:3000",
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    methods: ["GET", "POST"],
     allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true, // Allow credentials (cookies, authorization headers, etc.)
+    credentials: true, // Allow credentials if required (cookies)
   })
 );
 

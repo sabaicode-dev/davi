@@ -27,20 +27,21 @@ export class GoogleAuthController extends Controller {
    * Initiate Google Sign-In
    * @summary Initiates the Google Sign-In process and redirects to Google's authorization page.
    */
-  @Get("/google")
-  public async initiateGoogleSignIn(
-    @Res() redirect: TsoaResponse<302, { url: string }>,
-    @Res() errorResponse: TsoaResponse<500, { error: string }>
-  ): Promise<void> {
-    try {
-      const signInUrl = googleSignIn();
-      redirect(302, { url: signInUrl });
-      console.log("Redirecting to Google Sign-In URL:", signInUrl);
-    } catch (error: any) {
-      console.error("Error initiating Google Sign-In:", error);
-      errorResponse(500, { error: error.message });
-    }
+@Get("/google")
+public async initiateGoogleSignIn(
+  @Res() redirect: TsoaResponse<302, { url: string }>,
+  @Res() errorResponse: TsoaResponse<500, { error: string }>
+): Promise<void> {
+  try {
+    const signInUrl = googleSignIn();
+    console.log("Redirecting to Google Sign-In URL:", signInUrl);
+    // Send a 302 redirect to the frontend with the URL
+    redirect(302, { url: signInUrl });
+  } catch (error: any) {
+    console.error("Error initiating Google Sign-In:", error);
+    errorResponse(500, { error: error.message });
   }
+}
 
   /**
    * Google Callback
@@ -56,8 +57,6 @@ export class GoogleAuthController extends Controller {
     @Res() errorResponse: TsoaResponse<500, { error: string }>
   ): Promise<void> {
     try {
-      const response = (request as any).res as Response;
-
       if (!code) {
         throw new Error("Authorization code not found");
       }
@@ -65,7 +64,8 @@ export class GoogleAuthController extends Controller {
       // Exchange authorization code for tokens
       const tokens = await exchangeCodeForTokens(code);
 
-      // Set tokens in cookies
+      // Set tokens in cookies or handle them as needed
+      const response = (request as any).res as Response;
       setCookie(response, "idToken", tokens.id_token);
       setCookie(response, "accessToken", tokens.access_token);
       setCookie(response, "refreshToken", tokens.refresh_token);
@@ -73,27 +73,18 @@ export class GoogleAuthController extends Controller {
       // Decode the ID token to get user information
       const decodedIdToken: any = jwtDecode(tokens.id_token);
 
-      // Check email verification status
       if (!decodedIdToken.email_verified) {
         throw new Error("Email not verified by Google");
       }
+
+      // You can save the user in MongoDB here or take any further action
       const username = decodedIdToken.email.split("@")[0];
-      // Save or update user data in MongoDB
-      try {
-        await saveUserToDB({
-          username,
-          email: decodedIdToken.email,
-          cognitoUserId: decodedIdToken.sub,
-          confirmed: true,
-        });
-        console.log("User data saved or updated in MongoDB successfully.");
-      } catch (mongoError: any) {
-        console.error(
-          "Error saving user data to MongoDB:",
-          mongoError.message || mongoError
-        );
-        throw new Error("Failed to save user data to the database.");
-      }
+      await saveUserToDB({
+        username,
+        email: decodedIdToken.email,
+        cognitoUserId: decodedIdToken.sub,
+        confirmed: true,
+      });
 
       response.status(200).json({
         message: "User authenticated and data saved successfully",

@@ -10,7 +10,6 @@ interface LoginFormProps {
 
 export default function LoginForm({
   onSubmit,
-  onGoogleSignUp,
 }: LoginFormProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -80,13 +79,6 @@ export default function LoginForm({
         disabled={isLoading}
       >
         {isLoading ? "Logging in..." : "Login"}
-      </button>
-      <button
-        type="button"
-        onClick={onGoogleSignUp}
-        className="w-full mt-4 py-2 px-4 border rounded-md shadow-sm text-sm font-medium text-gray-500 hover:bg-gray-50"
-      >
-        Sign in with Google
       </button>
     </form>
   );
