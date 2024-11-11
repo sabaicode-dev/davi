@@ -1,4 +1,4 @@
-// src/services/AwsAuth.service.ts
+// src/services/authEmail.service.ts
 
 import {
   CognitoIdentityProviderClient,
@@ -12,8 +12,14 @@ import dotenv from "dotenv";
 import UserRepository from "../database/repositories/user.repository"; // Import the repository
 import path from "path";
 
-// Load environment variables
-dotenv.config({ path: path.resolve(__dirname, `../configs/.env.development`) });
+// Specify the path to your .env file
+const env = process.env.NODE_ENV || "development";
+const envPath =
+  env === "production"
+    ? path.resolve(__dirname, `./configs/.env.${env}`)
+    : path.resolve(__dirname, `../configs/.env.${env}`);
+
+dotenv.config({ path: envPath });
 
 // Initialize Cognito client
 const cognitoClient = new CognitoIdentityProviderClient({
@@ -32,41 +38,38 @@ const generateSecretHash = (
     .digest("base64");
 };
 
-// Function to sign up a new user
-export const signUpUser = async (email: string, password: string) => {
+export const signUpUser = async (
+  username: string,
+  email: string,
+  password: string
+) => {
   try {
     const clientId = process.env.AWS_COGNITO_CLIENT_ID!;
     const clientSecret = process.env.AWS_COGNITO_CLIENT_SECRET!;
-
-    // Error handling for missing environment variables
-    if (!clientId || !clientSecret) {
-      throw new Error(
-        "AWS_COGNITO_CLIENT_ID or AWS_COGNITO_CLIENT_SECRET is missing from environment variables."
-      );
-    }
-
     const secretHash = generateSecretHash(email, clientId, clientSecret);
+
+    console.log(`clientId : ${clientId}`);
 
     const command = new SignUpCommand({
       ClientId: clientId,
       Username: email,
       Password: password,
-      UserAttributes: [{ Name: "email", Value: email }],
+      UserAttributes: [
+        { Name: "email", Value: email },
+        { Name: "name", Value: username },
+      ],
       SecretHash: secretHash,
     });
 
     const response = await cognitoClient.send(command);
 
-    // Save the user in MongoDB with unconfirmed status
     if (response.UserSub) {
-      await UserRepository.createUser(email, response.UserSub, {
-        confirmed: false,
-      });
+      await UserRepository.createUser(username, email, response.UserSub, false);
     }
 
     return response;
   } catch (error: any) {
-    console.error("Error signing up user: ", error.message || error);
+    console.error("Error signing up user:", error.message || error);
     throw error;
   }
 };

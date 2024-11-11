@@ -1,11 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axiosInstance from "@/app/utils/axios"; // Adjust this import path based on your project structure
 import { AlertCircle, CheckCircle2 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
-export default function EmailVerification() {
+interface EmailVerificationProps {
+  email: string;
+}
+
+export default function EmailVerification({ email }: EmailVerificationProps) {
   const [verificationCode, setVerificationCode] = useState([
     "",
     "",
@@ -16,8 +21,14 @@ export default function EmailVerification() {
   ]);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
-
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    if (!email) {
+      setError("Email is missing. Please try signing up again.");
+    }
+  }, [email]);
 
   const handleChange = (index: number, value: string) => {
     if (value.length <= 1 && /^[0-9]*$/.test(value)) {
@@ -37,7 +48,6 @@ export default function EmailVerification() {
 
   const handleKeyDown = (index: number, e: React.KeyboardEvent) => {
     if (e.key === "Backspace" && !verificationCode[index]) {
-      // If the current input is empty, move to the previous input
       if (index > 0) {
         const prevInput = document.getElementById(
           `code-${index - 1}`
@@ -45,7 +55,7 @@ export default function EmailVerification() {
         if (prevInput) prevInput.focus();
 
         const newCode = [...verificationCode];
-        newCode[index - 1] = ""; // Clear the previous input
+        newCode[index - 1] = "";
         setVerificationCode(newCode);
       }
     }
@@ -62,26 +72,55 @@ export default function EmailVerification() {
 
     setError(null);
     setSuccess(false);
+    setIsLoading(true);
 
     try {
-      // Simulate API call for code verification
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      setSuccess(true);
+      // Verify the email with the entered code using backend endpoint
+      const response = await axiosInstance.post("/v1/auth/verify-email", {
+        email,
+        code,
+      });
+
+      if (response.status === 200) {
+        setSuccess(true);
+        router.push("/dashboard"); // Redirect on successful verification
+      } else {
+        setError("Failed to verify code. Please try again.");
+      }
     } catch (err) {
-      setError("Failed to verify code. Please try again.");
-      console.log(err);
+      setError("Verification failed. Please try again.");
+      console.error("Verification error:", err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleResendCode = async () => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      // Resend verification code for the provided email
+      await axiosInstance.post("/v1/auth/resend-code", { email });
+      setSuccess(true);
+      setError("A new verification code has been sent to your email.");
+    } catch (err) {
+      setError("Failed to resend the code. Please try again.");
+      console.error("Resend code error:", err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="grid gird-col h-screen place-content-center w-full">
+    <div className="grid grid-cols-1 h-screen place-content-center w-full">
       <div className="max-w-screen-md mx-auto mt-8 p-6 bg-white rounded-lg shadow-md">
         <div className="mb-4 flex justify-center items-center">
           <Image
             src="/images/auth-images/verify.png"
             width={200}
             height={200}
-            alt="Picture of the author"
+            alt="Verification"
             unoptimized
           />
         </div>
@@ -94,8 +133,8 @@ export default function EmailVerification() {
               htmlFor="code-0"
               className="block text-sm font-medium text-gray-500 mb-4"
             >
-              Enter verification code:{" "}
-              <span className="underline">sophearum14@gmail.com</span>
+              Enter the verification code sent to:{" "}
+              <span className="underline">{email}</span>
             </label>
             <div className="flex gap-2 justify-center">
               {verificationCode.map((digit, index) => (
@@ -127,16 +166,22 @@ export default function EmailVerification() {
             </div>
           )}
           <button
-            onClick={() => router.push('http://localhost:8080')}
             type="submit"
             className="w-full py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            disabled={isLoading}
           >
-            Verify
+            {isLoading ? "Verifying..." : "Verify"}
           </button>
         </form>
         <p className="mt-4 text-sm text-gray-400">
-          {`Don't receive the code? `}
-          <button className="text-blue-400">Resend</button>
+          {`Didn't receive the code? `}
+          <button
+            onClick={handleResendCode}
+            className="text-blue-400"
+            disabled={isLoading}
+          >
+            Resend
+          </button>
         </p>
       </div>
     </div>

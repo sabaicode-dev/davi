@@ -1,37 +1,56 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import axiosInstance from "@/app/utils/axios";
+import LoginForm from "@/app/(auth)/login/Components/LoginFrom";
 import Image from "next/image";
-import { RiEyeCloseFill, RiEyeCloseLine } from "react-icons/ri";
-import { BiArrowBack } from "react-icons/bi"; 
+import { BiArrowBack } from "react-icons/bi";
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    console.log("Signing up with:", email, password);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setIsLoading(false);
-    router.push("/dashboard");
+  const handleLogin = async (email: string, password: string) => {
+    setError(null);
+    try {
+      const response = await axiosInstance.post("/v1/auth/signin", {
+        email,
+        password,
+      });
+
+      if (response.status === 200) {
+        // On successful login, navigate to your dashboard page
+        router.push("http://localhost:8080");
+      } else {
+        setError("Login failed. Please try again.");
+      }
+    } catch (err) {
+      setError("Login failed. Please try again.");
+      console.error("Login error:", err);
+    }
   };
 
-  const handleGoogleSignUp = () => {
-    console.log("Signing up with Google");
+  const handleGoogleSignUp = async () => {
+    try {
+      const response = await axiosInstance.get("/v1/auth/google");
+
+      // Check if the response contains the redirect URL
+      if (response.data && response.data.url) {
+        // Redirect the browser to Google's OAuth URL
+        window.location.href = response.data.url;
+      } else {
+        console.error("Google Sign-in URL not found in response.");
+        alert("An error occurred during Google login.");
+      }
+    } catch (err) {
+      console.error("Google Sign-up error:", err);
+      alert("An error occurred during Google login.");
+    }
   };
 
-  const togglePasswordVisibility = () => {
-    setIsPasswordVisible(!isPasswordVisible);
-  };
+  console.log(error);
 
-  const handleBack = () => {
-    router.push('/'); 
-  };
+  const handleBack = () => router.push("/");
 
   return (
     <div className="min-h-screen flex">
@@ -47,69 +66,10 @@ export default function LoginPage() {
           </button>
           <h2 className="text-3xl font-bold mb-4">LOGIN</h2>
           <p className="text-gray-600 mb-8">Welcome back!</p>
-          <form className="space-y-6" onSubmit={handleSubmit}>
-            {/* email */}
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Email or Username
-              </label>
-              <div className="mt-1">
-                <input
-                  placeholder="Enter Email"
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  required
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </div>
-            </div>
-            {/* password  */}
-            <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Password
-              </label>
-              <div className="mt-1 relative">
-                <input
-                  placeholder="Enter Password"
-                  id="password"
-                  name="password"
-                  type={isPasswordVisible ? "text" : "password"}
-                  autoComplete="new-password"
-                  required
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-                {/* eyes button */}
-                <button
-                  type="button"
-                  onClick={togglePasswordVisibility}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
-                >
-                  {isPasswordVisible ? <RiEyeCloseLine /> : <RiEyeCloseFill />}
-                </button>
-              </div>
-            </div>
-            <div>
-              <button
-                type="submit"
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                disabled={isLoading}
-              >
-                {isLoading ? "Login..." : "Login"}
-              </button>
-            </div>
-          </form>
+          <LoginForm
+            onSubmit={handleLogin}
+            onGoogleSignUp={handleGoogleSignUp}
+          />
           <div className="relative flex items-center justify-center text-sm mt-4">
             <div className="flex-grow border-t border-gray-300"></div>
             <span className="px-2 text-gray-500 bg-white">
