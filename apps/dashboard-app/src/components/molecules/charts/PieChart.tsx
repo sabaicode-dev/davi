@@ -63,7 +63,7 @@ const PieChart: React.FC<PieChartProps> = ({ data, show_category = false }) => {
         options={chartOptions}
         series={series}
         type="pie"
-        height={350}
+        height={270}
       />
     </div>
   );
@@ -82,7 +82,7 @@ const PieChartTest: React.FC = () => {
   ];
 
   return (
-    <div className="w-full h-full mt-24">
+    <div className="">
       <PieChart data={sampleData} show_category={true} />
     </div>
   );

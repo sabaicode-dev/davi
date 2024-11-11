@@ -1,6 +1,6 @@
 // src/components/Step3.tsx
 import React from "react";
-import CSV from "@/public/images/Book-icon.png";
+import CSV from "@/public/images/step/CSV_logo.png";
 import Mongo from "@/public/images/step/MongoDB_logo.png";
 import URL from "@/public/images/step/URL_logo.png";
 import MySql from "@/public/images/step/MySQL_logo.png";
