@@ -2,12 +2,14 @@ import React from "react";
 import FileIcon from "@/public/images/file.png";
 import Button from "./Button";
 import { DeleteIcon } from "./icons/Icon";
+import { useNavigate } from "react-router-dom";
 interface CardProps {
   index: number;
   onDelete: () => void;
 }
 
 const Card: React.FC<CardProps> = ({ index, onDelete }) => {
+  const navigate = useNavigate();
   return (
     <div className="w-full bg-[#EBF1FF] p-5 flex space-x-10 rounded-lg">
       {/* Left Section */}
@@ -18,12 +20,12 @@ const Card: React.FC<CardProps> = ({ index, onDelete }) => {
           <img src={FileIcon} alt="File Icon" width={20} />
         </span>
       </div>
-      
+
       {/* Middle Section */}
       <div className="flex justify-between w-full">
         <div
-          onClick={() => alert(`Card ${index + 1} has been Clicked`)}
-          className="font-medium text-[14px] cursor-pointer"
+          onClick={() => navigate("/")}
+          className="font-medium text-[14px] cursor-pointer w-[95%]"
         >
           <p>Tech requirements.csv</p>
           <p>200 KB</p>
@@ -35,14 +37,6 @@ const Card: React.FC<CardProps> = ({ index, onDelete }) => {
           color="none"
           className="text-red-500 !bg-transparent"
         />
-        {/* <button
-          type="button"
-          onClick={onDelete}
-          className="flex justify-center items-center text-red-500"
-          
-        >
-          <DeleteIcon/>
-        </button> */}
       </div>
     </div>
   );
