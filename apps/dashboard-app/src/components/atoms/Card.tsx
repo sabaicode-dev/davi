@@ -21,7 +21,7 @@ const Card: React.FC<CardProps> = ({ index, onDelete }) => {
         </span>
       </div>
 
-      {/* Middle Section */}
+      {/*implement Middle Section  */}
       <div className="flex justify-between w-full">
         <div
           onClick={() => navigate("/")}
