@@ -29,14 +29,14 @@ export class GoogleAuthController extends Controller {
    */
 @Get("/google")
 public async initiateGoogleSignIn(
-  @Res() redirect: TsoaResponse<302, { url: string }>,
+  @Res() redirect: TsoaResponse<200, { url: string }>,
   @Res() errorResponse: TsoaResponse<500, { error: string }>
 ): Promise<void> {
   try {
     const signInUrl = googleSignIn();
     console.log("Redirecting to Google Sign-In URL:", signInUrl);
     // Send a 302 redirect to the frontend with the URL
-    redirect(302, { url: signInUrl });
+    redirect(200, { url: signInUrl });
   } catch (error: any) {
     console.error("Error initiating Google Sign-In:", error);
     errorResponse(500, { error: error.message });

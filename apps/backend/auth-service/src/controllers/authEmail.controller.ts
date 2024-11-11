@@ -20,7 +20,6 @@ export class CognitoController extends Controller {
    * Sign up a new user
    * @param requestBody The user email and password
    */
-  // @SuccessResponse("201", "User signed up successfully") // Custom success response
   @Post("signup")
   public async signUp(
     @Body() requestBody: SignUpRequest
@@ -28,10 +27,23 @@ export class CognitoController extends Controller {
     const { username, email, password } = requestBody;
     try {
       const result = await signUpUser(username, email, password);
-      this.setStatus(201); // Set the response status code to 201
-      return { message: "User signed up successfully", result };
+      this.setStatus(200); // Set the response status code to 201 (Created)
+      return { message: result.message, result: result }; // Ensure we always return 'result' in case of success
     } catch (error: any) {
-      throw new Error(error.message);
+      console.error("Error during sign-up:", error.message || error);
+
+      let result = {}; // Initialize result to be returned with the error message
+      let message = "An error occurred during sign-up."; // Default error message
+
+      if (error.message === "User already exists. Please try logging in.") {
+        // Handle user already exists error
+        this.setStatus(409); // Conflict (user already exists)
+        message = error.message; // Set the message for already existing user
+      } else {
+        this.setStatus(500); // Internal server error for other cases
+      }
+
+      return { message, result }; // Ensure 'result' is always included, even in error cases
     }
   }
 

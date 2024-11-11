@@ -173,7 +173,7 @@ const UploadCsv: React.FC<StepTwoProps> = ({ onBack }) => {
       <div className="flex justify-center">
         <div className="h-1 w-8 bg-blue-600 rounded-full mx-1"></div>
         <div className="h-1 w-8 bg-blue-600 rounded-full mx-1"></div>
-        <div className="h-1 w-8 bg-blue-200 rounded-full mx-1"></div>
+        <div className="h-1 w-8 bg-blue-600 rounded-full mx-1"></div>
       </div>
     </div>
   );

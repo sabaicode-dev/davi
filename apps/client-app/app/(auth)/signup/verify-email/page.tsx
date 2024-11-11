@@ -6,11 +6,7 @@ import { AlertCircle, CheckCircle2 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
-interface EmailVerificationProps {
-  email: string;
-}
-
-export default function EmailVerification({ email }: EmailVerificationProps) {
+export default function EmailVerification() {
   const [verificationCode, setVerificationCode] = useState([
     "",
     "",
@@ -22,13 +18,19 @@ export default function EmailVerification({ email }: EmailVerificationProps) {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [email, setEmail] = useState("");
+
   const router = useRouter();
 
   useEffect(() => {
-    if (!email) {
+    const storedEmail = localStorage.getItem("email");
+    if (storedEmail) {
+      setEmail(storedEmail);
+      setError(null); // Clear any error related to missing email
+    } else {
       setError("Email is missing. Please try signing up again.");
     }
-  }, [email]);
+  }, []);
 
   const handleChange = (index: number, value: string) => {
     if (value.length <= 1 && /^[0-9]*$/.test(value)) {
@@ -63,27 +65,31 @@ export default function EmailVerification({ email }: EmailVerificationProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Join the verification code into a single string
     const code = verificationCode.join("");
 
+    // Validate that the code is 6 digits long
     if (code.length !== 6) {
       setError("Please enter a 6-digit verification code.");
       return;
     }
 
+    // Clear any existing error before starting the verification
     setError(null);
     setSuccess(false);
     setIsLoading(true);
 
     try {
-      // Verify the email with the entered code using backend endpoint
-      const response = await axiosInstance.post("/v1/auth/verify-email", {
-        email,
-        code,
+      // Call the backend to verify the email and code
+      const response = await axiosInstance.post("/v1/auth/confirm", {
+        email, // Email is passed here for confirmation
+        confirmationCode: code, // The 6-digit code entered by the user
       });
 
       if (response.status === 200) {
         setSuccess(true);
-        router.push("/dashboard"); // Redirect on successful verification
+        router.push("/dashboard"); // Redirect to the dashboard or success page on verification success
       } else {
         setError("Failed to verify code. Please try again.");
       }
@@ -100,7 +106,7 @@ export default function EmailVerification({ email }: EmailVerificationProps) {
     setError(null);
 
     try {
-      // Resend verification code for the provided email
+      // Resend the verification code to the provided email
       await axiosInstance.post("/v1/auth/resend-code", { email });
       setSuccess(true);
       setError("A new verification code has been sent to your email.");
@@ -127,6 +133,7 @@ export default function EmailVerification({ email }: EmailVerificationProps) {
         <h2 className="text-2xl font-bold mb-4 text-center">
           Email Verification
         </h2>
+
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label
@@ -153,18 +160,21 @@ export default function EmailVerification({ email }: EmailVerificationProps) {
               ))}
             </div>
           </div>
+
           {error && (
             <div className="flex items-center text-red-600 mb-4">
               <AlertCircle className="mr-2" />
               <p>{error}</p>
             </div>
           )}
+
           {success && (
             <div className="flex items-center text-green-600 mb-4">
               <CheckCircle2 className="mr-2" />
               <p>Email verified successfully!</p>
             </div>
           )}
+
           <button
             type="submit"
             className="w-full py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
@@ -173,6 +183,7 @@ export default function EmailVerification({ email }: EmailVerificationProps) {
             {isLoading ? "Verifying..." : "Verify"}
           </button>
         </form>
+
         <p className="mt-4 text-sm text-gray-400">
           {`Didn't receive the code? `}
           <button
