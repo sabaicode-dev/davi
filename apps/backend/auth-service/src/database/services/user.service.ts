@@ -7,6 +7,7 @@ import User, { IUser } from "../models/user.models";
  */
 export const saveUserToDB = async (userData: {
   email: string;
+  username: string;
   cognitoUserId?: string;
   confirmed?: boolean;
 }): Promise<IUser | null> => {
@@ -17,6 +18,7 @@ export const saveUserToDB = async (userData: {
       // Create a new user
       user = new User({
         email: userData.email,
+        username: userData.username,
         cognitoUserId: userData.cognitoUserId,
         confirmed: userData.confirmed ?? false,
       });
@@ -24,6 +26,7 @@ export const saveUserToDB = async (userData: {
       console.log("New user saved to MongoDB:", user);
     } else {
       // Update existing user
+      user.username = userData.username || user.username;
       user.cognitoUserId = userData.cognitoUserId || user.cognitoUserId;
       user.confirmed = userData.confirmed ?? user.confirmed;
       await user.save();

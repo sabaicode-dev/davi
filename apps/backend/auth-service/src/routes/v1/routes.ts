@@ -4,6 +4,8 @@
 import type { TsoaRoute } from '@tsoa/runtime';
 import {  fetchMiddlewares, ExpressTemplateService } from '@tsoa/runtime';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+import { UpdateUserName } from './../../controllers/updateUserName.controller';
+// WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { GoogleAuthController } from './../../controllers/authGoogle.controller';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { CognitoController } from './../../controllers/authEmail.controller';
@@ -25,6 +27,7 @@ const models: TsoaRoute.Models = {
     "SignUpRequest": {
         "dataType": "refObject",
         "properties": {
+            "username": {"dataType":"string","required":true},
             "email": {"dataType":"string","required":true},
             "password": {"dataType":"string","required":true},
         },
@@ -74,6 +77,36 @@ export function RegisterRoutes(app: Router) {
 
 
     
+        app.put('/v1/auth/updateUsername',
+            ...(fetchMiddlewares<RequestHandler>(UpdateUserName)),
+            ...(fetchMiddlewares<RequestHandler>(UpdateUserName.prototype.updateUsername)),
+
+            async function UpdateUserName_updateUsername(request: ExRequest, response: ExResponse, next: any) {
+            const args: Record<string, TsoaRoute.ParameterSchema> = {
+                    requestBody: {"in":"body","name":"requestBody","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"newUsername":{"dataType":"string","required":true},"email":{"dataType":"string","required":true}}},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args, request, response });
+
+                const controller = new UpdateUserName();
+
+              await templateService.apiHandler({
+                methodName: 'updateUsername',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.get('/v1/auth/google',
             ...(fetchMiddlewares<RequestHandler>(GoogleAuthController)),
             ...(fetchMiddlewares<RequestHandler>(GoogleAuthController.prototype.initiateGoogleSignIn)),
@@ -192,7 +225,7 @@ export function RegisterRoutes(app: Router) {
                 response,
                 next,
                 validatedArgs,
-                successStatus: 201,
+                successStatus: undefined,
               });
             } catch (err) {
                 return next(err);
