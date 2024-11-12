@@ -13,6 +13,11 @@ const {
   AWS_REDIRECT_URI,
 } = process.env;
 
+
+/**
+ * Generate the Google Sign-In URL.
+ * @returns The Google Sign-In URL to redirect the user.
+ */
 export const googleSignIn = (): string => {
   if (!AWS_COGNITO_DOMAIN || !AWS_COGNITO_CLIENT_ID || !AWS_REDIRECT_URI) {
     throw new Error(
