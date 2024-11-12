@@ -19,6 +19,7 @@ export default function EmailVerification() {
   const [success, setSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
+  const [countdown, setCountdown] = useState(60);
 
   const router = useRouter();
 
@@ -31,6 +32,15 @@ export default function EmailVerification() {
       setError("Email is missing. Please try signing up again.");
     }
   }, []);
+
+  useEffect(() => {
+    if (countdown > 0) {
+      const timer = setInterval(() => {
+        setCountdown((prev) => prev - 1);
+      }, 1000);
+      return () => clearInterval(timer);
+    }
+  }, [countdown]);
 
   const handleChange = (index: number, value: string) => {
     if (value.length <= 1 && /^[0-9]*$/.test(value)) {
@@ -89,7 +99,7 @@ export default function EmailVerification() {
 
       if (response.status === 200) {
         setSuccess(true);
-        router.push("/dashboard"); // Redirect to the dashboard or success page on verification success
+        router.push("http://localhost:8080"); // Redirect to the dashboard or success page on verification success
       } else {
         setError("Failed to verify code. Please try again.");
       }
@@ -106,9 +116,8 @@ export default function EmailVerification() {
     setError(null);
 
     try {
-      // Resend the verification code to the provided email
       await axiosInstance.post("/v1/auth/resend-code", { email });
-      setSuccess(true);
+      setCountdown(60); // Reset countdown to 60 seconds after resending
       setError("A new verification code has been sent to your email.");
     } catch (err) {
       setError("Failed to resend the code. Please try again.");
@@ -184,15 +193,18 @@ export default function EmailVerification() {
           </button>
         </form>
 
-        <p className="mt-4 text-sm text-gray-400">
+        <p className="mt-4 text-sm text-gray-400 space-x-2">
           {`Didn't receive the code? `}
           <button
             onClick={handleResendCode}
-            className="text-blue-400"
-            disabled={isLoading}
+            className={`text-blue-400 ${
+              isLoading || countdown > 0 ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+            disabled={isLoading || countdown > 0} // Disable if loading or countdown > 0
           >
             Resend
           </button>
+          <span className="text-gray-400">({countdown}s)</span>
         </p>
       </div>
     </div>

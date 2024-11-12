@@ -50,7 +50,6 @@ export default function SignUpPage() {
 
       if (response.status === 200) {
         localStorage.setItem("email", email);
-        // typically 201 for created
         router.push("/signup/verify-email"); // Redirect to the verification page
       } else {
         setError("Sign-up failed. Please try again.");
