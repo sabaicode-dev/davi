@@ -49,6 +49,7 @@ export default function SignUpPage() {
       });
 
       if (response.status === 200) {
+        localStorage.setItem("username", username);
         localStorage.setItem("email", email);
         router.push("/signup/verify-email"); // Redirect to the verification page
       } else {

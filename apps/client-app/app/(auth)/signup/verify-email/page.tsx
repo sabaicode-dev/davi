@@ -204,7 +204,9 @@ export default function EmailVerification() {
           >
             Resend
           </button>
-          <span className="text-gray-400">({countdown}s)</span>
+          {countdown > 0 && (
+            <span className="text-gray-400">({countdown}s)</span>
+          )}
         </p>
       </div>
     </div>
