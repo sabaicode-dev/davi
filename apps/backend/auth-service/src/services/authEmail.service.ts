@@ -109,13 +109,6 @@ export const confirmSignUp = async (
     const clientSecret = process.env.AWS_COGNITO_CLIENT_SECRET!;
     const secretHash = generateSecretHash(email, clientId, clientSecret);
 
-    // Check last confirmation timestamp to enforce resend limit
-    const lastSentAt = await UserRepository.getLastConfirmationTimestamp(email);
-    const currentTime = Date.now();
-    if (lastSentAt && currentTime - lastSentAt < RESEND_CODE_LIMIT_MS) {
-      throw new Error("Please wait before requesting a new confirmation code.");
-    }
-
     const command = new ConfirmSignUpCommand({
       ClientId: clientId,
       Username: email,
@@ -131,8 +124,15 @@ export const confirmSignUp = async (
 
     return response;
   } catch (error: any) {
-    console.error("Error confirming sign-up: ", error.message || error);
-    throw error;
+    if (
+      error.message.includes("ExpiredCodeException") ||
+      error.message.includes("CodeMismatchException")
+    ) {
+      throw new Error(
+        "The confirmation code is invalid or has expired. Please request a new code."
+      );
+    }
+    throw new Error(error.message);
   }
 };
 

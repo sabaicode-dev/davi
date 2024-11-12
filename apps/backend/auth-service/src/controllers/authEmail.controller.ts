@@ -63,9 +63,40 @@ export class CognitoController extends Controller {
       const result = await confirmSignUp(email, confirmationCode);
       return { message: "User confirmed successfully", result };
     } catch (error: any) {
+      // Check for specific error codes
+      if (
+        error.message.includes("ExpiredCodeException") ||
+        error.message.includes("CodeMismatchException")
+      ) {
+        throw new Error(
+          "The confirmation code is invalid or has expired. Please request a new code and try again."
+        );
+      }
+      // Handle other errors
       throw new Error(error.message);
     }
   }
+
+  // @Post("confirm")
+  // public async confirmSignUp(
+  //   @Body() requestBody: ConfirmSignUpRequest
+  // ): Promise<{ message: string; result: any }> {
+  //   const { email, confirmationCode } = requestBody;
+  //   try {
+  //     const result = await confirmSignUp(email, confirmationCode);
+  //     return { message: "User confirmed successfully", result };
+  //   } catch (error: any) {
+  //     if (
+  //       error.message.includes("ExpiredCodeException") ||
+  //       error.message.includes("CodeMismatchException")
+  //     ) {
+  //       throw new Error(
+  //         "The confirmation code is invalid or expired. Please request a new code."
+  //       );
+  //     }
+  //     throw new Error(error.message);
+  //   }
+  // }
 
   /**
    * Resend the confirmation code to a user's email
