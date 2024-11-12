@@ -35,6 +35,7 @@ app.use(
   })
 );
 
+//log show allowedOrigins 
 console.log(`allowedOrigins : ${allowedOrigins}`);
 
 // ========================
