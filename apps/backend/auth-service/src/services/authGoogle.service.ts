@@ -19,11 +19,6 @@ const {
   AWS_REDIRECT_URI,
 } = process.env;
 
-// console.log("AWS_COGNITO_DOMAIN kk:", AWS_COGNITO_DOMAIN);
-// console.log("AWS_COGNITO_CLIENT_ID:", AWS_COGNITO_CLIENT_ID);
-// console.log("AWS_COGNITO_CLIENT_SECRET:", AWS_COGNITO_CLIENT_SECRET);
-// console.log("AWS_REDIRECT_URI:", AWS_REDIRECT_URI);
-
 /**
  * Generate the Google Sign-In URL.
  * @returns The Google Sign-In URL to redirect the user.
