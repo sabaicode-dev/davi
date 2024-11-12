@@ -3,9 +3,6 @@
 /**
  * Request type for Google Sign-Out, requiring a refresh token.
  */
-export interface GoogleSignOutRequest {
-  refreshToken: string;
-}
 
 export interface SignOutRequest {
   refreshToken: string;

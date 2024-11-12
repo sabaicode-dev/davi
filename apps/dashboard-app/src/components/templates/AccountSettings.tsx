@@ -25,9 +25,9 @@ const AccountSettings: React.FC = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await axios.get("/api/user"); // Fetching the user's details
+        const response = await axios.get("/v1/auth/updateUsername"); // Fetching the user's details
         setUser({
-          firstName: response.data.firstName || "",
+          firstName: response.data.username || "",
           lastName: response.data.lastName || "",
           email: response.data.email || "", // Set email from the fetched data
         });
@@ -75,7 +75,7 @@ const AccountSettings: React.FC = () => {
   // Function to update user name on the backend
   const updateUser = async () => {
     try {
-      const response = await axios.put("/api/user", {
+      const response = await axios.put("/v1/auth/updateUsername", {
         firstName: user.firstName,
         lastName: user.lastName,
       }); // Backend route to update user details

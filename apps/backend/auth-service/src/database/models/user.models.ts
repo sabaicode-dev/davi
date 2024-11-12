@@ -10,6 +10,7 @@ export interface IUser extends Document {
   confirmed: boolean;
   createdAt: Date;
   updatedAt: Date;
+  lastConfirmationSentAt?: number;
 }
 
 const UserSchema: Schema<IUser> = new Schema(
@@ -19,6 +20,7 @@ const UserSchema: Schema<IUser> = new Schema(
     password: { type: String },
     cognitoUserId: { type: String, unique: true },
     confirmed: { type: Boolean, default: false },
+    lastConfirmationSentAt: { type: Number },
   },
   {
     timestamps: true,

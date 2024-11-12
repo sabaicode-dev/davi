@@ -4,7 +4,7 @@
 import type { TsoaRoute } from '@tsoa/runtime';
 import {  fetchMiddlewares, ExpressTemplateService } from '@tsoa/runtime';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-import { UpdateUserName } from './../../controllers/updateUserName.controller';
+import { UpdateUserName } from './../../controllers/updateAndLogout.controller';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { GoogleAuthController } from './../../controllers/authGoogle.controller';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -16,7 +16,7 @@ import type { Request as ExRequest, Response as ExResponse, RequestHandler, Rout
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 
 const models: TsoaRoute.Models = {
-    "GoogleSignOutRequest": {
+    "SignOutRequest": {
         "dataType": "refObject",
         "properties": {
             "refreshToken": {"dataType":"string","required":true},
@@ -48,14 +48,6 @@ const models: TsoaRoute.Models = {
         "properties": {
             "email": {"dataType":"string","required":true},
             "confirmationCode": {"dataType":"string","required":true},
-        },
-        "additionalProperties": false,
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "SignOutRequest": {
-        "dataType": "refObject",
-        "properties": {
-            "refreshToken": {"dataType":"string","required":true},
         },
         "additionalProperties": false,
     },
@@ -107,13 +99,45 @@ export function RegisterRoutes(app: Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.put('/v1/auth/logout',
+            ...(fetchMiddlewares<RequestHandler>(UpdateUserName)),
+            ...(fetchMiddlewares<RequestHandler>(UpdateUserName.prototype.unifiedLogout)),
+
+            async function UpdateUserName_unifiedLogout(request: ExRequest, response: ExResponse, next: any) {
+            const args: Record<string, TsoaRoute.ParameterSchema> = {
+                    requestBody: {"in":"body","name":"requestBody","required":true,"ref":"SignOutRequest"},
+                    request: {"in":"request","name":"request","required":true,"dataType":"object"},
+                    errorResponse: {"in":"res","name":"500","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"error":{"dataType":"string","required":true}}},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args, request, response });
+
+                const controller = new UpdateUserName();
+
+              await templateService.apiHandler({
+                methodName: 'unifiedLogout',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.get('/v1/auth/google',
             ...(fetchMiddlewares<RequestHandler>(GoogleAuthController)),
             ...(fetchMiddlewares<RequestHandler>(GoogleAuthController.prototype.initiateGoogleSignIn)),
 
             async function GoogleAuthController_initiateGoogleSignIn(request: ExRequest, response: ExResponse, next: any) {
             const args: Record<string, TsoaRoute.ParameterSchema> = {
-                    redirect: {"in":"res","name":"302","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"url":{"dataType":"string","required":true}}},
+                    redirect: {"in":"res","name":"200","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"url":{"dataType":"string","required":true}}},
                     errorResponse: {"in":"res","name":"500","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"error":{"dataType":"string","required":true}}},
             };
 
@@ -159,38 +183,6 @@ export function RegisterRoutes(app: Router) {
 
               await templateService.apiHandler({
                 methodName: 'googleCallback',
-                controller,
-                response,
-                next,
-                validatedArgs,
-                successStatus: undefined,
-              });
-            } catch (err) {
-                return next(err);
-            }
-        });
-        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        app.post('/v1/auth/signout',
-            ...(fetchMiddlewares<RequestHandler>(GoogleAuthController)),
-            ...(fetchMiddlewares<RequestHandler>(GoogleAuthController.prototype.handleSignOut)),
-
-            async function GoogleAuthController_handleSignOut(request: ExRequest, response: ExResponse, next: any) {
-            const args: Record<string, TsoaRoute.ParameterSchema> = {
-                    requestBody: {"in":"body","name":"requestBody","required":true,"ref":"GoogleSignOutRequest"},
-                    request: {"in":"request","name":"request","required":true,"dataType":"object"},
-                    errorResponse: {"in":"res","name":"500","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"error":{"dataType":"string","required":true}}},
-            };
-
-            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-
-            let validatedArgs: any[] = [];
-            try {
-                validatedArgs = templateService.getValidatedArgs({ args, request, response });
-
-                const controller = new GoogleAuthController();
-
-              await templateService.apiHandler({
-                methodName: 'handleSignOut',
                 controller,
                 response,
                 next,
@@ -292,13 +284,13 @@ export function RegisterRoutes(app: Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        app.post('/v1/auth/logout',
+        app.post('/v1/auth/resend-code',
             ...(fetchMiddlewares<RequestHandler>(CognitoController)),
-            ...(fetchMiddlewares<RequestHandler>(CognitoController.prototype.logout)),
+            ...(fetchMiddlewares<RequestHandler>(CognitoController.prototype.resendCode)),
 
-            async function CognitoController_logout(request: ExRequest, response: ExResponse, next: any) {
+            async function CognitoController_resendCode(request: ExRequest, response: ExResponse, next: any) {
             const args: Record<string, TsoaRoute.ParameterSchema> = {
-                    requestBody: {"in":"body","name":"requestBody","required":true,"ref":"SignOutRequest"},
+                    requestBody: {"in":"body","name":"requestBody","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"email":{"dataType":"string","required":true}}},
             };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -310,7 +302,7 @@ export function RegisterRoutes(app: Router) {
                 const controller = new CognitoController();
 
               await templateService.apiHandler({
-                methodName: 'logout',
+                methodName: 'resendCode',
                 controller,
                 response,
                 next,

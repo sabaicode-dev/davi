@@ -18,6 +18,7 @@ const UploadCsv: React.FC<StepTwoProps> = ({ onBack }) => {
   const [error, setError] = useState<string>("");
 
   const MAX_FILENAME_LENGTH = 30; // Set your maximum filename length here
+  const MAX_UPLOAD_DURATION = 5000; // Set the max upload duration in ms
 
   const handleFileUpload = () => {
     fileInputRef.current?.click();
@@ -30,7 +31,7 @@ const UploadCsv: React.FC<StepTwoProps> = ({ onBack }) => {
         setFileName(file.name);
         setFileSize(file.size / 1024); // Convert size to KB
         setError("");
-        simulateUpload(); // Start the upload simulation
+        simulateUpload(file.size); // Pass file size to simulateUpload
       } else {
         setError("Please upload a valid CSV file.");
       }
@@ -39,26 +40,36 @@ const UploadCsv: React.FC<StepTwoProps> = ({ onBack }) => {
     }
   };
 
-  const simulateUpload = () => {
+  const simulateUpload = (fileSize: number) => {
     setProgress(0);
+    const intervalDuration = calculateInterval(fileSize);
+
     const interval = setInterval(() => {
       setProgress((prev) => {
         if (prev < 100) return prev + 1;
         clearInterval(interval);
         return 100;
       });
-    }, 50); // Simulate upload every 50ms
+    }, intervalDuration); // Dynamic interval based on file size
+  };
+
+  // Function to dynamically calculate interval duration
+  const calculateInterval = (fileSize: number) => {
+    const fileSizeKB = fileSize / 1024; // Convert to KB
+    const interval = (MAX_UPLOAD_DURATION / 100) * (fileSizeKB / 100);
+    // Bound interval within reasonable limits
+    return Math.min(Math.max(interval, 10), 200);
   };
 
   // Function to truncate file names
   const truncateFileName = (name: string) => {
-    const extension = name.split(".").pop(); // Get the file extension
-    const baseName = name.substring(0, name.lastIndexOf(".")); // Get the name without the extension
+    const extension = name.split(".").pop();
+    const baseName = name.substring(0, name.lastIndexOf("."));
 
     if (baseName.length > MAX_FILENAME_LENGTH) {
-      return baseName.substring(0, MAX_FILENAME_LENGTH) + `...${extension}`; // Truncate and append extension
+      return baseName.substring(0, MAX_FILENAME_LENGTH) + `...${extension}`;
     }
-    return name; // Return original name if it's within the limit
+    return name;
   };
 
   return (
@@ -121,8 +132,7 @@ const UploadCsv: React.FC<StepTwoProps> = ({ onBack }) => {
                       <p className="text-sm font-medium text-gray-700 truncate max-w-xs">
                         {truncateFileName(fileName)}{" "}
                       </p>
-                      {progress === 100 && <CheckTick />}{" "}
-                      {/* Show CheckTick only when progress is 100% */}
+                      {progress === 100 && <CheckTick />}
                     </div>
                     <p className="text-sm text-gray-500 mt-1">
                       {fileSize.toFixed(2)} KB
@@ -132,7 +142,7 @@ const UploadCsv: React.FC<StepTwoProps> = ({ onBack }) => {
                     <div className="h-2 w-full bg-blue-300 rounded-full">
                       <div
                         className="h-2 bg-[#443DFF] rounded-full"
-                        style={{ width: `${progress}%` }} // Dynamic width based on progress
+                        style={{ width: `${progress}%` }}
                       ></div>
                     </div>
                     <p className="text-sm font-medium text-blue-600">
@@ -173,7 +183,7 @@ const UploadCsv: React.FC<StepTwoProps> = ({ onBack }) => {
       <div className="flex justify-center">
         <div className="h-1 w-8 bg-blue-600 rounded-full mx-1"></div>
         <div className="h-1 w-8 bg-blue-600 rounded-full mx-1"></div>
-        <div className="h-1 w-8 bg-blue-200 rounded-full mx-1"></div>
+        <div className="h-1 w-8 bg-blue-600 rounded-full mx-1"></div>
       </div>
     </div>
   );
