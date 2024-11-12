@@ -1,11 +1,10 @@
-// src/services/authEmail.service.ts
-
 import {
   CognitoIdentityProviderClient,
   SignUpCommand,
   AdminInitiateAuthCommand,
   ConfirmSignUpCommand,
   RevokeTokenCommand,
+  ResendConfirmationCodeCommand,
 } from "@aws-sdk/client-cognito-identity-provider";
 import * as crypto from "crypto";
 import dotenv from "dotenv";
@@ -47,8 +46,6 @@ export const signUpUser = async (
     const clientId = process.env.AWS_COGNITO_CLIENT_ID!;
     const clientSecret = process.env.AWS_COGNITO_CLIENT_SECRET!;
     const secretHash = generateSecretHash(email, clientId, clientSecret);
-
-    console.log(`clientId : ${clientId}`);
 
     const command = new SignUpCommand({
       ClientId: clientId,
@@ -101,6 +98,8 @@ export const signInUser = async (email: string, password: string) => {
 };
 
 // Function to confirm a user's sign-up
+const RESEND_CODE_LIMIT_MS = 60000; // 1 minute in milliseconds
+
 export const confirmSignUp = async (
   email: string,
   confirmationCode: string
@@ -109,6 +108,13 @@ export const confirmSignUp = async (
     const clientId = process.env.AWS_COGNITO_CLIENT_ID!;
     const clientSecret = process.env.AWS_COGNITO_CLIENT_SECRET!;
     const secretHash = generateSecretHash(email, clientId, clientSecret);
+
+    // Check last confirmation timestamp to enforce resend limit
+    const lastSentAt = await UserRepository.getLastConfirmationTimestamp(email);
+    const currentTime = Date.now();
+    if (lastSentAt && currentTime - lastSentAt < RESEND_CODE_LIMIT_MS) {
+      throw new Error("Please wait before requesting a new confirmation code.");
+    }
 
     const command = new ConfirmSignUpCommand({
       ClientId: clientId,
@@ -119,8 +125,9 @@ export const confirmSignUp = async (
 
     const response = await cognitoClient.send(command);
 
-    // Update user to confirmed status in MongoDB
+    // Confirm user and update last confirmation timestamp
     await UserRepository.confirmUser(email);
+    await UserRepository.updateConfirmationTimestamp(email);
 
     return response;
   } catch (error: any) {
@@ -129,19 +136,46 @@ export const confirmSignUp = async (
   }
 };
 
+// Function to resend the confirmation code
+export const resendConfirmationCode = async (email: string) => {
+  try {
+    const clientId = process.env.AWS_COGNITO_CLIENT_ID!;
+    const clientSecret = process.env.AWS_COGNITO_CLIENT_SECRET!;
+
+    // Check cooldown period
+    const lastSentAt = await UserRepository.getLastConfirmationTimestamp(email);
+    const currentTime = Date.now();
+    if (lastSentAt && currentTime - lastSentAt < RESEND_CODE_LIMIT_MS) {
+      throw new Error("Please wait before requesting a new confirmation code.");
+    }
+
+    // Generate the secret hash
+    const secretHash = generateSecretHash(email, clientId, clientSecret);
+
+    // Create and send the ResendConfirmationCode command with the SECRET_HASH
+    const command = new ResendConfirmationCodeCommand({
+      ClientId: clientId,
+      Username: email,
+      SecretHash: secretHash, // Add this parameter
+    });
+
+    await cognitoClient.send(command);
+
+    // Update the last confirmation timestamp
+    await UserRepository.updateConfirmationTimestamp(email);
+
+    return { message: "Confirmation code resent successfully" };
+  } catch (error: any) {
+    console.error("Error resending confirmation code:", error.message || error);
+    throw error;
+  }
+};
+
 // Function to log out a user by revoking their refresh token
 export const logoutUser = async (refreshToken: string) => {
   try {
     const clientId = process.env.AWS_COGNITO_CLIENT_ID!;
-    if (!clientId) {
-      throw new Error(
-        "AWS_COGNITO_CLIENT_ID is missing from environment variables."
-      );
-    }
-
     const clientSecret = process.env.AWS_COGNITO_CLIENT_SECRET!;
-
-    // console.log(`Using ClientId: ${clientId} to revoke token ${refreshToken}.`);
 
     const command = new RevokeTokenCommand({
       ClientId: clientId,

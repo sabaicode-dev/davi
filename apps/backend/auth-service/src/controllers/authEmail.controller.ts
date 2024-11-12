@@ -1,10 +1,9 @@
-// src/controllers/authEmail.controller.ts
-
 import { Body, Controller, Post, Route, Tags } from "tsoa";
 import {
   signUpUser,
   signInUser,
   confirmSignUp,
+  resendConfirmationCode, // Import the resend function
 } from "../services/authEmail.service";
 
 import {
@@ -14,13 +13,12 @@ import {
 } from "./types/authEmail.type";
 
 @Route("/v1/auth") // Define the base route for the controller
-@Tags("Email Intergrate AWS Cognito")
+@Tags("Email Integrate AWS Cognito")
 export class CognitoController extends Controller {
   /**
    * Sign up a new user
    * @param requestBody The user email and password
    */
-  // @SuccessResponse("201", "User signed up successfully") // Custom success response
   @Post("signup")
   public async signUp(
     @Body() requestBody: SignUpRequest
@@ -64,6 +62,23 @@ export class CognitoController extends Controller {
     try {
       const result = await confirmSignUp(email, confirmationCode);
       return { message: "User confirmed successfully", result };
+    } catch (error: any) {
+      throw new Error(error.message);
+    }
+  }
+
+  /**
+   * Resend the confirmation code to a user's email
+   * @param requestBody The user's email
+   */
+  @Post("resend-code")
+  public async resendCode(
+    @Body() requestBody: { email: string }
+  ): Promise<{ message: string }> {
+    const { email } = requestBody;
+    try {
+      const result = await resendConfirmationCode(email);
+      return result;
     } catch (error: any) {
       throw new Error(error.message);
     }

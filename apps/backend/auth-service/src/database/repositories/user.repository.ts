@@ -1,4 +1,3 @@
-// src/repositories/user.repository.ts
 import User, { IUser } from "../models/user.models";
 
 class UserRepository {
@@ -57,6 +56,28 @@ class UserRepository {
     return await User.findOneAndUpdate(
       { email },
       { $set: { username: newUsername } },
+      { new: true }
+    ).exec();
+  }
+
+  /**
+   * Retrieves the last confirmation timestamp of a user by email.
+   */
+  async getLastConfirmationTimestamp(email: string): Promise<number | null> {
+    const user = await User.findOne(
+      { email },
+      { lastConfirmationSentAt: 1 }
+    ).exec();
+    return user?.lastConfirmationSentAt || null;
+  }
+
+  /**
+   * Updates the last confirmation timestamp of a user by email.
+   */
+  async updateConfirmationTimestamp(email: string): Promise<IUser | null> {
+    return await User.findOneAndUpdate(
+      { email },
+      { $set: { lastConfirmationSentAt: Date.now() } },
       { new: true }
     ).exec();
   }

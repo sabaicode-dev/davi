@@ -328,7 +328,7 @@
 				},
 				"description": "Sign up a new user",
 				"tags": [
-					"Email Intergrate AWS Cognito"
+					"Email Integrate AWS Cognito"
 				],
 				"security": [],
 				"parameters": [],
@@ -373,7 +373,7 @@
 				},
 				"description": "Sign in an existing user",
 				"tags": [
-					"Email Intergrate AWS Cognito"
+					"Email Integrate AWS Cognito"
 				],
 				"security": [],
 				"parameters": [],
@@ -418,7 +418,7 @@
 				},
 				"description": "Confirm user sign up",
 				"tags": [
-					"Email Intergrate AWS Cognito"
+					"Email Integrate AWS Cognito"
 				],
 				"security": [],
 				"parameters": [],
@@ -430,6 +430,57 @@
 							"schema": {
 								"$ref": "#/components/schemas/ConfirmSignUpRequest",
 								"description": "The user email and confirmation code"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/v1/auth/resend-code": {
+			"post": {
+				"operationId": "ResendCode",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"description": "Resend the confirmation code to a user's email",
+				"tags": [
+					"Email Integrate AWS Cognito"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"description": "The user's email",
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"email": {
+										"type": "string"
+									}
+								},
+								"required": [
+									"email"
+								],
+								"type": "object",
+								"description": "The user's email"
 							}
 						}
 					}
