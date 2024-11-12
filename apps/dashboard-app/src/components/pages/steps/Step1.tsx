@@ -1,5 +1,6 @@
 import Logo from "@/public/images/step/step1_pic.png";
 import Button from "../../atoms/Button";
+import { FaPlus } from 'react-icons/fa6';
 interface StepProps {
   onNext: () => void;
 }
@@ -31,7 +32,8 @@ export const Step1 = function ({ onNext }: StepProps) {
             <Button
               className="ml-auto py-3"
               onClick={onNext}
-              children="+ Start New Project"
+              startContent={<FaPlus />}
+              children="Start New Project"
               size="small"
               radius="2xl"
               color="secondary"

@@ -14,12 +14,12 @@ interface Step3Props {
 
 const Step3: React.FC<Step3Props> = ({ onBack, onSelectSource }) => {
   return (
-    <div className="container py-6">
+    <div className="py-6 flex flex-col justify-center items-center">
       <h2 className="text-xl font-semibold text-gray-800 mb-6 text-center">
         Pick a data source to start
       </h2>
 
-      <div className="mx-auto flex justify-between items-center space-x-6">
+      <div className="mx-auto flex flex-row justify-between items-center space-x-6">
         {" "}
         {/* Reduced spacing here */}
         <div
@@ -86,7 +86,7 @@ const Step3: React.FC<Step3Props> = ({ onBack, onSelectSource }) => {
         </div>
       </div>
 
-      <div className="flex flex-col justify-center items-center h-auto mt-36">
+      <div className="flex flex-row justify-center items-center h-auto mt-36">
         {" "}
         {/* Adjusted spacing */}
         <div className="bg-white p-6 max-w-xl w-full text-center">
@@ -99,22 +99,21 @@ const Step3: React.FC<Step3Props> = ({ onBack, onSelectSource }) => {
             <div className="h-1 w-6 bg-blue-200 rounded-full mx-1"></div>
           </div>
         </div>
+        
       </div>
-
-      <div className="flex justify-end">
-        {" "}
-        {/* Adjusted spacing */}
-        <Button
-          onClick={onBack}
-          children="Back"
-          size="medium"
-          radius="2xl"
-          color="outline"
-          isLoading={false}
-          isIconOnly={false}
-          isDisabled={false}
-        />
-      </div>
+      {/* Adjusted spacing */}
+      <div className="flex justify-end items-end w-full">
+          <Button
+            onClick={onBack}
+            children="Back"
+            size="medium"
+            radius="2xl"
+            color="outline"
+            isLoading={false}
+            isIconOnly={false}
+            isDisabled={false}
+          />
+        </div>
     </div>
   );
 };
