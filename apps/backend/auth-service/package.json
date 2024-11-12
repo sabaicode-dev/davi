@@ -30,6 +30,7 @@
   },
   "devDependencies": {
     "@datacatalog2024/ms-libs": "0.0.1",
+    "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
     "@types/joi": "^17.2.3",
     "@types/node": "^22.7.5",

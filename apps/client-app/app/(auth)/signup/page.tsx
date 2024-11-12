@@ -20,40 +20,65 @@ export default function SignUpPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Check if the passwords match
     if (password !== cpassword) {
       setError("Passwords do not match.");
       return;
     }
 
-    setIsLoading(true);
-    setError(null);
+    setIsLoading(true); // Start loading spinner
+    setError(null); // Reset error message
 
     try {
+      // Call the signup API
       const response = await axiosInstance.post("/v1/auth/signup", {
         email,
         password,
         username,
       });
+
+      // If the response is successful (status 201), navigate to the verification page
       if (response.status === 200) {
-        router.push("/signup/verify-email"); // Redirect on successful verification
+        localStorage.setItem("signupEmail", email);
+        router.push("/signup/verify-email"); // Redirect to the verification page
       } else {
-        setError("Failed to verify code. Please try again.");
+        // If the response is not 200, show the error
+        setError("Sign-up failed. Please try again.");
       }
-      router.push(""); // Adjust as needed for verification page
-    } catch (err) {
-      setError("Sign-up failed. Please try again.");
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
+      // Handle errors from the API
+      if (err.response) {
+        if (err.response.status === 409) {
+          setError("User already exists. Please try logging in.");
+        } else {
+          setError("Sign-up failed. Please try again.");
+        }
+      } else {
+        setError("An unexpected error occurred. Please try again.");
+      }
       console.error("Sign-up error:", err);
     } finally {
-      setIsLoading(false);
+      setIsLoading(false); // Stop loading spinner
     }
   };
 
   const handleGoogleSignUp = async () => {
     try {
       const response = await axiosInstance.get("/v1/auth/google");
-      window.location.href = response.data.url;
-    } catch (err) {
+
+      // Ensure the URL is in the response
+      if (response.data && response.data.url) {
+        window.location.href = response.data.url; // Redirect to the Google OAuth page
+      } else {
+        console.error("Google Sign-up URL not found in the response.");
+        setError("An error occurred during Google login. Please try again.");
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
       console.error("Google Sign-up error:", err);
+      setError("An error occurred during Google login. Please try again.");
     }
   };
 
@@ -64,6 +89,8 @@ export default function SignUpPage() {
   const handleBack = () => {
     router.push("/");
   };
+
+
   return (
     <div className="min-h-screen flex">
       {/* Left Section - Form */}
@@ -156,6 +183,7 @@ export default function SignUpPage() {
               </div>
             </div>
 
+
             {/* comfirm password */}
             <div>
               <label
@@ -204,6 +232,7 @@ export default function SignUpPage() {
             </span>
             <div className="flex-grow border-t border-gray-300"></div>
           </div>
+
 
           <div className="mt-4">
             <button

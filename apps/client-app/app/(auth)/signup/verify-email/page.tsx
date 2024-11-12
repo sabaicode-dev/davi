@@ -6,11 +6,8 @@ import { AlertCircle, CheckCircle2 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
-interface EmailVerificationProps {
-  email: string;
-}
 
-export default function EmailVerification({ email }: EmailVerificationProps) {
+export default function EmailVerification() {
   const [verificationCode, setVerificationCode] = useState([
     "",
     "",
@@ -22,13 +19,17 @@ export default function EmailVerification({ email }: EmailVerificationProps) {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [email, setEmail] = useState<string | null>(null); 
   const router = useRouter();
 
   useEffect(() => {
-    if (!email) {
+    const storedEmail = localStorage.getItem("signupEmail");
+    if (storedEmail) {
+      setEmail(storedEmail);
+    } else {
       setError("Email is missing. Please try signing up again.");
     }
-  }, [email]);
+  }, []);
 
   const handleChange = (index: number, value: string) => {
     if (value.length <= 1 && /^[0-9]*$/.test(value)) {
@@ -76,14 +77,14 @@ export default function EmailVerification({ email }: EmailVerificationProps) {
 
     try {
       // Verify the email with the entered code using backend endpoint
-      const response = await axiosInstance.post("/v1/auth/verify-email", {
+      const response = await axiosInstance.post("/v1/auth/confirm", {
         email,
-        code,
+        confirmationCode: code,
       });
 
       if (response.status === 200) {
         setSuccess(true);
-        router.push("/dashboard"); // Redirect on successful verification
+        router.push("http://localhost:8080"); // Redirect on successful verification
       } else {
         setError("Failed to verify code. Please try again.");
       }

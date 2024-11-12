@@ -207,10 +207,7 @@
 			"get": {
 				"operationId": "InitiateGoogleSignIn",
 				"responses": {
-					"204": {
-						"description": "No content"
-					},
-					"302": {
+					"200": {
 						"description": "",
 						"content": {
 							"application/json": {
@@ -227,6 +224,9 @@
 								}
 							}
 						}
+					},
+					"204": {
+						"description": "No content"
 					},
 					"500": {
 						"description": "",

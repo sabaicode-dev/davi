@@ -28,7 +28,7 @@ export class CognitoController extends Controller {
     const { username, email, password } = requestBody;
     try {
       const result = await signUpUser(username, email, password);
-      this.setStatus(201); // Set the response status code to 201
+      this.setStatus(200); // Set the response status code to 201
       return { message: "User signed up successfully", result };
     } catch (error: any) {
       throw new Error(error.message);
