@@ -20,6 +20,7 @@ const Helps: React.FC = () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   };
+  // ''''
 
   const handleChanged = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
