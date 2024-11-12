@@ -1,19 +1,24 @@
-// src/services/authEmail.service.ts
-
 import {
   CognitoIdentityProviderClient,
   SignUpCommand,
   AdminInitiateAuthCommand,
   ConfirmSignUpCommand,
   RevokeTokenCommand,
+  ResendConfirmationCodeCommand,
 } from "@aws-sdk/client-cognito-identity-provider";
 import * as crypto from "crypto";
 import dotenv from "dotenv";
 import UserRepository from "../database/repositories/user.repository"; // Import the repository
 import path from "path";
 
-// Load environment variables
-dotenv.config({ path: path.resolve(__dirname, `../configs/.env.development`) });
+// Specify the path to your .env file
+const env = process.env.NODE_ENV || "development";
+const envPath =
+  env === "production"
+    ? path.resolve(__dirname, `./configs/.env.${env}`)
+    : path.resolve(__dirname, `../configs/.env.${env}`);
+
+dotenv.config({ path: envPath });
 
 // Initialize Cognito client
 const cognitoClient = new CognitoIdentityProviderClient({
@@ -59,10 +64,19 @@ export const signUpUser = async (
       await UserRepository.createUser(username, email, response.UserSub, false);
     }
 
-    return response;
+    // Return relevant data or result
+    return {
+      message:
+        "User signed up successfully. Please check your email to confirm your account.",
+    };
   } catch (error: any) {
+    // Handle specific error for user already existing
+    if (error.code === "UsernameExistsException") {
+      throw new Error("User already exists. Please try logging in.");
+    }
+
     console.error("Error signing up user:", error.message || error);
-    throw error;
+    throw new Error("An error occurred during sign-up.");
   }
 };
 
@@ -93,6 +107,8 @@ export const signInUser = async (email: string, password: string) => {
 };
 
 // Function to confirm a user's sign-up
+const RESEND_CODE_LIMIT_MS = 60000; // 1 minute in milliseconds
+
 export const confirmSignUp = async (
   email: string,
   confirmationCode: string
@@ -111,12 +127,55 @@ export const confirmSignUp = async (
 
     const response = await cognitoClient.send(command);
 
-    // Update user to confirmed status in MongoDB
+    // Confirm user and update last confirmation timestamp
     await UserRepository.confirmUser(email);
+    await UserRepository.updateConfirmationTimestamp(email);
 
     return response;
   } catch (error: any) {
-    console.error("Error confirming sign-up: ", error.message || error);
+    if (
+      error.message.includes("ExpiredCodeException") ||
+      error.message.includes("CodeMismatchException")
+    ) {
+      throw new Error(
+        "The confirmation code is invalid or has expired. Please request a new code."
+      );
+    }
+    throw new Error(error.message);
+  }
+};
+
+// Function to resend the confirmation code
+export const resendConfirmationCode = async (email: string) => {
+  try {
+    const clientId = process.env.AWS_COGNITO_CLIENT_ID!;
+    const clientSecret = process.env.AWS_COGNITO_CLIENT_SECRET!;
+
+    // Check cooldown period
+    const lastSentAt = await UserRepository.getLastConfirmationTimestamp(email);
+    const currentTime = Date.now();
+    if (lastSentAt && currentTime - lastSentAt < RESEND_CODE_LIMIT_MS) {
+      throw new Error("Please wait before requesting a new confirmation code.");
+    }
+
+    // Generate the secret hash
+    const secretHash = generateSecretHash(email, clientId, clientSecret);
+
+    // Create and send the ResendConfirmationCode command with the SECRET_HASH
+    const command = new ResendConfirmationCodeCommand({
+      ClientId: clientId,
+      Username: email,
+      SecretHash: secretHash, // Add this parameter
+    });
+
+    await cognitoClient.send(command);
+
+    // Update the last confirmation timestamp
+    await UserRepository.updateConfirmationTimestamp(email);
+
+    return { message: "Confirmation code resent successfully" };
+  } catch (error: any) {
+    console.error("Error resending confirmation code:", error.message || error);
     throw error;
   }
 };
@@ -125,15 +184,7 @@ export const confirmSignUp = async (
 export const logoutUser = async (refreshToken: string) => {
   try {
     const clientId = process.env.AWS_COGNITO_CLIENT_ID!;
-    if (!clientId) {
-      throw new Error(
-        "AWS_COGNITO_CLIENT_ID is missing from environment variables."
-      );
-    }
-
     const clientSecret = process.env.AWS_COGNITO_CLIENT_SECRET!;
-
-    // console.log(`Using ClientId: ${clientId} to revoke token ${refreshToken}.`);
 
     const command = new RevokeTokenCommand({
       ClientId: clientId,

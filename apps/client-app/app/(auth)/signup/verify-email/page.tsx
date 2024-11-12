@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axiosInstance from "@/app/utils/axios"; // Adjust this import path based on your project structure
 import { AlertCircle, CheckCircle2 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -16,8 +17,30 @@ export default function EmailVerification() {
   ]);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [email, setEmail] = useState("");
+  const [countdown, setCountdown] = useState(60);
 
   const router = useRouter();
+
+  useEffect(() => {
+    const storedEmail = localStorage.getItem("email");
+    if (storedEmail) {
+      setEmail(storedEmail);
+      setError(null); // Clear any error related to missing email
+    } else {
+      setError("Email is missing. Please try signing up again.");
+    }
+  }, []);
+
+  useEffect(() => {
+    if (countdown > 0) {
+      const timer = setInterval(() => {
+        setCountdown((prev) => prev - 1);
+      }, 1000);
+      return () => clearInterval(timer);
+    }
+  }, [countdown]);
 
   const handleChange = (index: number, value: string) => {
     if (value.length <= 1 && /^[0-9]*$/.test(value)) {
@@ -37,7 +60,6 @@ export default function EmailVerification() {
 
   const handleKeyDown = (index: number, e: React.KeyboardEvent) => {
     if (e.key === "Backspace" && !verificationCode[index]) {
-      // If the current input is empty, move to the previous input
       if (index > 0) {
         const prevInput = document.getElementById(
           `code-${index - 1}`
@@ -45,7 +67,7 @@ export default function EmailVerification() {
         if (prevInput) prevInput.focus();
 
         const newCode = [...verificationCode];
-        newCode[index - 1] = ""; // Clear the previous input
+        newCode[index - 1] = "";
         setVerificationCode(newCode);
       }
     }
@@ -53,49 +75,82 @@ export default function EmailVerification() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Join the verification code into a single string
     const code = verificationCode.join("");
 
+    // Validate that the code is 6 digits long
     if (code.length !== 6) {
       setError("Please enter a 6-digit verification code.");
       return;
     }
 
+    // Clear any existing error before starting the verification
     setError(null);
     setSuccess(false);
+    setIsLoading(true);
 
     try {
-      // Simulate API call for code verification
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      setSuccess(true);
+      // Call the backend to verify the email and code
+      const response = await axiosInstance.post("/v1/auth/confirm", {
+        email, // Email is passed here for confirmation
+        confirmationCode: code, // The 6-digit code entered by the user
+      });
+
+      if (response.status === 200) {
+        setSuccess(true);
+        router.push("http://localhost:8080"); // Redirect to the dashboard or success page on verification success
+      } else {
+        setError("Failed to verify code. Please try again.");
+      }
     } catch (err) {
-      setError("Failed to verify code. Please try again.");
-      console.log(err);
+      setError("Verification failed. Please try again.");
+      console.error("Verification error:", err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleResendCode = async () => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      await axiosInstance.post("/v1/auth/resend-code", { email });
+      setCountdown(60);
+      setError("A new verification code has been sent to your email.");
+    } catch (err) {
+      setError("Failed to resend the code. Please try again.");
+      console.error("Resend code error:", err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="grid gird-col h-screen place-content-center w-full">
+    <div className="grid grid-cols-1 h-screen place-content-center w-full">
       <div className="max-w-screen-md mx-auto mt-8 p-6 bg-white rounded-lg shadow-md">
         <div className="mb-4 flex justify-center items-center">
           <Image
             src="/images/auth-images/verify.png"
             width={200}
             height={200}
-            alt="Picture of the author"
+            alt="Verification"
             unoptimized
           />
         </div>
         <h2 className="text-2xl font-bold mb-4 text-center">
           Email Verification
         </h2>
+
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label
               htmlFor="code-0"
               className="block text-sm font-medium text-gray-500 mb-4"
             >
-              Enter verification code:{" "}
-              <span className="underline">sophearum14@gmail.com</span>
+              Enter the verification code sent to:{" "}
+              <span className="underline">{email}</span>
             </label>
             <div className="flex gap-2 justify-center">
               {verificationCode.map((digit, index) => (
@@ -114,29 +169,44 @@ export default function EmailVerification() {
               ))}
             </div>
           </div>
+
           {error && (
             <div className="flex items-center text-red-600 mb-4">
               <AlertCircle className="mr-2" />
               <p>{error}</p>
             </div>
           )}
+
           {success && (
             <div className="flex items-center text-green-600 mb-4">
               <CheckCircle2 className="mr-2" />
               <p>Email verified successfully!</p>
             </div>
           )}
+
           <button
-            onClick={() => router.push('http://localhost:8080')}
             type="submit"
             className="w-full py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            disabled={isLoading}
           >
-            Verify
+            {isLoading ? "Verifying..." : "Verify"}
           </button>
         </form>
-        <p className="mt-4 text-sm text-gray-400">
-          {`Don't receive the code? `}
-          <button className="text-blue-400">Resend</button>
+
+        <p className="mt-4 text-sm text-gray-400 space-x-2">
+          {`Didn't receive the code? `}
+          <button
+            onClick={handleResendCode}
+            className={`text-blue-400 ${
+              isLoading || countdown > 0 ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+            disabled={isLoading || countdown > 0} // Disable if loading or countdown > 0
+          >
+            Resend
+          </button>
+          {countdown > 0 && (
+            <span className="text-gray-400">({countdown}s)</span>
+          )}
         </p>
       </div>
     </div>

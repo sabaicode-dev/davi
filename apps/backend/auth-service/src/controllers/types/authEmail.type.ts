@@ -14,7 +14,3 @@ export interface ConfirmSignUpRequest {
   email: string;
   confirmationCode: string;
 }
-
-export interface DeleteUserRequest {
-  email: string;
-}

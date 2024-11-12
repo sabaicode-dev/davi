@@ -1,16 +1,10 @@
 import { URLSearchParams } from "url";
 import dotenv from "dotenv";
 import path from "path";
-// import { fetch } from "undici"; // Use fetch from undici
+import axios from "axios";
 
-// Specify the path to your .env file
-const env = process.env.NODE_ENV || "development";
-const envPath =
-  env === "production"
-    ? path.resolve(__dirname, `./configs/.env.${env}`)
-    : path.resolve(__dirname, `../configs/.env.${env}`);
-
-dotenv.config({ path: envPath });
+// Load environment variables from .env file
+dotenv.config({ path: path.resolve(__dirname, "../configs/.env.development") });
 
 const {
   AWS_COGNITO_DOMAIN,
@@ -19,10 +13,6 @@ const {
   AWS_REDIRECT_URI,
 } = process.env;
 
-// console.log("AWS_COGNITO_DOMAIN kk:", AWS_COGNITO_DOMAIN);
-// console.log("AWS_COGNITO_CLIENT_ID:", AWS_COGNITO_CLIENT_ID);
-// console.log("AWS_COGNITO_CLIENT_SECRET:", AWS_COGNITO_CLIENT_SECRET);
-// console.log("AWS_REDIRECT_URI:", AWS_REDIRECT_URI);
 
 /**
  * Generate the Google Sign-In URL.
@@ -48,11 +38,6 @@ export const googleSignIn = (): string => {
   return `${AWS_COGNITO_DOMAIN}/oauth2/authorize?${authorizeParams.toString()}`;
 };
 
-/**
- * Exchange the authorization code from Google for Cognito tokens.
- * @param code - The authorization code received from Google.
- * @returns Cognito tokens, including access, ID, and refresh tokens.
- */
 export const exchangeCodeForTokens = async (code: string): Promise<any> => {
   const authorizationHeader = `Basic ${Buffer.from(
     `${AWS_COGNITO_CLIENT_ID}:${AWS_COGNITO_CLIENT_SECRET}`
@@ -65,49 +50,16 @@ export const exchangeCodeForTokens = async (code: string): Promise<any> => {
     redirect_uri: AWS_REDIRECT_URI as string,
   });
 
-  const response = await fetch(`${AWS_COGNITO_DOMAIN}/oauth2/token`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-      Authorization: authorizationHeader,
-    },
-    body: requestBody.toString(),
-  });
+  const response = await axios.post(
+    `${AWS_COGNITO_DOMAIN}/oauth2/token`,
+    requestBody,
+    {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        Authorization: authorizationHeader,
+      },
+    }
+  );
 
-  const data: any = await response.json();
-  console.log("Response from token exchange:", data);
-
-  if (!response.ok) {
-    throw new Error(data.error || "Error exchanging code for tokens");
-  }
-
-  return data;
-};
-
-/**
- * Revoke the refresh token for signing out the user.
- * @param refreshToken - The refresh token to be revoked.
- */
-export const signOut = async (refreshToken: string): Promise<void> => {
-  const authorizationHeader = `Basic ${Buffer.from(
-    `${AWS_COGNITO_CLIENT_ID}:${AWS_COGNITO_CLIENT_SECRET}`
-  ).toString("base64")}`;
-
-  const requestBody = new URLSearchParams({
-    token: refreshToken,
-  });
-
-  const response = await fetch(`${AWS_COGNITO_DOMAIN}/oauth2/revoke`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-      Authorization: authorizationHeader,
-    },
-    body: requestBody.toString(),
-  });
-
-  if (!response.ok) {
-    const data: any = await response.json();
-    throw new Error(data.error || "Error revoking token");
-  }
+  return response.data;
 };

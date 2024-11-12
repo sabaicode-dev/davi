@@ -7,7 +7,7 @@
 		"requestBodies": {},
 		"responses": {},
 		"schemas": {
-			"GoogleSignOutRequest": {
+			"SignOutRequest": {
 				"description": "Request type for Google Sign-Out, requiring a refresh token.",
 				"properties": {
 					"refreshToken": {
@@ -71,18 +71,6 @@
 				],
 				"type": "object",
 				"additionalProperties": false
-			},
-			"SignOutRequest": {
-				"properties": {
-					"refreshToken": {
-						"type": "string"
-					}
-				},
-				"required": [
-					"refreshToken"
-				],
-				"type": "object",
-				"additionalProperties": false
 			}
 		},
 		"securitySchemes": {}
@@ -123,7 +111,7 @@
 				},
 				"description": "Update username of an existing user",
 				"tags": [
-					"Update UserName"
+					"Update and Logout"
 				],
 				"security": [],
 				"parameters": [],
@@ -151,14 +139,75 @@
 				}
 			}
 		},
+		"/v1/auth/logout": {
+			"put": {
+				"operationId": "UnifiedLogout",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"anyOf": [
+										{
+											"properties": {
+												"message": {
+													"type": "string"
+												}
+											},
+											"required": [
+												"message"
+											],
+											"type": "object"
+										},
+										{}
+									]
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"error": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"error"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"description": "Unified logout function to handle user sign out and clear tokens",
+				"tags": [
+					"Update and Logout"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SignOutRequest"
+							}
+						}
+					}
+				}
+			}
+		},
 		"/v1/auth/google": {
 			"get": {
 				"operationId": "InitiateGoogleSignIn",
 				"responses": {
-					"204": {
-						"description": "No content"
-					},
-					"302": {
+					"200": {
 						"description": "",
 						"content": {
 							"application/json": {
@@ -175,6 +224,9 @@
 								}
 							}
 						}
+					},
+					"204": {
+						"description": "No content"
 					},
 					"500": {
 						"description": "",
@@ -249,53 +301,6 @@
 				]
 			}
 		},
-		"/v1/auth/signout": {
-			"post": {
-				"operationId": "HandleSignOut",
-				"responses": {
-					"204": {
-						"description": "No content"
-					},
-					"500": {
-						"description": "- Error response in case of a failure.",
-						"content": {
-							"application/json": {
-								"schema": {
-									"properties": {
-										"error": {
-											"type": "string"
-										}
-									},
-									"required": [
-										"error"
-									],
-									"type": "object"
-								}
-							}
-						}
-					}
-				},
-				"description": "Sign Out",
-				"summary": "Signs out the user by revoking the refresh token and clearing cookies.",
-				"tags": [
-					"Google Intergrate AWS Cognito"
-				],
-				"security": [],
-				"parameters": [],
-				"requestBody": {
-					"description": "- Contains the refresh token required for signing out.",
-					"required": true,
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/GoogleSignOutRequest",
-								"description": "- Contains the refresh token required for signing out."
-							}
-						}
-					}
-				}
-			}
-		},
 		"/v1/auth/signup": {
 			"post": {
 				"operationId": "SignUp",
@@ -323,7 +328,7 @@
 				},
 				"description": "Sign up a new user",
 				"tags": [
-					"Email Intergrate AWS Cognito"
+					"Email Integrate AWS Cognito"
 				],
 				"security": [],
 				"parameters": [],
@@ -368,7 +373,7 @@
 				},
 				"description": "Sign in an existing user",
 				"tags": [
-					"Email Intergrate AWS Cognito"
+					"Email Integrate AWS Cognito"
 				],
 				"security": [],
 				"parameters": [],
@@ -413,7 +418,7 @@
 				},
 				"description": "Confirm user sign up",
 				"tags": [
-					"Email Intergrate AWS Cognito"
+					"Email Integrate AWS Cognito"
 				],
 				"security": [],
 				"parameters": [],
@@ -431,9 +436,9 @@
 				}
 			}
 		},
-		"/v1/auth/logout": {
+		"/v1/auth/resend-code": {
 			"post": {
-				"operationId": "Logout",
+				"operationId": "ResendCode",
 				"responses": {
 					"200": {
 						"description": "Ok",
@@ -441,7 +446,6 @@
 							"application/json": {
 								"schema": {
 									"properties": {
-										"result": {},
 										"message": {
 											"type": "string"
 										}
@@ -455,17 +459,28 @@
 						}
 					}
 				},
+				"description": "Resend the confirmation code to a user's email",
 				"tags": [
-					"Email Intergrate AWS Cognito"
+					"Email Integrate AWS Cognito"
 				],
 				"security": [],
 				"parameters": [],
 				"requestBody": {
+					"description": "The user's email",
 					"required": true,
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "#/components/schemas/SignOutRequest"
+								"properties": {
+									"email": {
+										"type": "string"
+									}
+								},
+								"required": [
+									"email"
+								],
+								"type": "object",
+								"description": "The user's email"
 							}
 						}
 					}

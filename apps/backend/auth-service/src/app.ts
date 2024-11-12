@@ -3,6 +3,8 @@ import swaggerUi from "swagger-ui-express";
 import { RegisterRoutes } from "./routes/v1/routes";
 import fs from "fs";
 import path from "path";
+import { allowedOrigins, corsOptions } from "@/src/middleware/allowsReq";
+import { errorHandler } from "@/src/middleware/errorHandler";
 
 // Dynamically load swagger.json
 const swaggerDocument = JSON.parse(
@@ -19,6 +21,13 @@ const app = express();
 // ========================
 app.use(express.json()); // Help to get the json from request body
 
+// Configure CORS to allow requests from localhost:3000
+// Apply CORS configuration
+app.use(corsOptions);
+
+//log show allowedOrigins
+console.log(`allowedOrigins : ${allowedOrigins}`);
+
 // ========================
 // Global API V1
 // ========================
@@ -32,6 +41,6 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 // ========================
 // ERROR Handler
 // ========================
-// Handle Later
+app.use(errorHandler);
 
 export default app;
