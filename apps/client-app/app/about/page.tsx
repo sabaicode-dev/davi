@@ -1,5 +1,4 @@
 import React from "react";
-
 import { HeroSection } from "@/app/about/components/blockCode/HeroSection";
 import { OurTeam } from "@/app/about/components/blockCode/OurTeam";
 import { BackgroundBeamsWithCollision } from "@/app/about/components/ui/background-animations";
