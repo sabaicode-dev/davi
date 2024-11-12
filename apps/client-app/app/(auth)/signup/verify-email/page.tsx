@@ -117,7 +117,7 @@ export default function EmailVerification() {
 
     try {
       await axiosInstance.post("/v1/auth/resend-code", { email });
-      setCountdown(60); // Reset countdown to 60 seconds after resending
+      setCountdown(60);
       setError("A new verification code has been sent to your email.");
     } catch (err) {
       setError("Failed to resend the code. Please try again.");
