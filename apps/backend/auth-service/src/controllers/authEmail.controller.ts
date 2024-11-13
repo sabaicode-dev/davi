@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Route, Tags } from "tsoa";
+import { Body, Controller, Post, Res, Route, Tags, TsoaResponse } from "tsoa";
 import {
   signUpUser,
   signInUser,
@@ -50,18 +50,47 @@ export class CognitoController extends Controller {
    * Sign in an existing user
    * @param requestBody The user email and password
    */
+
+  // Updated signIn method
   @Post("signin")
   public async signIn(
-    @Body() requestBody: SignInRequest
-  ): Promise<{ message: string; result: any }> {
+    @Body() requestBody: SignInRequest,
+    @Res()
+    sendResponse: TsoaResponse<200 | 401, { message: string; result?: any }>
+  ): Promise<void> {
     const { email, password } = requestBody;
     try {
       const result = await signInUser(email, password);
-      return { message: "User signed in successfully", result };
+
+      // Send the response with a status code and cookie
+      sendResponse(
+        200,
+        {
+          message: "User signed in successfully",
+          result,
+        },
+        {
+          "Set-Cookie": `authToken=${result?.IdToken}; HttpOnly; Secure=${
+            process.env.NODE_ENV === "production"
+          }; Max-Age=86400; SameSite=Strict`,
+        }
+      );
     } catch (error: any) {
-      throw new Error(error.message);
+      sendResponse(401, { message: error.message });
     }
   }
+  // @Post("signin")
+  // public async signIn(
+  //   @Body() requestBody: SignInRequest
+  // ): Promise<{ message: string; result: any }> {
+  //   const { email, password } = requestBody;
+  //   try {
+  //     const result = await signInUser(email, password);
+  //     return { message: "User signed in successfully", result };
+  //   } catch (error: any) {
+  //     throw new Error(error.message);
+  //   }
+  // }
 
   /**
    * Confirm user sign up
