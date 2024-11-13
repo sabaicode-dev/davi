@@ -1,10 +1,10 @@
 // src/components/DataFlow.tsx
 import React, { useState } from "react";
-import { Step1 } from "@/src/components/pages/steps/Step1";
-import Step2 from "@/src/components/pages/steps/Step2";
-import Step3 from "@/src/components/pages/steps/Step3";
+import { Step1 } from "@/src/components/pages/steps/GetStart";
+import Step2 from "@/src/components/pages/steps/CreateProject";
+import Step3 from "@/src/components/pages/steps/PickDataSource";
 import UploadCsv from "@/src/components/pages/steps/UploadCSV";
-import Step4 from "@/src/components/pages/steps/Step4";
+import Step4 from "@/src/components/pages/steps/ImportUrl";
 
 const DataFlow: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(1); // Start at Step 1
@@ -20,7 +20,6 @@ const DataFlow: React.FC = () => {
       setCurrentStep(4); // Go to UploadCsv if CSV is selected
     else if (source === "URL") setCurrentStep(5); // Go to Step4 if URL is selected
   };
-
   return (
     <div>
       {currentStep === 1 && <Step1 onNext={handleNext} />}

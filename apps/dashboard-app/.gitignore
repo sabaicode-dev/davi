@@ -1,3 +1,5 @@
+.env.sample
+.env.local
 node_modules/
 _README.md
 build/
