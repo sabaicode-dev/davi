@@ -52,6 +52,7 @@ export class CognitoController extends Controller {
    */
 
   // Updated signIn method
+
   @Post("signin")
   public async signIn(
     @Body() requestBody: SignInRequest,
