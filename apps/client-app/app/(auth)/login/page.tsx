@@ -18,12 +18,12 @@ export default function LoginPage() {
         password,
       });
 
-      if (response.status === 200) {
-        // On successful login, navigate to your dashboard page
-        router.push("http://localhost:8080");
-      } else {
-        setError("Login failed. Please try again.");
-      }
+      // if (response.status === 200) {
+      //   // On successful login, navigate to your dashboard page
+      //   router.push("http://localhost:8080");
+      // } else {
+      //   setError("Login failed. Please try again.");
+      // }
     } catch (err) {
       setError("Login failed. Please try again.");
       console.error("Login error:", err);
