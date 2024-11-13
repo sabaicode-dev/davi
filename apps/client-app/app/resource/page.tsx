@@ -7,7 +7,6 @@ import { HeroSection } from "./components/HeroSection";
 const ResourcePage = () => {
   return (
     <>
-      {/* Here */}
       <HeroSection />
       <DocumentationSection />
       <CTASection />
