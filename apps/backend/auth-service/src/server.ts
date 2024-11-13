@@ -1,8 +1,10 @@
-import app from "@/src/app";
-import configs from "@/src/config";
+import app from "./app";
+import configs from "./config";
+import connectToMongoDB from "./database/connection";
 
 async function run() {
   try {
+    await connectToMongoDB();
     app.listen(configs.port, () => {
       console.log(`Auth Service running on http://localhost:${configs.port}`);
     });
