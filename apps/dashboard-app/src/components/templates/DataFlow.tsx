@@ -1,15 +1,15 @@
 import React, { useState } from "react";
-import { GetStart } from "@/src/components/pages/steps/GetStart";
-import CreateProject from "@/src/components/pages/steps/CreateProject";
-import SelectProject from "@/src/components/pages/steps/SelectProject";
-import PickDataSource from "@/src/components/pages/steps/PickDataSource";
-import UploadCSV from "@/src/components/pages/steps/UploadCSV";
-import ImportUrl from "@/src/components/pages/steps/ImportUrl";
+import { GetStart } from "@/src/components/molecules/steps/GetStart";
+import CreateProject from "@/src/components/molecules/steps/CreateProject";
+import SelectProject from "@/src/components/molecules/steps/SelectProject";
+import PickDataSource from "@/src/components/molecules/steps/PickDataSource";
+import UploadCSV from "@/src/components/molecules/steps/UploadCSV";
+import ImportUrl from "@/src/components/molecules/steps/ImportUrl";
 
 const DataFlow: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(1); // Start at Step 1
   const [selectedSource, setSelectedSource] = useState<string | null>(null);
-  const [selectedProject, setSelectedProject] = useState<string | null>(null);
+  const [projectId, setProjectId] = useState<string | null>(null);
 
   // Step change logic
   const handleNext = () => {
@@ -21,11 +21,11 @@ const DataFlow: React.FC = () => {
   };
 
   // Handle project selection
-  const handleProjectSelect = (projectId: string) => {
-    setSelectedProject(projectId);
+  const handleProjectSelect = (id: string) => {
+    setProjectId(id);
     setCurrentStep(4); // Move to PickDataSource after project selection
   };
-
+console.log(projectId)
   // Handle selecting a data source (CSV or URL)
   const handleSelectSource = (source: string) => {
     setSelectedSource(source);
@@ -55,8 +55,8 @@ const DataFlow: React.FC = () => {
           onNext={handleNext}
         />
       )}
-      {currentStep === 5 && selectedSource === "CSV" && (
-        <UploadCSV onBack={() => setCurrentStep(4)} />
+      {currentStep === 5 && projectId && selectedSource === "CSV" && (
+        <UploadCSV onBack={() => setCurrentStep(4)} projectId={projectId} />
       )}
       {currentStep === 6 && selectedSource === "URL" && (
         <ImportUrl

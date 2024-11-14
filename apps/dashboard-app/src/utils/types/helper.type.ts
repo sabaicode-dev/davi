@@ -5,4 +5,5 @@ export interface RequestParams {
   url: string;
   method: HTTPMethod;
   data?: Record<string, any>;
+  headers?: Record<string, string>;
 }

@@ -7,6 +7,7 @@ import Button from "../../atoms/Button";
 interface Step4Props {
   onNext: () => void;
   onBack: () => void;
+  selectedSource?: string;
 }
 
 const Step4: React.FC<Step4Props> = ({ onNext, onBack }) => {

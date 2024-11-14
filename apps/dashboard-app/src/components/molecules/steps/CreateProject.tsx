@@ -88,9 +88,6 @@ const CreateProject: React.FC<Step2Props> = ({
     }
   };
 
-  console.log(projectNameState);
-  console.log(descriptionState);
-
   return (
     <div className="mx-auto max-w-4xl p-10">
       <div className="flex ">
@@ -173,9 +170,10 @@ const CreateProject: React.FC<Step2Props> = ({
               size="small"
               radius="2xl"
               color="secondary"
-              isLoading={isLoading} // Show loading spinner during request
+              isLoading={isLoading}
               isIconOnly={false}
-              isDisabled={isLoading} // Disable the button during request
+              isDisabled={isLoading}
+              className="!px-5"
             />
           </div>
         </div>

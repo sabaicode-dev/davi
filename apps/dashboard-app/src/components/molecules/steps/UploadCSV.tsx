@@ -1,4 +1,3 @@
-// src/components/UploadCsv.tsx
 import React, { useRef, useState } from "react";
 import Logo from "@/public/images/step/step4_pic.png";
 import {
@@ -10,9 +9,10 @@ import request from "@/src/utils/helper";
 
 interface StepTwoProps {
   onBack: () => void;
+  projectId: string;
 }
 
-const UploadCsv: React.FC<StepTwoProps> = ({ onBack }) => {
+const UploadCsv: React.FC<StepTwoProps> = ({ onBack, projectId }) => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [fileName, setFileName] = useState<string>("");
   const [fileSize, setFileSize] = useState<number>(0);
@@ -30,10 +30,10 @@ const UploadCsv: React.FC<StepTwoProps> = ({ onBack }) => {
     if (file) {
       if (file.type === "text/csv" || file.name.endsWith(".csv")) {
         setFileName(file.name);
-        setFileSize(file.size / 1024);
+        setFileSize(file.size / 1024); // Store file size in KB
         setError("");
         simulateUpload();
-        uploadFileToDB(file); // Call the global upload function
+        uploadFileToDB(file); // Pass the selected file to upload function
       } else {
         setError("Please upload a valid CSV file.");
       }
@@ -42,16 +42,20 @@ const UploadCsv: React.FC<StepTwoProps> = ({ onBack }) => {
     }
   };
 
-  // Global upload function
+  // Upload file to the backend, with additional fields as required by the model
   const uploadFileToDB = async (file: File) => {
     const formData = new FormData();
     formData.append("file", file);
+    formData.append("filename", file.name);
+    formData.append("size", file.size.toString());
+    formData.append("type", "csv"); // Assuming 'csv' type as a placeholder
 
     try {
       const response = await request({
-        url: "http://127.0.0.1:8000/api/v1/file-upload/",
+        url: `http://127.0.0.1:8000/api/v1/project/${projectId}/upload-file/`,
         method: "POST",
         data: formData,
+        headers: { "Content-Type": "multipart/form-data" },
       });
       console.log("Upload response:", response);
     } catch (error) {
@@ -129,7 +133,7 @@ const UploadCsv: React.FC<StepTwoProps> = ({ onBack }) => {
                     <FileIcon />
                   </div>
                 </div>
-                <div className="flex flex-col">
+                <div className="flex flex-col w-full">
                   <div className="flex flex-col justify-start">
                     <div className="flex flex-row items-center space-x-4">
                       <p className="text-sm font-medium text-gray-700 truncate max-w-xs">
@@ -141,10 +145,10 @@ const UploadCsv: React.FC<StepTwoProps> = ({ onBack }) => {
                       {fileSize.toFixed(2)} KB
                     </p>
                   </div>
-                  <div className="flex flex-row justify-center items-center mt-3 space-x-4">
+                  <div className="flex flex-row justify-center items-center mt-1 space-x-4 w-full">
                     <div className="h-2 w-full bg-blue-300 rounded-full">
                       <div
-                        className="h-2 bg-[#443DFF] rounded-full"
+                        className="h-2 bg-[#443DFF] rounded-full w-[300px]"
                         style={{ width: `${progress}%` }}
                       ></div>
                     </div>
