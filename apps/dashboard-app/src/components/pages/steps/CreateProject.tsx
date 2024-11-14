@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Joi from "joi";
 import Logo from "@/public/images/step/step2_pic.png";
 import Button from "@/src/components/atoms/Button";
-import CreateProject from "@/src/utils/helper";
+import request from "@/src/utils/helper";
 import axios from "axios";
 
 interface Step2Props {
@@ -24,7 +24,7 @@ type ErrorMessages = {
   [key: string]: string;
 };
 
-const Step2: React.FC<Step2Props> = ({
+const CreateProject: React.FC<Step2Props> = ({
   onNext,
   onBack,
   projectName = "",
@@ -38,23 +38,22 @@ const Step2: React.FC<Step2Props> = ({
     description: "",
   });
   const [isLoading, setIsLoading] = useState(false); // For loading spinner
-  
-  
+
   const handleNext = async () => {
     setIsLoading(true);
 
     try {
-      const url_api = process.env.REACT_APP_API_URL as string
-      console.log(url_api)
-      const response = await CreateProject({
-        url: url_api,
+      const url_api = process.env.REACT_APP_API_URL;
+      console.log(url_api);
+      const response = await request({
+        url: `${url_api}`,
         method: "POST",
         data: {
           project_name: projectNameState,
           project_description: descriptionState,
         },
       });
-      console.log(url_api)
+      console.log(url_api);
       console.log("Project creation response:", response);
 
       // Now you can properly check the status
@@ -190,4 +189,4 @@ const Step2: React.FC<Step2Props> = ({
   );
 };
 
-export default Step2;
+export default CreateProject;

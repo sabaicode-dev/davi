@@ -1,3 +1,4 @@
+// src/components/UploadCsv.tsx
 import React, { useRef, useState } from "react";
 import Logo from "@/public/images/step/step4_pic.png";
 import {
@@ -5,6 +6,7 @@ import {
   FileIcon,
   UploadFile,
 } from "@/src/components/atoms/icons/Icon";
+import request from "@/src/utils/helper";
 
 interface StepTwoProps {
   onBack: () => void;
@@ -17,7 +19,7 @@ const UploadCsv: React.FC<StepTwoProps> = ({ onBack }) => {
   const [progress, setProgress] = useState<number>(0);
   const [error, setError] = useState<string>("");
 
-  const MAX_FILENAME_LENGTH = 30; // Set your maximum filename length here
+  const MAX_FILENAME_LENGTH = 30;
 
   const handleFileUpload = () => {
     fileInputRef.current?.click();
@@ -28,14 +30,32 @@ const UploadCsv: React.FC<StepTwoProps> = ({ onBack }) => {
     if (file) {
       if (file.type === "text/csv" || file.name.endsWith(".csv")) {
         setFileName(file.name);
-        setFileSize(file.size / 1024); // Convert size to KB
+        setFileSize(file.size / 1024);
         setError("");
-        simulateUpload(); // Start the upload simulation
+        simulateUpload();
+        uploadFileToDB(file); // Call the global upload function
       } else {
         setError("Please upload a valid CSV file.");
       }
     } else {
       setError("No file selected.");
+    }
+  };
+
+  // Global upload function
+  const uploadFileToDB = async (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const response = await request({
+        url: "http://127.0.0.1:8000/api/v1/file-upload/",
+        method: "POST",
+        data: formData,
+      });
+      console.log("Upload response:", response);
+    } catch (error) {
+      console.error("Failed to upload file:", error);
     }
   };
 
@@ -47,30 +67,25 @@ const UploadCsv: React.FC<StepTwoProps> = ({ onBack }) => {
         clearInterval(interval);
         return 100;
       });
-    }, 50); // Simulate upload every 50ms
+    }, 50);
   };
 
-  // Function to truncate file names
   const truncateFileName = (name: string) => {
-    const extension = name.split(".").pop(); // Get the file extension
-    const baseName = name.substring(0, name.lastIndexOf(".")); // Get the name without the extension
-
+    const extension = name.split(".").pop();
+    const baseName = name.substring(0, name.lastIndexOf("."));
     if (baseName.length > MAX_FILENAME_LENGTH) {
-      return baseName.substring(0, MAX_FILENAME_LENGTH) + `...${extension}`; // Truncate and append extension
+      return baseName.substring(0, MAX_FILENAME_LENGTH) + `...${extension}`;
     }
-    return name; // Return original name if it's within the limit
+    return name;
   };
 
   return (
     <div>
       <div className="flex justify-center items-center h-full">
         <div className="flex w-full max-w-4xl p-10 space-x-16">
-          {/* Left Image Section */}
           <div className="w-1/2 flex items-center justify-center">
             <img src={Logo} alt="Illustration" className="w-full h-auto" />
           </div>
-
-          {/* Right Form Section */}
           <div className="w-1/2 pt-11 flex flex-col">
             <h2 className="text-xl font-semibold text-gray-800 mb-2">
               Upload and Attach Files
@@ -78,7 +93,6 @@ const UploadCsv: React.FC<StepTwoProps> = ({ onBack }) => {
             <p className="text-sm text-gray-600 mb-10">
               Upload and attach files to this project.
             </p>
-            {/* File Upload Section */}
             <div
               className="border-2 border-dashed border-[#E4E7EC] bg-[#FFFFFF] p-3 rounded-lg text-center cursor-pointer shadow-sm"
               onClick={handleFileUpload}
@@ -121,8 +135,7 @@ const UploadCsv: React.FC<StepTwoProps> = ({ onBack }) => {
                       <p className="text-sm font-medium text-gray-700 truncate max-w-xs">
                         {truncateFileName(fileName)}{" "}
                       </p>
-                      {progress === 100 && <CheckTick />}{" "}
-                      {/* Show CheckTick only when progress is 100% */}
+                      {progress === 100 && <CheckTick />}
                     </div>
                     <p className="text-sm text-gray-500 mt-1">
                       {fileSize.toFixed(2)} KB
@@ -132,7 +145,7 @@ const UploadCsv: React.FC<StepTwoProps> = ({ onBack }) => {
                     <div className="h-2 w-full bg-blue-300 rounded-full">
                       <div
                         className="h-2 bg-[#443DFF] rounded-full"
-                        style={{ width: `${progress}%` }} // Dynamic width based on progress
+                        style={{ width: `${progress}%` }}
                       ></div>
                     </div>
                     <p className="text-sm font-medium text-blue-600">
@@ -145,7 +158,6 @@ const UploadCsv: React.FC<StepTwoProps> = ({ onBack }) => {
 
             {error && <p className="mt-2 text-red-600">{error}</p>}
 
-            {/* Buttons */}
             <div className="flex justify-end mt-6 space-x-3">
               <button
                 onClick={onBack}
@@ -169,7 +181,6 @@ const UploadCsv: React.FC<StepTwoProps> = ({ onBack }) => {
         </div>
       </div>
 
-      {/* Step Indicator */}
       <div className="flex justify-center">
         <div className="h-1 w-8 bg-blue-600 rounded-full mx-1"></div>
         <div className="h-1 w-8 bg-blue-600 rounded-full mx-1"></div>

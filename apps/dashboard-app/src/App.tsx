@@ -1,16 +1,17 @@
 import Layout from "@/src/components/organisms/layout/MainLayout";
-import "./styles.css";
+import "@/src/styles.css";
 import {
   BrowserRouter as Router,
   Route,
   BrowserRouter,
   Routes,
 } from "react-router-dom";
-import Visualize from "./components/pages/Visualize";
-import Dataset from "./components/pages/Dataset";
-import Helps from "./components/pages/Helps";
-import AccountSettings from "./components/templates/AccountSettings";
-import DataFlow from "./components/templates/DataFlow";
+import Visualize from "@/src/components/pages/Visualize";
+import Dataset from "@/src/components/pages/Dataset";
+import Helps from "@/src/components/pages/Helps";
+import AccountSettings from "@/src/components/templates/AccountSettings";
+import DataFlow from "@/src/components/templates/DataFlow";
+import SelectProject from "./components/pages/steps/SelectProject";
 
 export const App = () => {
   return (

@@ -15,26 +15,25 @@ const request = async ({
   data = {},
 }: RequestParams): Promise<ApiResponse> => {
   try {
+    const headers: Record<string, string> = {
+      "Content-Type": data instanceof FormData ? "multipart/form-data" : "application/json",
+    };
+
     const response: AxiosResponse = await axios({
       url: base_url + url,
       method: method,
       data: data,
-      headers: {
-        "Content-Type": "application/json", // Specify JSON content type
-      },
+      headers: headers,
       withCredentials: true,
     });
     return {
-      data: data.data,
+      data: response.data,
       status: response.status,
       success: response.status >= 200 && response.status < 300,
     };
   } catch (error) {
-    console.log("This error block");
     console.error(error);
-    throw error; // Rethrow the error to be caught in the calling code
-  } finally {
-    console.log("call finally");
+    throw error;
   }
 };
 

@@ -5,7 +5,7 @@ interface StepProps {
   onNext: () => void;
 }
 
-export const Step1 = function ({ onNext }: StepProps) {
+export const GetStart = function ({ onNext }: StepProps) {
   return (
     <div className="flex justify-center items-center ">
       <div className="flex w-full max-w-4xl  rounded-lg">
