@@ -1,5 +1,5 @@
 {
-  "name": "@easycode002/ms-libs",
+  "name": "@sabaicode-dev/ms-libs",
   "version": "0.0.1",
   "main": "./src/index.js",
   "types": "./src/index.d.ts",
@@ -22,7 +22,7 @@
   "author": "data-catalog team",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/easycode002/data-catalog.git"
+    "url": "git+https://github.com/sabaicode-dev/davi.git"
   },
   "publishConfig": {
     "registry": "https://npm.pkg.github.com"
