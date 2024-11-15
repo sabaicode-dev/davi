@@ -11,6 +11,7 @@ import Dataset from "@/src/components/pages/Dataset";
 import Helps from "@/src/components/pages/Helps";
 import AccountSettings from "@/src/components/templates/AccountSettings";
 import Project from "@/src/components/pages/Project";
+import CreateProject from "@/src/components/molecules/steps/CreateProject";
 
 export const App = () => {
   return (
@@ -22,6 +23,7 @@ export const App = () => {
           <Route path="/dataset" element={<Dataset />} />
           <Route path="/helps" element={<Helps />} />
           <Route path="/accountsetting" element={<AccountSettings />} />
+          <Route path="/create-project" element={<CreateProject />} />
         </Routes>
       </Layout>
     </BrowserRouter>

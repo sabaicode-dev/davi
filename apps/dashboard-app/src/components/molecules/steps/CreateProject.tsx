@@ -6,8 +6,8 @@ import request from "@/src/utils/helper";
 import axios from "axios";
 
 interface Step2Props {
-  onNext: () => void;
-  onBack: () => void;
+  onNext?: () => void;
+  onBack?: () => void;
   projectName?: string; // Optional initial value for project name
   description?: string; // Optional initial value for description
 }

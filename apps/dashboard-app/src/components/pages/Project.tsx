@@ -16,7 +16,7 @@ export default function Project() {
         });
 
         if (response && response.data && response.data.results) {
-          setResponseData(response.data.results); // Sets the state with project data
+          setResponseData(response.data.results);
         }
       } catch (error) {
         console.error("Error fetching projects", error);
@@ -25,7 +25,6 @@ export default function Project() {
     getProject();
   }, []);
 
-  // Use another useEffect to monitor responseData after it's updated
   useEffect(() => {
     console.log("Updated responseData:", responseData);
   }, [responseData]);
