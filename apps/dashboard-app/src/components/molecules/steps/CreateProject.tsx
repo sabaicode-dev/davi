@@ -37,11 +37,11 @@ const CreateProject: React.FC<Step2Props> = ({
     projectName: "",
     description: "",
   });
-  const [isLoading, setIsLoading] = useState(false); // For loading spinner
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleNext = async () => {
     setIsLoading(true);
-
+  
     try {
       const url_api = process.env.REACT_APP_API_URL;
       console.log(url_api);
@@ -55,13 +55,13 @@ const CreateProject: React.FC<Step2Props> = ({
       });
       console.log(url_api);
       console.log("Project creation response:", response);
-
-      // Now you can properly check the status
+  
       if (response.success || response.status === 201) {
         setErrorMessages({ projectName: "", description: "" });
         setProjectName("");
         setDescription("");
-        onNext();
+        // Safely call the onNext function if it exists
+        onNext?.();
       } else {
         setErrorMessages({
           projectName: "Failed to create project. Unexpected status.",
@@ -87,6 +87,7 @@ const CreateProject: React.FC<Step2Props> = ({
       setIsLoading(false);
     }
   };
+  
 
   return (
     <div className="mx-auto max-w-4xl p-10">
