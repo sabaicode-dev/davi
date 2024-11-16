@@ -31,7 +31,8 @@ export default function Project() {
 
   return (
     <div className="h-auto flex justify-center items-center">
-      {responseData.length === 0 ? <DataFlow />: <HomeProject/>}
+      {/* {responseData.length === 0 ? <DataFlow />: <HomeProject/>} */}
+      <DataFlow/>
     </div>
   );
 }

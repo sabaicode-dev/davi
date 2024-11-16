@@ -164,7 +164,6 @@ const CreateProject: React.FC<Step2Props> = ({
               isIconOnly={false}
               isDisabled={false}
             />
-
             <Button
               onClick={handleNext}
               children="Next"
