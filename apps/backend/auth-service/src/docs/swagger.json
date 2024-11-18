@@ -86,14 +86,17 @@
 	"paths": {
 		"/v1/auth/me": {
 			"get": {
-				"operationId": "GetUserDetails",
+				"operationId": "GetMe",
 				"responses": {
 					"200": {
-						"description": "The username and email of the authenticated user.",
+						"description": "The `username` and `email` of the user.",
 						"content": {
 							"application/json": {
 								"schema": {
 									"properties": {
+										"createdAt": {
+											"type": "string"
+										},
 										"email": {
 											"type": "string"
 										},
@@ -102,6 +105,7 @@
 										}
 									},
 									"required": [
+										"createdAt",
 										"email",
 										"username"
 									],
@@ -127,9 +131,27 @@
 								}
 							}
 						}
+					},
+					"500": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"error": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"error"
+									],
+									"type": "object"
+								}
+							}
+						}
 					}
 				},
-				"description": "Get logged-in user details",
+				"description": "Get the logged-in user's profile using `cognitoUserId` from cookies.",
 				"tags": [
 					"User Management"
 				],
@@ -415,10 +437,22 @@
 										}
 									},
 									"required": [
+										"result",
 										"message"
 									],
 									"type": "object"
 								}
+							}
+						},
+						"headers": {
+							"Set-Cookie": {
+								"schema": {
+									"items": {
+										"type": "string"
+									},
+									"type": "array"
+								},
+								"required": true
 							}
 						}
 					},
@@ -431,7 +465,6 @@
 							"application/json": {
 								"schema": {
 									"properties": {
-										"result": {},
 										"message": {
 											"type": "string"
 										}
