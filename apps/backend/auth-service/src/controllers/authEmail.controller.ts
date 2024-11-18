@@ -1,16 +1,27 @@
-import { Body, Controller, Post, Route, Tags } from "tsoa";
+import {
+  Body,
+  Controller,
+  Post,
+  Res,
+  Route,
+  Tags,
+  TsoaResponse,
+  Request,
+} from "tsoa";
+import express, { Response } from "express";
 import {
   signUpUser,
   signInUser,
   confirmSignUp,
-  resendConfirmationCode, // Import the resend function
+  resendConfirmationCode,
 } from "../services/authEmail.service";
-
+import jwt from "jsonwebtoken";
 import {
   ConfirmSignUpRequest,
   SignInRequest,
   SignUpRequest,
 } from "./types/authEmail.type";
+import { setCookie } from "../utils/cookie";
 
 @Route("/v1/auth") // Define the base route for the controller
 @Tags("Email Integrate AWS Cognito")
@@ -52,14 +63,45 @@ export class CognitoController extends Controller {
    */
   @Post("signin")
   public async signIn(
-    @Body() requestBody: SignInRequest
-  ): Promise<{ message: string; result: any }> {
+    @Request() request: express.Request,
+    @Body() requestBody: SignInRequest,
+    @Res() errorResponse: TsoaResponse<401, { message: string }>
+  ): Promise<void> {
     const { email, password } = requestBody;
     try {
       const result = await signInUser(email, password);
-      return { message: "User signed in successfully", result };
+
+      // Access the Express Response object
+      const response = (request as any).res as Response;
+
+      if (!result?.IdToken || !result?.RefreshToken || !result?.AccessToken) {
+        errorResponse(401, { message: "Authentication tokens are missing" });
+        return;
+      }
+
+      // Decode the IdToken to extract cognitoUserId
+      const decodedToken = jwt.decode(result.IdToken) as { sub?: string };
+      const cognitoUserId = decodedToken?.sub; // 'sub' is typically the user ID
+
+      if (!cognitoUserId) {
+        errorResponse(401, { message: "Unable to retrieve user ID" });
+        return;
+      }
+
+      // Set cookies securely for tokens and cognitoUserId
+      setCookie(response, "idToken", result.IdToken);
+      setCookie(response, "accessToken", result.AccessToken);
+      setCookie(response, "refreshToken", result.RefreshToken);
+      setCookie(response, "cognitoUserId", cognitoUserId);
+      // Respond with success
+      response.status(200).json({
+        message: "User authenticated and data saved successfully",
+        result,
+        cognitoUserId,
+      });
     } catch (error: any) {
-      throw new Error(error.message);
+      console.error("Sign-in error:", error.message || error);
+      errorResponse(401, { message: error.message || "Sign-in failed." });
     }
   }
 
