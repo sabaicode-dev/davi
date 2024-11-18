@@ -425,37 +425,6 @@
 			"post": {
 				"operationId": "SignIn",
 				"responses": {
-					"200": {
-						"description": "",
-						"content": {
-							"application/json": {
-								"schema": {
-									"properties": {
-										"result": {},
-										"message": {
-											"type": "string"
-										}
-									},
-									"required": [
-										"result",
-										"message"
-									],
-									"type": "object"
-								}
-							}
-						},
-						"headers": {
-							"Set-Cookie": {
-								"schema": {
-									"items": {
-										"type": "string"
-									},
-									"type": "array"
-								},
-								"required": true
-							}
-						}
-					},
 					"204": {
 						"description": "No content"
 					},
