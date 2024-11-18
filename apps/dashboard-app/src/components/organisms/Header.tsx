@@ -18,6 +18,7 @@ const Header: React.FC = () => {
     const fetchUserDetails = async () => {
       try {
         const response = await fetch("http://localhost:4001/v1/auth/me", {
+          method: "GET",
           credentials: "include", // Include cookies in the request
         });
 

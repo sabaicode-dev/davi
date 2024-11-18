@@ -12,10 +12,10 @@ import express, { Response } from "express";
 import {
   googleSignIn,
   exchangeCodeForTokens,
-} from "../services/authGoogle.service";
-import { setCookie } from "../utils/cookie";
+} from "@/src/services/authGoogle.service";
+import { setCookie } from "@/src/utils/cookie";
 import { jwtDecode } from "jwt-decode";
-import { saveUserToDB } from "../database/services/user.service"; // MongoDB service function to save user data
+import { saveUserToDB } from "@/src/database/services/user.service"; // MongoDB service function to save user data
 
 /**
  * Controller for handling Google authentication.
@@ -87,10 +87,13 @@ export class GoogleAuthController extends Controller {
       });
 
       // Set cookies securely for tokens and cognitoUserId
+      console.log("Setting cookies...");
       setCookie(response, "idToken", tokens.id_token);
       setCookie(response, "accessToken", tokens.access_token);
       setCookie(response, "refreshToken", tokens.refresh_token);
       setCookie(response, "cognitoUserId", cognitoUserId);
+
+      console.log("Cookies set successfully!");
 
       // Respond with success
       response.status(200).json({
