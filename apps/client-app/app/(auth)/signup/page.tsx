@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-// import { useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import axiosInstance from "@/app/utils/axios";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -9,8 +9,6 @@ import { z } from "zod"; // Import zod to infer schema types
 import Image from "next/image";
 import { RiEyeCloseFill, RiEyeCloseLine } from "react-icons/ri";
 import { BiArrowBack } from "react-icons/bi";
-
-
 
 // Infer the type of RegisterFormData from RegisterSchema
 type RegisterFormData = z.infer<typeof RegisterSchema>;
