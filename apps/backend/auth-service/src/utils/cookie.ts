@@ -15,8 +15,8 @@ export function setCookie(
 ): void {
   const defaultOptions: CookieOptions = {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "development", // Ensure secure cookies in production
-    sameSite: process.env.NODE_ENV === "development" ? "none" : "lax", // Use type assertion
+    secure: process.env.NODE_ENV === "production", // Ensure secure cookies in production
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // Use type assertion
     maxAge: 3600 * 1000, // Default to 1 hour
     ...options,
   };

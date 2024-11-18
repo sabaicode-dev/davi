@@ -362,10 +362,22 @@
 										}
 									},
 									"required": [
+										"result",
 										"message"
 									],
 									"type": "object"
 								}
+							}
+						},
+						"headers": {
+							"Set-Cookie": {
+								"schema": {
+									"items": {
+										"type": "string"
+									},
+									"type": "array"
+								},
+								"required": true
 							}
 						}
 					},
@@ -378,7 +390,6 @@
 							"application/json": {
 								"schema": {
 									"properties": {
-										"result": {},
 										"message": {
 											"type": "string"
 										}

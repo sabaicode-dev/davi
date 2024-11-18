@@ -5,7 +5,7 @@ import {
   confirmSignUp,
   resendConfirmationCode, // Import the resend function
 } from "../services/authEmail.service";
-
+import jwt from "jsonwebtoken";
 import {
   ConfirmSignUpRequest,
   SignInRequest,
@@ -50,48 +50,60 @@ export class CognitoController extends Controller {
    * Sign in an existing user
    * @param requestBody The user email and password
    */
-
-  // Updated signIn method
-
   @Post("signin")
   public async signIn(
     @Body() requestBody: SignInRequest,
     @Res()
-    sendResponse: TsoaResponse<200 | 401, { message: string; result?: any }>
+    successResponse: TsoaResponse<
+      200,
+      { message: string; result: any },
+      { "Set-Cookie": string[] }
+    >,
+    @Res() errorResponse: TsoaResponse<401, { message: string }>
   ): Promise<void> {
     const { email, password } = requestBody;
     try {
       const result = await signInUser(email, password);
 
-      // Send the response with a status code and cookie
-      sendResponse(
+      if (!result?.IdToken || !result?.RefreshToken || !result?.AccessToken) {
+        errorResponse(401, { message: "Authentication tokens are missing" });
+        return;
+      }
+
+      // Decode the IdToken to extract cognitoUserId
+      const decodedToken = jwt.decode(result.IdToken) as { sub?: string };
+      const cognitoUserId = decodedToken?.sub; // 'sub' is typically the user ID
+
+      if (!cognitoUserId) {
+        errorResponse(401, { message: "Unable to retrieve user ID" });
+        return;
+      }
+
+      const cookies = [
+        `idToken=${result.IdToken}; HttpOnly; Secure; Max-Age=86400; SameSite=Strict`,
+        `refreshToken=${result.RefreshToken}; HttpOnly; Secure; Max-Age=86400; SameSite=Strict`,
+        `accessToken=${result.AccessToken}; HttpOnly; Secure; Max-Age=3600; SameSite=Strict`,
+        `cognitoUserId=${cognitoUserId}; HttpOnly; Secure; Max-Age=86400; SameSite=Strict`,
+      ];
+
+      successResponse(
         200,
         {
           message: "User signed in successfully",
-          result,
+          result: {
+            IdToken: result.IdToken,
+            RefreshToken: result.RefreshToken,
+            AccessToken: result.AccessToken,
+            cognitoUserId,
+          },
         },
-        {
-          "Set-Cookie": `authToken=${result?.IdToken}; HttpOnly; Secure=${
-            process.env.NODE_ENV === "production"
-          }; Max-Age=86400; SameSite=Strict`,
-        }
+        { "Set-Cookie": cookies }
       );
     } catch (error: any) {
-      sendResponse(401, { message: error.message });
+      console.error("Sign-in error:", error.message || error);
+      errorResponse(401, { message: error.message || "Sign-in failed." });
     }
   }
-  // @Post("signin")
-  // public async signIn(
-  //   @Body() requestBody: SignInRequest
-  // ): Promise<{ message: string; result: any }> {
-  //   const { email, password } = requestBody;
-  //   try {
-  //     const result = await signInUser(email, password);
-  //     return { message: "User signed in successfully", result };
-  //   } catch (error: any) {
-  //     throw new Error(error.message);
-  //   }
-  // }
 
   /**
    * Confirm user sign up
