@@ -5,7 +5,7 @@ import Content from "./organisms/Content";
 const DocumentationSection = () => {
   const [section, setSection] = useState<string>("learn-about-davi");
   return (
-    <section className="relative">
+    <section className="relative bg-[#F5F5F5]">
       <div className="py-14 my-8 px-4 w-full flex flex-col md:flex-row md:justify-between">
         {/* Sidebar with fixed positioning within DocumentationSection */}
         <div className="w-full md:w-1/3 md:relative lg:sticky lg:top-0">
