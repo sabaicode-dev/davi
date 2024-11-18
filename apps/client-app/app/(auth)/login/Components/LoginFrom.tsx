@@ -14,9 +14,7 @@ interface LoginFormProps {
 // Define the schema type for TypeScript
 type LoginFormData = z.infer<typeof LoginSchema>;
 
-export default function LoginForm({
-  onSubmit,
-}: LoginFormProps) {
+export default function LoginForm({ onSubmit }: LoginFormProps) {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const {
     register,

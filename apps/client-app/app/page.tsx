@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     title: "Home",
     description:
       "Welcome to DAVI - An all-in-one platform for data analysis, visualization, and integration. Empower your team to make data-driven decisions faster and smarter.",
-    images: './opengraph-image.png'
+    images: "./opengraph-image.png",
   },
 };
 

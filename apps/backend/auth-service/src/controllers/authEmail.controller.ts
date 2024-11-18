@@ -1,5 +1,4 @@
 import { Body, Controller, Post, Res, Route, Tags, TsoaResponse } from "tsoa";
-import { Response } from "express";
 import {
   signUpUser,
   signInUser,
@@ -11,7 +10,6 @@ import {
   SignInRequest,
   SignUpRequest,
 } from "./types/authEmail.type";
-import { setCookie } from "../utils/cookie";
 
 @Route("/v1/auth")
 @Tags("Email Integrate AWS Cognito")
@@ -43,46 +41,50 @@ export class CognitoController extends Controller {
    * Sign in an existing user.
    * @param requestBody - The user email and password.
    */
+
+  // Updated signIn method
+
   @Post("signin")
   public async signIn(
     @Body() requestBody: SignInRequest,
-    @Res() successResponse: TsoaResponse<200, { message: string; result: any }>,
-    @Res() errorResponse: TsoaResponse<401, { message: string }>
+    @Res()
+    sendResponse: TsoaResponse<200 | 401, { message: string; result?: any }>
   ): Promise<void> {
     const { email, password } = requestBody;
 
     try {
       const result = await signInUser(email, password);
 
-      if (!result?.IdToken || !result?.RefreshToken) {
-        errorResponse(401, { message: "Authentication tokens are missing" });
-        return;
-      }
-
-      // Mock Express Response object for `setCookie`
-      const mockResponse = {
-        cookie: (name: string, value: string, options: any) => {
-          console.log(`Setting cookie: ${name}=${value}, options:`, options);
+      // Send the response with a status code and cookie
+      sendResponse(
+        200,
+        {
+          message: "User signed in successfully",
+          result,
         },
-      } as unknown as Response;
-
-      // Set cookies using the utility
-      setCookie(mockResponse, "authToken", result.IdToken, {
-        maxAge: 3600 * 1000,
-      }); // 1 hour
-      setCookie(mockResponse, "refreshToken", result.RefreshToken, {
-        maxAge: 604800 * 1000,
-      }); // 7 days
-
-      // Return success response
-      successResponse(200, {
-        message: "User signed in successfully",
-        result: { IdToken: result.IdToken, RefreshToken: result.RefreshToken },
-      });
+        {
+          "Set-Cookie": `authToken=${result?.IdToken}; HttpOnly; Secure=${
+            process.env.NODE_ENV === "production"
+          }; Max-Age=86400; SameSite=Strict`,
+        }
+      );
     } catch (error: any) {
-      errorResponse(401, { message: error.message });
+      sendResponse(401, { message: error.message });
     }
   }
+  // @Post("signin")
+  // public async signIn(
+  //   @Body() requestBody: SignInRequest
+  // ): Promise<{ message: string; result: any }> {
+  //   const { email, password } = requestBody;
+  //   try {
+  //     const result = await signInUser(email, password);
+  //     return { message: "User signed in successfully", result };
+  //   } catch (error: any) {
+  //     throw new Error(error.message);
+  //   }
+  // }
+
   /**
    * Confirm user sign-up.
    * @param requestBody - The user email and confirmation code.

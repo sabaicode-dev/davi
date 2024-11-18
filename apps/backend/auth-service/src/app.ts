@@ -5,6 +5,7 @@ import fs from "fs";
 import path from "path";
 import { allowedOrigins, corsOptions } from "@/src/middleware/allowsReq";
 import { errorHandler } from "@/src/middleware/errorHandler";
+import cookieParser from "cookie-parser";
 
 // Dynamically load swagger.json
 const swaggerDocument = JSON.parse(
@@ -20,6 +21,11 @@ const app = express();
 // Global Middleware
 // ========================
 app.use(express.json()); // Help to get the json from request body
+
+// =======================
+// Security Middlewares
+// =======================
+app.use(cookieParser());
 
 // Configure CORS to allow requests from localhost:3000
 // Apply CORS configuration

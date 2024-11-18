@@ -61,11 +61,6 @@ export class GoogleAuthController extends Controller {
 
       // Decode the ID token to get user information
       const decodedIdToken: any = jwtDecode(tokens.id_token);
-
-      if (!decodedIdToken || !decodedIdToken.email || !decodedIdToken.sub) {
-        throw new Error("Invalid ID token received from Google");
-      }
-
       if (!decodedIdToken.email_verified) {
         throw new Error("Email not verified by Google");
       }

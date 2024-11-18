@@ -415,7 +415,6 @@
 										}
 									},
 									"required": [
-										"result",
 										"message"
 									],
 									"type": "object"
@@ -432,6 +431,7 @@
 							"application/json": {
 								"schema": {
 									"properties": {
+										"result": {},
 										"message": {
 											"type": "string"
 										}

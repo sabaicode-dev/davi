@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { CognitoJwtVerifier } from 'aws-jwt-verify';
 import configs from '@/src/config';
-import { AuthenticationError, AuthorizationError, NotFoundError } from '@sabaicode-dev/ms-libs';
+import { AuthenticationError, AuthorizationError, NotFoundError } from '/ms-libs';
 import ROUTE_PATHS, { RouteConfig } from '@/src/route-defs';
 import { jwtDecode } from 'jwt-decode';
 import axios from 'axios';
