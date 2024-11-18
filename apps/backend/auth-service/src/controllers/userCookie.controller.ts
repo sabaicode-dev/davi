@@ -26,7 +26,7 @@ export class UserController extends Controller {
 
       console.log("cognitoUserId from cookie:", cognitoUserId);
 
-      // Fetch the user by cognitoUserId
+      // Fetch the user by cognitoUserId here
       const user = await UserRepository.getUserByCognitoId(cognitoUserId);
       if (!user) {
         console.error(`No user found for cognitoUserId: ${cognitoUserId}`);
