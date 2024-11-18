@@ -4,12 +4,13 @@ import Logo from "@/public/images/step/step2_pic.png";
 import Button from "@/src/components/atoms/Button";
 import request from "@/src/utils/helper";
 import axios from "axios";
-import { useDataFlow } from "@/src/context/UIContext";
+import { useNavigate } from "react-router-dom";
+
 interface Step2Props {
   onNext?: () => void;
   onBack?: () => void;
-  projectName?: string; // Optional initial value for project name
-  description?: string; // Optional initial value for description
+  projectName?: string;
+  description?: string;
 }
 
 const schema = Joi.object({
@@ -37,6 +38,11 @@ const CreateProject: React.FC<Step2Props> = ({
   });
   const [isLoading, setIsLoading] = useState(false);
 
+  const navigate = useNavigate();
+  const goBackToGetStart = () => {
+    navigate("/");
+  };
+
   const handleNext = async () => {
     setIsLoading(true);
 
@@ -51,6 +57,9 @@ const CreateProject: React.FC<Step2Props> = ({
           project_description: descriptionState,
         },
       });
+
+      navigate("/select-project");
+
       console.log(url_api);
       console.log("Project creation response:", response);
 
@@ -152,7 +161,7 @@ const CreateProject: React.FC<Step2Props> = ({
 
           <div className="flex justify-end space-x-3">
             <Button
-              onClick={onBack}
+              onClick={goBackToGetStart}
               children="Back"
               size="medium"
               radius="2xl"
@@ -163,7 +172,7 @@ const CreateProject: React.FC<Step2Props> = ({
             />
             <Button
               onClick={handleNext}
-              children="Next"
+              children="Next ss"
               size="small"
               radius="2xl"
               color="secondary"

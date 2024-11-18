@@ -1,7 +1,6 @@
-import DataFlow from "@/src/components/templates/DataFlow";
 import { useEffect, useState } from "react";
 import request from "@/src/utils/helper";
-import HomeProject from "@/src/components/molecules/HomeProject";
+import { GetStart } from "../molecules/steps/GetStart";
 
 export default function Project() {
   const [responseData, setResponseData] = useState([]);
@@ -32,7 +31,7 @@ export default function Project() {
   return (
     <div className="flex w-full justify-center items-center">
       <div className="w-full">
-        {responseData.length === 0 ? <DataFlow /> : <HomeProject />}
+        <GetStart />
       </div>
     </div>
   );
