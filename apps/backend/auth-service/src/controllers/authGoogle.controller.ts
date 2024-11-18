@@ -1,8 +1,20 @@
-import { Controller, Get, Query, Route, Tags, Res, TsoaResponse } from "tsoa";
-import { response } from "express";
+import {
+  Controller,
+  Get,
+  Query,
+  Route,
+  Tags,
+  Res,
+  Request,
+  TsoaResponse,
+  Post,
+  Body,
+} from "tsoa";
+import express, { Response } from "express";
 import {
   googleSignIn,
   exchangeCodeForTokens,
+  exchangeRefreshTokenForNewTokens, // Assuming a function that exchanges refresh token
 } from "../services/authGoogle.service";
 import { setCookie } from "../utils/cookie";
 import { jwtDecode } from "jwt-decode";
@@ -44,6 +56,7 @@ export class GoogleAuthController extends Controller {
   @Get("/google/callback")
   public async googleCallback(
     @Query() code: string,
+    @Request() request: express.Request,
     @Res() errorResponse: TsoaResponse<500, { error: string }>
   ): Promise<void> {
     try {
@@ -55,17 +68,13 @@ export class GoogleAuthController extends Controller {
       const tokens = await exchangeCodeForTokens(code);
 
       // Set tokens in cookies or handle them as needed
+      const response = (request as any).res as Response;
       setCookie(response, "idToken", tokens.id_token);
       setCookie(response, "accessToken", tokens.access_token);
       setCookie(response, "refreshToken", tokens.refresh_token);
 
       // Decode the ID token to get user information
       const decodedIdToken: any = jwtDecode(tokens.id_token);
-
-      if (!decodedIdToken || !decodedIdToken.email || !decodedIdToken.sub) {
-        throw new Error("Invalid ID token received from Google");
-      }
-
       if (!decodedIdToken.email_verified) {
         throw new Error("Email not verified by Google");
       }
@@ -85,6 +94,50 @@ export class GoogleAuthController extends Controller {
       });
     } catch (error: any) {
       console.error("Error during Google callback:", error.message || error);
+      errorResponse(500, { error: error.message || "Internal server error" });
+    }
+  }
+
+  /**
+   * Refresh Token
+   * @summary Exchanges a valid refresh token for a new set of access and ID tokens.
+   * @param refreshToken - The refresh token to exchange.
+   * @param req - The Express Request object.
+   * @param errorResponse - Error response in case of failure.
+   */
+  @Post("/refresh-token")
+  public async refreshToken(
+    @Body() body: { refreshToken: string },
+    @Request() request: express.Request,
+    @Res() errorResponse: TsoaResponse<500, { error: string }>
+  ): Promise<void> {
+    try {
+      if (!body.refreshToken) {
+        throw new Error("Refresh token is required");
+      }
+
+      // Exchange the refresh token for new tokens
+      const newTokens = await exchangeRefreshTokenForNewTokens(
+        body.refreshToken
+      );
+
+      if (!newTokens.access_token || !newTokens.id_token) {
+        throw new Error("Failed to refresh tokens");
+      }
+
+      // Set new tokens in cookies
+      const response = (request as any).res as Response;
+      setCookie(response, "idToken", newTokens.id_token);
+      setCookie(response, "accessToken", newTokens.access_token);
+      setCookie(response, "refreshToken", newTokens.refresh_token);
+
+      // Respond with the new tokens
+      response.status(200).json({
+        message: "Tokens refreshed successfully",
+        tokens: newTokens,
+      });
+    } catch (error: any) {
+      console.error("Error refreshing tokens:", error.message || error);
       errorResponse(500, { error: error.message || "Internal server error" });
     }
   }
