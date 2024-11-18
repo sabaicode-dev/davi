@@ -84,6 +84,59 @@
 		"contact": {}
 	},
 	"paths": {
+		"/v1/auth/me": {
+			"get": {
+				"operationId": "GetUserDetails",
+				"responses": {
+					"200": {
+						"description": "The username and email of the authenticated user.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"email": {
+											"type": "string"
+										},
+										"username": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"email",
+										"username"
+									],
+									"type": "object"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"error": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"error"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"description": "Get logged-in user details",
+				"tags": [
+					"User Management"
+				],
+				"security": [],
+				"parameters": []
+			}
+		},
 		"/v1/auth/updateUsername": {
 			"put": {
 				"operationId": "UpdateUsername",
@@ -326,20 +379,20 @@
 						}
 					}
 				},
-				"description": "Sign up a new user",
+				"description": "Sign up a new user.",
 				"tags": [
 					"Email Integrate AWS Cognito"
 				],
 				"security": [],
 				"parameters": [],
 				"requestBody": {
-					"description": "The user email and password",
+					"description": "- The user email and password.",
 					"required": true,
 					"content": {
 						"application/json": {
 							"schema": {
 								"$ref": "#/components/schemas/SignUpRequest",
-								"description": "The user email and password"
+								"description": "- The user email and password."
 							}
 						}
 					}
@@ -351,7 +404,7 @@
 				"operationId": "SignIn",
 				"responses": {
 					"200": {
-						"description": "Ok",
+						"description": "",
 						"content": {
 							"application/json": {
 								"schema": {
@@ -369,22 +422,43 @@
 								}
 							}
 						}
+					},
+					"204": {
+						"description": "No content"
+					},
+					"401": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
 					}
 				},
-				"description": "Sign in an existing user",
+				"description": "Sign in an existing user.",
 				"tags": [
 					"Email Integrate AWS Cognito"
 				],
 				"security": [],
 				"parameters": [],
 				"requestBody": {
-					"description": "The user email and password",
+					"description": "- The user email and password.",
 					"required": true,
 					"content": {
 						"application/json": {
 							"schema": {
 								"$ref": "#/components/schemas/SignInRequest",
-								"description": "The user email and password"
+								"description": "- The user email and password."
 							}
 						}
 					}
@@ -416,20 +490,20 @@
 						}
 					}
 				},
-				"description": "Confirm user sign up",
+				"description": "Confirm user sign-up.",
 				"tags": [
 					"Email Integrate AWS Cognito"
 				],
 				"security": [],
 				"parameters": [],
 				"requestBody": {
-					"description": "The user email and confirmation code",
+					"description": "- The user email and confirmation code.",
 					"required": true,
 					"content": {
 						"application/json": {
 							"schema": {
 								"$ref": "#/components/schemas/ConfirmSignUpRequest",
-								"description": "The user email and confirmation code"
+								"description": "- The user email and confirmation code."
 							}
 						}
 					}
@@ -459,14 +533,14 @@
 						}
 					}
 				},
-				"description": "Resend the confirmation code to a user's email",
+				"description": "Resend the confirmation code to a user's email.",
 				"tags": [
 					"Email Integrate AWS Cognito"
 				],
 				"security": [],
 				"parameters": [],
 				"requestBody": {
-					"description": "The user's email",
+					"description": "- The user's email.",
 					"required": true,
 					"content": {
 						"application/json": {
@@ -480,7 +554,7 @@
 									"email"
 								],
 								"type": "object",
-								"description": "The user's email"
+								"description": "- The user's email."
 							}
 						}
 					}

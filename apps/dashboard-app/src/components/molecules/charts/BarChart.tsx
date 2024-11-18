@@ -2,6 +2,8 @@ import React from "react";
 import Chart from "react-apexcharts";
 import { ApexOptions } from "apexcharts";
 
+useR
+
 // Define the type for individual data items
 interface DataItem {
   category: string;
