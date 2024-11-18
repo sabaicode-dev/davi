@@ -4,7 +4,7 @@ import Logo from "@/public/images/step/step2_pic.png";
 import Button from "@/src/components/atoms/Button";
 import request from "@/src/utils/helper";
 import axios from "axios";
-
+import { useDataFlow } from "@/src/context/UIContext";
 interface Step2Props {
   onNext?: () => void;
   onBack?: () => void;
@@ -19,7 +19,6 @@ const schema = Joi.object({
   description: Joi.string().allow(""),
 });
 
-// Define a type with an index signature for error messages
 type ErrorMessages = {
   [key: string]: string;
 };
@@ -32,7 +31,6 @@ const CreateProject: React.FC<Step2Props> = ({
 }) => {
   const [projectNameState, setProjectName] = useState(projectName || "");
   const [descriptionState, setDescription] = useState(description || "");
-
   const [errorMessages, setErrorMessages] = useState<ErrorMessages>({
     projectName: "",
     description: "",
@@ -41,7 +39,7 @@ const CreateProject: React.FC<Step2Props> = ({
 
   const handleNext = async () => {
     setIsLoading(true);
-  
+
     try {
       const url_api = process.env.REACT_APP_API_URL;
       console.log(url_api);
@@ -55,7 +53,7 @@ const CreateProject: React.FC<Step2Props> = ({
       });
       console.log(url_api);
       console.log("Project creation response:", response);
-  
+
       if (response.success || response.status === 201) {
         setErrorMessages({ projectName: "", description: "" });
         setProjectName("");
@@ -87,7 +85,6 @@ const CreateProject: React.FC<Step2Props> = ({
       setIsLoading(false);
     }
   };
-  
 
   return (
     <div className="mx-auto max-w-4xl p-10">

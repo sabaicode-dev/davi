@@ -1,4 +1,10 @@
-import React, { createContext, useState, useContext, useCallback, ReactNode } from "react";
+import React, {
+  createContext,
+  useState,
+  useContext,
+  useCallback,
+  ReactNode,
+} from "react";
 import request from "../utils/helper";
 
 interface Project {
@@ -18,7 +24,9 @@ interface APIContextType {
 
 const APIContext = createContext<APIContextType | undefined>(undefined);
 
-export const APIProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const APIProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -33,7 +41,6 @@ export const APIProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         url: `http://127.0.0.1:8000/api/v1/projects/`,
         method: "GET",
       });
-
       if (response.success && response.data.results) {
         setProjects(response.data.results);
       } else {
@@ -50,10 +57,15 @@ export const APIProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const getFilteredProjects = useCallback(
     (filter: "recent" | "alphabetical" | null): Project[] => {
       if (filter === "recent") {
-        return [...projects].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+        return [...projects].sort(
+          (a, b) =>
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        );
       }
       if (filter === "alphabetical") {
-        return [...projects].sort((a, b) => a.project_name.localeCompare(b.project_name));
+        return [...projects].sort((a, b) =>
+          a.project_name.localeCompare(b.project_name)
+        );
       }
       return projects;
     },
@@ -61,7 +73,9 @@ export const APIProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   );
 
   return (
-    <APIContext.Provider value={{ projects, fetchProjects, getFilteredProjects, isLoading, error }}>
+    <APIContext.Provider
+      value={{ projects, fetchProjects, getFilteredProjects, isLoading, error }}
+    >
       {children}
     </APIContext.Provider>
   );

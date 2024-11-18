@@ -5,15 +5,20 @@ import { FaCheck, FaPlus } from "react-icons/fa6";
 import { FaSortAlphaDown, FaSortAlphaUp } from "react-icons/fa";
 import Button from "@/src/components/atoms/Button";
 import SelectProject from "@/src/components/molecules/steps/SelectProject";
-import { useNavigate } from "react-router-dom";
 
-const HomeProject: React.FC = () => {
+interface IHomeProject {
+  onNext: () => void;
+}
+
+const HomeProject: React.FC<IHomeProject> = ({ onNext }) => {
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
-  const [selectedSort, setSelectedSort] = useState<"recent" | "alphabetical" | null>(null);
+  const [selectedSort, setSelectedSort] = useState<
+    "recent" | "alphabetical" | null
+  >(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const navigate = useNavigate();
 
-  const toggleProfileDropdown = () => setIsProfileDropdownOpen(!isProfileDropdownOpen);
+  const toggleProfileDropdown = () =>
+    setIsProfileDropdownOpen(!isProfileDropdownOpen);
 
   const closeDropdown = () => setIsProfileDropdownOpen(false);
 
@@ -29,7 +34,10 @@ const HomeProject: React.FC = () => {
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         closeDropdown();
       }
     };
@@ -39,7 +47,7 @@ const HomeProject: React.FC = () => {
   }, []);
 
   return (
-    <div className="w-full h-full xl:mx-4 2xl:mx-10">
+    <div className="w-full h-full">
       <div className="mt-4">
         <h1 className="text-lg font-bold mb-4">Project</h1>
         <div className="flex flex-row justify-between items-center">
@@ -72,7 +80,9 @@ const HomeProject: React.FC = () => {
                         <FaSortAlphaDown />
                         <span>Sort by Recent</span>
                       </div>
-                      {selectedSort === "recent" && <FaCheck className="ml-auto" />}
+                      {selectedSort === "recent" && (
+                        <FaCheck className="ml-auto" />
+                      )}
                     </button>
                     <button
                       onClick={handleSortByAlphabetical}
@@ -82,7 +92,9 @@ const HomeProject: React.FC = () => {
                         <FaSortAlphaUp />
                         <span>Sort by Alphabetical</span>
                       </div>
-                      {selectedSort === "alphabetical" && <FaCheck className="ml-auto" />}
+                      {selectedSort === "alphabetical" && (
+                        <FaCheck className="ml-auto" />
+                      )}
                     </button>
                   </div>
                 </div>
@@ -105,16 +117,15 @@ const HomeProject: React.FC = () => {
               children="Start New Project"
               color="secondary"
               startContent={<FaPlus />}
-              onClick={() => navigate("/accountsetting")}
+              onClick={onNext}
             />
           </div>
         </div>
       </div>
       <div className="mt-4">
-        <SelectProject selectedSort={selectedSort} />
+        <SelectProject selectedSort={selectedSort}/>
       </div>
     </div>
   );
 };
-
 export default HomeProject;

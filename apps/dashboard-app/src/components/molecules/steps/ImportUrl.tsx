@@ -1,4 +1,3 @@
-// src/components/Step4.tsx
 import React from "react";
 import { useState } from "react";
 import Logo from "@/public/images/step/step4_pic.png";
@@ -10,7 +9,7 @@ interface Step4Props {
   selectedSource?: string;
 }
 
-const Step4: React.FC<Step4Props> = ({ onNext, onBack }) => {
+const ImportUrl: React.FC<Step4Props> = ({ onNext, onBack }) => {
   const [url, setUrl] = useState(""); // State to manage the URL input
   const [error, setError] = useState(""); // State to manage the error message
 
@@ -112,4 +111,4 @@ const Step4: React.FC<Step4Props> = ({ onNext, onBack }) => {
   );
 };
 
-export default Step4;
+export default ImportUrl;

@@ -4,10 +4,16 @@ import ImageProject from "@/public/images/saveImage.png";
 import formatDate from "@/src/utils/formatDate";
 
 interface SelectProjectProps {
-  selectedSort?: "recent" | "alphabetical" | null;
+  selectedSort?: "recent" | "alphabetical" | null; // selectedSort is optional
+  onSelectProject?: (projectId: string) => void;
+  onBack?: () => void;
 }
 
-const SelectProject: React.FC<SelectProjectProps> = ({ selectedSort }) => {
+const SelectProject: React.FC<SelectProjectProps> = ({
+  selectedSort = "recent",
+  onSelectProject,
+  onBack,
+}) => {
   const { projects, fetchProjects, getFilteredProjects, isLoading, error } =
     useAPI();
 
@@ -21,11 +27,12 @@ const SelectProject: React.FC<SelectProjectProps> = ({ selectedSort }) => {
   if (error) return <p className="text-red-500">Error: {error}</p>;
 
   return (
-    <div className="space-y-4 overflow-auto mt-4 p-2">
+    <div className="space-y-4 overflow-auto mt-4 p-2 w-full ">
       {filteredProjects.map((project) => (
         <div
           key={project._id}
-          className="flex justify-between p-4 shadow-lg rounded-xl"
+          className="flex justify-between p-4 shadow-lg rounded-xl cursor-pointer ring-2"
+          onClick={() => onSelectProject?.(project._id)}
         >
           <div className="flex flex-row space-x-4">
             <img src={ImageProject} alt="Project" className="w-12 h-12" />
@@ -37,6 +44,14 @@ const SelectProject: React.FC<SelectProjectProps> = ({ selectedSort }) => {
           </div>
         </div>
       ))}
+      {onBack && (
+        <button
+          onClick={onBack}
+          className="mt-4 px-4 py-2 bg-gray-300 rounded-md"
+        >
+          Back
+        </button>
+      )}
     </div>
   );
 };

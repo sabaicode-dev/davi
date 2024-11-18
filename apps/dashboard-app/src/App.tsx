@@ -23,6 +23,7 @@ export const App = () => {
               <Route path="/dataset" element={<Dataset />} />
               <Route path="/helps" element={<Helps />} />
               <Route path="/accountsetting" element={<AccountSettings />} />
+              <Route path="/cleaning" element={<AccountSettings />} />
             </Routes>
           </Layout>
         </DataFlowProvider>

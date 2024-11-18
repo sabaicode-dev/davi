@@ -30,9 +30,10 @@ export default function Project() {
   }, [responseData]);
 
   return (
-    <div className="h-auto flex justify-center items-center">
-      {/* {responseData.length === 0 ? <DataFlow />: <HomeProject/>} */}
-      <DataFlow/>
+    <div className="flex w-full justify-center items-center">
+      <div className="w-full">
+        {responseData.length === 0 ? <DataFlow /> : <HomeProject />}
+      </div>
     </div>
   );
 }
