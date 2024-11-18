@@ -9,16 +9,35 @@ import { useNavigate } from "react-router-dom";
 const Header: React.FC = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState<string | null>(null);
+  const [email, setEmail] = useState<string | null>(null);
+
   const navigate = useNavigate();
 
   useEffect(() => {
-    const storedUsername = localStorage.getItem("username");
-    const storedEmail = localStorage.getItem("email");
+    const fetchUserDetails = async () => {
+      try {
+        const response = await fetch("http://localhost:4001/v1/auth/me", {
+          method: "GET",
+          credentials: "include", // Include cookies in the request
+        });
 
-    if (storedUsername) setUsername(storedUsername);
-    if (storedEmail) setEmail(storedEmail);
+        console.log("response", response);
+
+        if (response.ok) {
+          const data = await response.json();
+          console.log("User data", data);
+          setUsername(data.username);
+          setEmail(data.email);
+        } else {
+          console.error("Failed to fetch user details");
+        }
+      } catch (error) {
+        console.error("Error fetching user details:", error);
+      }
+    };
+
+    fetchUserDetails();
   }, []);
 
   const handleProfileClick = () => {
@@ -26,8 +45,38 @@ const Header: React.FC = () => {
     closeDropdown();
   };
 
+  const handleLogout = async () => {
+    try {
+      // Call the logout API with the refresh token
+      const response = await fetch("http://localhost:4001/v1/auth/logout", {
+        method: "PUT",
+        credentials: "include", // Include cookies in the request
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          refreshToken: "dummyRefreshToken", // Replace with the actual token if needed
+        }),
+      });
+
+      if (response.ok) {
+        console.log("User logged out successfully");
+
+        // Clear the state in the frontend
+        setUsername(null);
+        setEmail(null);
+
+        // Redirect the user to the login page
+        window.location.href = "http://localhost:3000/login";
+      } else {
+        console.error("Failed to log out:", await response.json());
+      }
+    } catch (error) {
+      console.error("Error during logout:", error);
+    }
+  };
+
   const toggleDropdown = () => {
-    // Open the notification dropdown and close the profile dropdown if it's open
     setIsDropdownOpen(!isDropdownOpen);
     if (isProfileDropdownOpen) {
       setIsProfileDropdownOpen(false);
@@ -35,7 +84,6 @@ const Header: React.FC = () => {
   };
 
   const toggleProfileDropdown = () => {
-    // Open the profile dropdown and close the notification dropdown if it's open
     setIsProfileDropdownOpen(!isProfileDropdownOpen);
     if (isDropdownOpen) {
       setIsDropdownOpen(false);
@@ -43,10 +91,10 @@ const Header: React.FC = () => {
   };
 
   const closeDropdown = () => {
-    // Close both dropdowns
     setIsDropdownOpen(false);
     setIsProfileDropdownOpen(false);
   };
+
   return (
     <header className="bg-white shadow-md flex items-center justify-between py-3 px-8 fixed top-0 left-0 w-full z-50">
       <div className="flex items-center cursor-pointer">
@@ -132,7 +180,9 @@ const Header: React.FC = () => {
             alt="Profile"
             className="size-8 rounded-full"
           />
-          <span className="mr-1 font-medium">{username || "UserName"}</span>
+          <span className="mr-1 text-lg font-medium">
+            {username || "UserName"}
+          </span>
           <svg
             width="14"
             height="8"
@@ -160,7 +210,7 @@ const Header: React.FC = () => {
                   className="w-14 h-14 rounded-full"
                 />
                 <div className="ml-3">
-                  <p className="font-medium">{username}</p>
+                  <p className="font-normal">{username}</p>
                   <p className="text-sm text-gray-500">{email}</p>
                 </div>
               </div>
@@ -176,7 +226,10 @@ const Header: React.FC = () => {
                 <FiUser size={22} />
                 <span>My Profile</span>
               </button>
-              <button className="w-full flex items-center p-3 text-red-500 hover:bg-gray-100 rounded-sm mt-2 space-x-3">
+              <button
+                onClick={handleLogout}
+                className="w-full flex items-center p-3 text-red-500 hover:bg-gray-100 rounded-sm mt-2 space-x-3"
+              >
                 <AiOutlineLogout size={22} />
                 <span>Log Out</span>
               </button>

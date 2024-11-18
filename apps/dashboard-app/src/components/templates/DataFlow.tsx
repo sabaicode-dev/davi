@@ -39,7 +39,6 @@ const DataFlow: React.FC = () => {
         <Step4
           onNext={handleNext}
           onBack={() => setCurrentStep(3)}
-          selectedSource="URL"
         />
       )}
     </div>

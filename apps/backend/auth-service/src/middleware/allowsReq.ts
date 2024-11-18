@@ -4,7 +4,7 @@ import cors from "cors";
 const allowedOrigins =
   process.env.NODE_ENV === "production"
     ? ["https://d3llp4uth9m31o.cloudfront.net"]
-    : ["http://localhost:3000"];
+    : ["http://localhost:3000","http://localhost:8080"];
 
 // Export the CORS middleware configuration
 export const corsOptions = cors({
