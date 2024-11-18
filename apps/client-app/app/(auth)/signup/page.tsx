@@ -2,30 +2,41 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import axiosInstance from "@/app/utils/axios";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { RegisterSchema } from "@/app/schema/Register"; // Import the schema
+import { z } from "zod"; // Import zod to infer schema types
 import Image from "next/image";
 import { RiEyeCloseFill, RiEyeCloseLine } from "react-icons/ri";
 import { BiArrowBack } from "react-icons/bi";
 
+// Infer the type of RegisterFormData from RegisterSchema
+type RegisterFormData = z.infer<typeof RegisterSchema>;
+
 export default function SignUpPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [cpassword, setCPassword] = useState("");
-  const [username, setUsername] = useState("");
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<RegisterFormData>({
+    resolver: zodResolver(RegisterSchema),
+  });
+
   const [isLoading, setIsLoading] = useState(false);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [error, setError] = useState<string | null>(null);
-
   const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // Define an interface for Axios error response
+  interface AxiosErrorResponse {
+    response?: {
+      status: number;
+    };
+  }
 
-    // Check if the passwords match
-    if (password !== cpassword) {
-      setError("Passwords do not match.");
-      return;
-    }
+  // Updated to use RegisterFormData type, removed any
+  const handleSignUp = async (data: RegisterFormData) => {
+    const { email, password, username } = data;
 
     setIsLoading(true); // Start loading spinner
     setError(null); // Reset error message
@@ -38,19 +49,17 @@ export default function SignUpPage() {
         username,
       });
 
-      // If the response is successful (status 201), navigate to the verification page
       if (response.status === 200) {
-        localStorage.setItem("signupEmail", email);
+        localStorage.setItem("username", username);
+        localStorage.setItem("email", email);
         router.push("/signup/verify-email"); // Redirect to the verification page
       } else {
-        // If the response is not 200, show the error
         setError("Sign-up failed. Please try again.");
       }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (err: any) {
-      // Handle errors from the API
-      if (err.response) {
-        if (err.response.status === 409) {
+    } catch (err) {
+      const errorResponse = err as AxiosErrorResponse; // Type cast error as AxiosErrorResponse
+      if (errorResponse.response) {
+        if (errorResponse.response.status === 409) {
           setError("User already exists. Please try logging in.");
         } else {
           setError("Sign-up failed. Please try again.");
@@ -64,32 +73,29 @@ export default function SignUpPage() {
     }
   };
 
+  const togglePasswordVisibility = () => {
+    setIsPasswordVisible(!isPasswordVisible);
+  };
+
   const handleGoogleSignUp = async () => {
     try {
       const response = await axiosInstance.get("/v1/auth/google");
 
-      // Ensure the URL is in the response
       if (response.data && response.data.url) {
         window.location.href = response.data.url; // Redirect to the Google OAuth page
       } else {
-        console.error("Google Sign-up URL not found in the response.");
         setError("An error occurred during Google login. Please try again.");
       }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (err: any) {
+    } catch (err) {
+      setError("An error occurred during Google login. Please try again.");
       console.error("Google Sign-up error:", err);
       setError("An error occurred during Google login. Please try again.");
     }
   };
 
-  const togglePasswordVisibility = () => {
-    setIsPasswordVisible(!isPasswordVisible);
-  };
-
   const handleBack = () => {
     router.push("/");
   };
-
 
   return (
     <div className="min-h-screen flex">
@@ -107,7 +113,15 @@ export default function SignUpPage() {
           <p className="text-gray-600 mb-8">
             Enter the details to create your account
           </p>
-          <form className="space-y-6" onSubmit={handleSubmit}>
+
+          {/* Error Message */}
+          {error && (
+            <div className="flex items-center text-red-600 mb-2">
+              <p>{error}</p>
+            </div>
+          )}
+
+          <form className="space-y-6" onSubmit={handleSubmit(handleSignUp)}>
             {/* usernaem */}
             <div>
               <label
@@ -120,14 +134,17 @@ export default function SignUpPage() {
                 <input
                   placeholder="Enter Username"
                   id="username"
-                  name="username"
                   type="text"
                   autoComplete="username"
                   required
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  {...register("username")}
                 />
+                {errors.username && (
+                  <p className="text-sm text-red-500">
+                    {errors.username.message}
+                  </p>
+                )}
               </div>
             </div>
             {/* email */}
@@ -140,16 +157,16 @@ export default function SignUpPage() {
               </label>
               <div className="mt-1">
                 <input
-                  placeholder="Enter Email"
                   id="email"
-                  name="email"
                   type="email"
+                  placeholder="Enter Email"
                   autoComplete="email"
-                  required
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  {...register("email")}
                 />
+                {errors.email && (
+                  <p className="text-sm text-red-500">{errors.email.message}</p>
+                )}
               </div>
             </div>
             {/* password  */}
@@ -162,15 +179,12 @@ export default function SignUpPage() {
               </label>
               <div className="mt-1 relative">
                 <input
-                  placeholder="Enter Password"
                   id="password"
-                  name="password"
                   type={isPasswordVisible ? "text" : "password"}
+                  placeholder="Enter Password"
                   autoComplete="new-password"
-                  required
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  {...register("password")}
                 />
                 {/* Eye button */}
                 <button
@@ -194,15 +208,12 @@ export default function SignUpPage() {
               </label>
               <div className="mt-1 relative">
                 <input
-                  placeholder="Confirm Password"
-                  id="cpassword"
-                  name="cpassword"
+                  id="confirmPassword"
                   type={isPasswordVisible ? "text" : "password"}
+                  placeholder="Confirm Password"
                   autoComplete="new-password"
-                  required
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                  value={cpassword}
-                  onChange={(e) => setCPassword(e.target.value)}
+                  {...register("confirmPassword")}
                 />
                 {/* Eye button */}
                 <button
@@ -212,6 +223,11 @@ export default function SignUpPage() {
                 >
                   {isPasswordVisible ? <RiEyeCloseLine /> : <RiEyeCloseFill />}
                 </button>
+                {errors.confirmPassword && (
+                  <p className="text-sm text-red-500">
+                    {errors.confirmPassword.message}
+                  </p>
+                )}
               </div>
             </div>
 

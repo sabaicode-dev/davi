@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Logo from "@/public/images/header/logo.png";
 import ProfileUser from "@/public/images/header/roem-reaksmey.jpeg";
 import FileImg from "@/public/images/header/status-up.png";
@@ -9,7 +9,17 @@ import { useNavigate } from "react-router-dom";
 const Header: React.FC = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const storedUsername = localStorage.getItem("username");
+    const storedEmail = localStorage.getItem("email");
+
+    if (storedUsername) setUsername(storedUsername);
+    if (storedEmail) setEmail(storedEmail);
+  }, []);
 
   const handleProfileClick = () => {
     navigate("/accountsetting");
@@ -122,7 +132,7 @@ const Header: React.FC = () => {
             alt="Profile"
             className="size-8 rounded-full"
           />
-          <span className="mr-1 font-medium">ReakSmey</span>
+          <span className="mr-1 font-medium">{username || "UserName"}</span>
           <svg
             width="14"
             height="8"
@@ -150,8 +160,8 @@ const Header: React.FC = () => {
                   className="w-14 h-14 rounded-full"
                 />
                 <div className="ml-3">
-                  <p className="font-medium">ReakSmey</p>
-                  <p className="text-sm text-gray-500">reaksmey007@gmail.com</p>
+                  <p className="font-medium">{username}</p>
+                  <p className="text-sm text-gray-500">{email}</p>
                 </div>
               </div>
               <button onClick={closeDropdown} className="text-gray-500">

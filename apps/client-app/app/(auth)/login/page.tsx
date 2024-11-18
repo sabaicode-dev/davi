@@ -40,7 +40,7 @@ export default function LoginPage() {
         window.location.href = response.data.url;
       } else {
         console.error("Google Sign-in URL not found in response.");
-        alert("An error occurred during Google login.");
+        alert("And error occurred during Google login.");
       }
     } catch (err) {
       console.error("Google Sign-up error:", err);
@@ -57,7 +57,7 @@ export default function LoginPage() {
       {/* Left Section - Form */}
       <div className="flex flex-col justify-center w-full sm:w-1/2 p-8 sm:p-12 lg:p-24 bg-white rounded-r-3xl">
         <div className="sm:max-w-md w-full mx-auto">
-          {/* back button */}
+          {/* Back button */}
           <button
             onClick={handleBack}
             className="mb-6 text-gray-600 hover:text-gray-800"
@@ -66,10 +66,27 @@ export default function LoginPage() {
           </button>
           <h2 className="text-3xl font-bold mb-4">LOGIN</h2>
           <p className="text-gray-600 mb-8">Welcome back!</p>
-          <LoginForm
-            onSubmit={handleLogin}
-            onGoogleSignUp={handleGoogleSignUp}
-          />
+
+          {/* Display error message */}
+          {error && (
+            <div className="text-red-500 text-sm mb-4">
+              {error}{" "}
+              {error ===
+                "Account does not exist. Would you like to sign up?" && (
+                <button
+                  onClick={() => router.push("/signup")}
+                  className="text-blue-500 underline ml-2"
+                >
+                  Sign Up
+                </button>
+              )}
+            </div>
+          )}
+
+          {/* LoginForm with handleLogin */}
+          <LoginForm onSubmit={handleLogin} />
+
+          {/* Divider */}
           <div className="relative flex items-center justify-center text-sm mt-4">
             <div className="flex-grow border-t border-gray-300"></div>
             <span className="px-2 text-gray-500 bg-white">
@@ -77,7 +94,8 @@ export default function LoginPage() {
             </span>
             <div className="flex-grow border-t border-gray-300"></div>
           </div>
-          {/* sign in with Google */}
+
+          {/* Sign in with Google */}
           <div className="mt-4">
             <button
               onClick={handleGoogleSignUp}
@@ -89,6 +107,7 @@ export default function LoginPage() {
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
               >
+                {/* Google icon */}
                 <path
                   d="M20.3081 10.2303C20.3081 9.55056 20.253 8.86711 20.1354 8.19836H10.7031V12.0492H16.1046C15.8804 13.2911 15.1602 14.3898 14.1057 15.0879V17.5866H17.3282C19.2205 15.8449 20.3081 13.2728 20.3081 10.2303Z"
                   fill="#3F83F8"
@@ -109,6 +128,8 @@ export default function LoginPage() {
               Sign up with Google
             </button>
           </div>
+
+          {/* Signup redirect */}
           <div className="mt-4">
             <p className="text-xs text-gray-400">
               {`Don't have an account? `}

@@ -26,10 +26,23 @@ export class CognitoController extends Controller {
     const { username, email, password } = requestBody;
     try {
       const result = await signUpUser(username, email, password);
-      this.setStatus(200); // Set the response status code to 201
-      return { message: "User signed up successfully", result };
+      this.setStatus(200); // Set the response status code to 201 (Created)
+      return { message: result.message, result: result }; // Ensure we always return 'result' in case of success
     } catch (error: any) {
-      throw new Error(error.message);
+      console.error("Error during sign-up:", error.message || error);
+
+      let result = {}; // Initialize result to be returned with the error message
+      let message = "An error occurred during sign-up."; // Default error message
+
+      if (error.message === "User already exists. Please try logging in.") {
+        // Handle user already exists error
+        this.setStatus(409); // Conflict (user already exists)
+        message = error.message; // Set the message for already existing user
+      } else {
+        this.setStatus(500); // Internal server error for other cases
+      }
+
+      return { message, result }; // Ensure 'result' is always included, even in error cases
     }
   }
 
@@ -76,27 +89,6 @@ export class CognitoController extends Controller {
       throw new Error(error.message);
     }
   }
-
-  // @Post("confirm")
-  // public async confirmSignUp(
-  //   @Body() requestBody: ConfirmSignUpRequest
-  // ): Promise<{ message: string; result: any }> {
-  //   const { email, confirmationCode } = requestBody;
-  //   try {
-  //     const result = await confirmSignUp(email, confirmationCode);
-  //     return { message: "User confirmed successfully", result };
-  //   } catch (error: any) {
-  //     if (
-  //       error.message.includes("ExpiredCodeException") ||
-  //       error.message.includes("CodeMismatchException")
-  //     ) {
-  //       throw new Error(
-  //         "The confirmation code is invalid or expired. Please request a new code."
-  //       );
-  //     }
-  //     throw new Error(error.message);
-  //   }
-  // }
 
   /**
    * Resend the confirmation code to a user's email

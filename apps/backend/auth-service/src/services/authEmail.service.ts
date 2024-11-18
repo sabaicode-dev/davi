@@ -64,10 +64,19 @@ export const signUpUser = async (
       await UserRepository.createUser(username, email, response.UserSub, false);
     }
 
-    return response;
+    // Return relevant data or result
+    return {
+      message:
+        "User signed up successfully. Please check your email to confirm your account.",
+    };
   } catch (error: any) {
+    // Handle specific error for user already existing
+    if (error.code === "UsernameExistsException") {
+      throw new Error("User already exists. Please try logging in.");
+    }
+
     console.error("Error signing up user:", error.message || error);
-    throw error;
+    throw new Error("An error occurred during sign-up.");
   }
 };
 

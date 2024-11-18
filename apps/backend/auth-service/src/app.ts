@@ -3,7 +3,8 @@ import swaggerUi from "swagger-ui-express";
 import { RegisterRoutes } from "./routes/v1/routes";
 import fs from "fs";
 import path from "path";
-import cors from "cors";
+import { allowedOrigins, corsOptions } from "@/src/middleware/allowsReq";
+import { errorHandler } from "@/src/middleware/errorHandler";
 
 // Dynamically load swagger.json
 const swaggerDocument = JSON.parse(
@@ -21,21 +22,10 @@ const app = express();
 app.use(express.json()); // Help to get the json from request body
 
 // Configure CORS to allow requests from localhost:3000
-const allowedOrigins =
-  process.env.NODE_ENV === "production"
-    ? ["https://d3llp4uth9m31o.cloudfront.net"]
-    : ["http://localhost:3000"]; // Adjust the origin if needed
+// Apply CORS configuration
+app.use(corsOptions);
 
-app.use(
-  cors({
-    origin: allowedOrigins,
-    methods: ["GET", "POST"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true, // Allow credentials if required (cookies)
-  })
-);
-
-//log show allowedOrigins 
+//log show allowedOrigins
 console.log(`allowedOrigins : ${allowedOrigins}`);
 
 // ========================
@@ -51,5 +41,6 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 // ========================
 // ERROR Handler
 // ========================
+app.use(errorHandler);
 
 export default app;
