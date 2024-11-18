@@ -1,19 +1,9 @@
-import {
-  Body,
-  Controller,
-  Post,
-  Res,
-  Route,
-  Tags,
-  TsoaResponse,
-  Request,
-} from "tsoa";
-import express, { Response } from "express";
+import { Body, Controller, Post, Res, Route, Tags, TsoaResponse } from "tsoa";
 import {
   signUpUser,
   signInUser,
   confirmSignUp,
-  resendConfirmationCode,
+  resendConfirmationCode, // Import the resend function
 } from "../services/authEmail.service";
 import jwt from "jsonwebtoken";
 import {
@@ -21,14 +11,13 @@ import {
   SignInRequest,
   SignUpRequest,
 } from "./types/authEmail.type";
-import { setCookie } from "../utils/cookie";
 
-@Route("/v1/auth")
+@Route("/v1/auth") // Define the base route for the controller
 @Tags("Email Integrate AWS Cognito")
 export class CognitoController extends Controller {
   /**
-   * Sign up a new user.
-   * @param requestBody - The user email and password.
+   * Sign up a new user
+   * @param requestBody The user email and password
    */
   @Post("signup")
   public async signUp(
@@ -37,35 +26,45 @@ export class CognitoController extends Controller {
     const { username, email, password } = requestBody;
     try {
       const result = await signUpUser(username, email, password);
-      this.setStatus(200);
-      return { message: result.message, result };
+      this.setStatus(200); // Set the response status code to 201 (Created)
+      return { message: result.message, result: result }; // Ensure we always return 'result' in case of success
     } catch (error: any) {
-      console.error("Sign-up error:", error.message || error);
-      this.setStatus(error.message === "User already exists." ? 409 : 500);
-      return {
-        message: error.message || "An error occurred during sign-up.",
-        result: {},
-      };
+      console.error("Error during sign-up:", error.message || error);
+
+      let result = {}; // Initialize result to be returned with the error message
+      let message = "An error occurred during sign-up."; // Default error message
+
+      if (error.message === "User already exists. Please try logging in.") {
+        // Handle user already exists error
+        this.setStatus(409); // Conflict (user already exists)
+        message = error.message; // Set the message for already existing user
+      } else {
+        this.setStatus(500); // Internal server error for other cases
+      }
+
+      return { message, result }; // Ensure 'result' is always included, even in error cases
     }
   }
 
   /**
-   * Sign in an existing user.
-   * @param requestBody - The user email and password.
+   * Sign in an existing user
+   * @param requestBody The user email and password
    */
   @Post("signin")
   public async signIn(
-    @Request() request: express.Request,
     @Body() requestBody: SignInRequest,
-    @Res() errorResponse: TsoaResponse<401, { message: string }>
+    @Res()
+    successResponse: TsoaResponse<
+      200,
+      { message: string; result: any },
+      { "Set-Cookie": string[] }
+    >,
+    @Res()
+    errorResponse: TsoaResponse<401, { message: string }>
   ): Promise<void> {
     const { email, password } = requestBody;
-
     try {
       const result = await signInUser(email, password);
-
-      // Access the Express Response object
-      const response = (request as any).res as Response;
 
       if (!result?.IdToken || !result?.RefreshToken || !result?.AccessToken) {
         errorResponse(401, { message: "Authentication tokens are missing" });
@@ -81,17 +80,26 @@ export class CognitoController extends Controller {
         return;
       }
 
-      // Set cookies securely for tokens and cognitoUserId
-      setCookie(response, "idToken", result.IdToken);
-      setCookie(response, "accessToken", result.AccessToken);
-      setCookie(response, "refreshToken", result.RefreshToken);
-      setCookie(response, "cognitoUserId", cognitoUserId);
-      // Respond with success
-      response.status(200).json({
-        message: "User authenticated and data saved successfully",
-        result,
-        cognitoUserId,
-      });
+      const cookies = [
+        `idToken=${result.IdToken}; HttpOnly; Secure; Max-Age=86400; SameSite=Strict`,
+        `refreshToken=${result.RefreshToken}; HttpOnly; Secure; Max-Age=86400; SameSite=Strict`,
+        `accessToken=${result.AccessToken}; HttpOnly; Secure; Max-Age=3600; SameSite=Strict`,
+        `cognitoUserId=${cognitoUserId}; HttpOnly; Secure; Max-Age=86400; SameSite=Strict`,
+      ];
+
+      successResponse(
+        200,
+        {
+          message: "User signed in successfully",
+          result: {
+            IdToken: result.IdToken,
+            RefreshToken: result.RefreshToken,
+            AccessToken: result.AccessToken,
+            cognitoUserId,
+          },
+        },
+        { "Set-Cookie": cookies }
+      );
     } catch (error: any) {
       console.error("Sign-in error:", error.message || error);
       errorResponse(401, { message: error.message || "Sign-in failed." });
@@ -99,8 +107,8 @@ export class CognitoController extends Controller {
   }
 
   /**
-   * Confirm user sign-up.
-   * @param requestBody - The user email and confirmation code.
+   * Confirm user sign up
+   * @param requestBody The user email and confirmation code
    */
   @Post("confirm")
   public async confirmSignUp(
@@ -111,21 +119,23 @@ export class CognitoController extends Controller {
       const result = await confirmSignUp(email, confirmationCode);
       return { message: "User confirmed successfully", result };
     } catch (error: any) {
-      const isCodeError =
+      // Check for specific error codes
+      if (
         error.message.includes("ExpiredCodeException") ||
-        error.message.includes("CodeMismatchException");
-
-      throw new Error(
-        isCodeError
-          ? "The confirmation code is invalid or has expired. Please request a new code."
-          : error.message
-      );
+        error.message.includes("CodeMismatchException")
+      ) {
+        throw new Error(
+          "The confirmation code is invalid or has expired. Please request a new code and try again."
+        );
+      }
+      // Handle other errors
+      throw new Error(error.message);
     }
   }
 
   /**
-   * Resend the confirmation code to a user's email.
-   * @param requestBody - The user's email.
+   * Resend the confirmation code to a user's email
+   * @param requestBody The user's email
    */
   @Post("resend-code")
   public async resendCode(
