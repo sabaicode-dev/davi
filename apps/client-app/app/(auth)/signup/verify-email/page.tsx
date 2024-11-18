@@ -6,7 +6,6 @@ import { AlertCircle, CheckCircle2 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
-
 export default function EmailVerification() {
   const [verificationCode, setVerificationCode] = useState([
     "",
@@ -19,17 +18,29 @@ export default function EmailVerification() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [email, setEmail] = useState<string | null>(null); 
+  const [email, setEmail] = useState("");
+  const [countdown, setCountdown] = useState(60);
+
   const router = useRouter();
 
   useEffect(() => {
-    const storedEmail = localStorage.getItem("signupEmail");
+    const storedEmail = localStorage.getItem("email");
     if (storedEmail) {
       setEmail(storedEmail);
+      setError(null); // Clear any error related to missing email
     } else {
       setError("Email is missing. Please try signing up again.");
     }
   }, []);
+
+  useEffect(() => {
+    if (countdown > 0) {
+      const timer = setInterval(() => {
+        setCountdown((prev) => prev - 1);
+      }, 1000);
+      return () => clearInterval(timer);
+    }
+  }, [countdown]);
 
   const handleChange = (index: number, value: string) => {
     if (value.length <= 1 && /^[0-9]*$/.test(value)) {
@@ -64,27 +75,31 @@ export default function EmailVerification() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Join the verification code into a single string
     const code = verificationCode.join("");
 
+    // Validate that the code is 6 digits long
     if (code.length !== 6) {
       setError("Please enter a 6-digit verification code.");
       return;
     }
 
+    // Clear any existing error before starting the verification
     setError(null);
     setSuccess(false);
     setIsLoading(true);
 
     try {
-      // Verify the email with the entered code using backend endpoint
+      // Call the backend to verify the email and code
       const response = await axiosInstance.post("/v1/auth/confirm", {
-        email,
-        confirmationCode: code,
+        email, // Email is passed here for confirmation
+        confirmationCode: code, // The 6-digit code entered by the user
       });
 
       if (response.status === 200) {
         setSuccess(true);
-        router.push("http://localhost:8080"); // Redirect on successful verification
+        router.push("http://localhost:8080"); // Redirect to the dashboard or success page on verification success
       } else {
         setError("Failed to verify code. Please try again.");
       }
@@ -101,9 +116,8 @@ export default function EmailVerification() {
     setError(null);
 
     try {
-      // Resend verification code for the provided email
       await axiosInstance.post("/v1/auth/resend-code", { email });
-      setSuccess(true);
+      setCountdown(60);
       setError("A new verification code has been sent to your email.");
     } catch (err) {
       setError("Failed to resend the code. Please try again.");
@@ -112,6 +126,7 @@ export default function EmailVerification() {
       setIsLoading(false);
     }
   };
+
 
   return (
     <div className="grid grid-cols-1 h-screen place-content-center w-full">
@@ -128,6 +143,7 @@ export default function EmailVerification() {
         <h2 className="text-2xl font-bold mb-4 text-center">
           Email Verification
         </h2>
+
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label
@@ -154,18 +170,21 @@ export default function EmailVerification() {
               ))}
             </div>
           </div>
+
           {error && (
             <div className="flex items-center text-red-600 mb-4">
               <AlertCircle className="mr-2" />
               <p>{error}</p>
             </div>
           )}
+
           {success && (
             <div className="flex items-center text-green-600 mb-4">
               <CheckCircle2 className="mr-2" />
               <p>Email verified successfully!</p>
             </div>
           )}
+
           <button
             type="submit"
             className="w-full py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
@@ -174,15 +193,21 @@ export default function EmailVerification() {
             {isLoading ? "Verifying..." : "Verify"}
           </button>
         </form>
-        <p className="mt-4 text-sm text-gray-400">
+
+        <p className="mt-4 text-sm text-gray-400 space-x-2">
           {`Didn't receive the code? `}
           <button
             onClick={handleResendCode}
-            className="text-blue-400"
-            disabled={isLoading}
+            className={`text-blue-400 ${
+              isLoading || countdown > 0 ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+            disabled={isLoading || countdown > 0} // Disable if loading or countdown > 0
           >
             Resend
           </button>
+          {countdown > 0 && (
+            <span className="text-gray-400">({countdown}s)</span>
+          )}
         </p>
       </div>
     </div>
