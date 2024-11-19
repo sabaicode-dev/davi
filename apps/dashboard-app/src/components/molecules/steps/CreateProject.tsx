@@ -26,7 +26,6 @@ type ErrorMessages = {
 
 const CreateProject: React.FC<Step2Props> = ({
   onNext,
-  onBack,
   projectName = "",
   description = "",
 }) => {
@@ -172,7 +171,7 @@ const CreateProject: React.FC<Step2Props> = ({
             />
             <Button
               onClick={handleNext}
-              children="Next ss"
+              children="Next"
               size="small"
               radius="2xl"
               color="secondary"

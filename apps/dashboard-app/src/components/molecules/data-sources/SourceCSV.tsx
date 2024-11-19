@@ -1,10 +1,19 @@
 import React from "react";
 import CSV from "@/public/images/step/CSV_logo.png";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 const SourceCSV: React.FC = () => {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const projectId = searchParams.get("projectId");
+  const goToUploadCsv = () => {
+    navigate(`/upload/${projectId}`);
+  };
+
   return (
     <div
-      className="w-60 h-full mx-auto border rounded-lg" // Reduced width from w-72 to w-60
+      onClick={goToUploadCsv}
+      className="w-60 h-full mx-auto border rounded-lg bg-red-400 p-3"
     >
       <div className="bg-green-100 cursor-pointer hover:bg-green-200 h-32 px-6 py-3 flex items-center justify-center rounded-tl-lg rounded-tr-lg">
         {/* Reduced height and padding */}

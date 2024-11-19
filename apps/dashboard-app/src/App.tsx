@@ -11,12 +11,16 @@ import { GetStart } from "@/src/components/molecules/steps/GetStart";
 import CreateProject from "@/src/components/molecules/steps/CreateProject";
 import SelectProject from "@/src/components/molecules/steps/SelectProject";
 import PickDataSource from "@/src/components/molecules/steps/PickDataSource";
+import UploadCsv from "./components/molecules/steps/UploadCSV";
+import ImportUrl from "./components/molecules/steps/ImportUrl";
 
 const routes = [
   { path: "/", element: <GetStart /> },
   { path: "/create-project", element: <CreateProject /> },
   { path: "/select-project", element: <SelectProject /> },
   { path: "/pick-datasource", element: <PickDataSource /> },
+  { path: "/upload/:projectId", element: <UploadCsv /> },
+  { path: "/import/:projectId", element: <ImportUrl /> },
   { path: "/visualize", element: <Visualize /> },
   { path: "/dataset", element: <Dataset /> },
   { path: "/helps", element: <Helps /> },

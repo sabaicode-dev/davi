@@ -1,4 +1,5 @@
 import React, { useRef, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom"; // Import useParams for dynamic routing
 import Logo from "@/public/images/step/step4_pic.png";
 import {
   CheckTick,
@@ -8,11 +9,14 @@ import {
 import request from "@/src/utils/helper";
 
 interface StepTwoProps {
-  onBack: () => void;
-  projectId: string;
+  projectId?: string;
 }
 
-const UploadCsv: React.FC<StepTwoProps> = ({ onBack, projectId }) => {
+const UploadCsv: React.FC<StepTwoProps> = ({ projectId }) => {
+  const navigate = useNavigate();
+  const { projectId: paramProjectId } = useParams<{ projectId: string }>();
+  const resolvedProjectId = projectId || paramProjectId;
+
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [fileName, setFileName] = useState<string>("");
   const [fileSize, setFileSize] = useState<number>(0);
@@ -25,15 +29,16 @@ const UploadCsv: React.FC<StepTwoProps> = ({ onBack, projectId }) => {
     fileInputRef.current?.click();
   };
 
+  console.log("Resolved Project ID:", resolvedProjectId);
+
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       if (file.type === "text/csv" || file.name.endsWith(".csv")) {
         setFileName(file.name);
-        setFileSize(file.size / 1024); // Store file size in KB
-        setError("");
+        setFileSize(file.size / 1024);
         simulateUpload();
-        uploadFileToDB(file); // Pass the selected file to upload function
+        uploadFileToDB(file);
       } else {
         setError("Please upload a valid CSV file.");
       }
@@ -42,8 +47,12 @@ const UploadCsv: React.FC<StepTwoProps> = ({ onBack, projectId }) => {
     }
   };
 
-  // Upload file to the backend, with additional fields as required by the model
   const uploadFileToDB = async (file: File) => {
+    if (!resolvedProjectId) {
+      setError("No project ID provided.");
+      return;
+    }
+
     const formData = new FormData();
     formData.append("file", file);
     formData.append("filename", file.name);
@@ -52,11 +61,12 @@ const UploadCsv: React.FC<StepTwoProps> = ({ onBack, projectId }) => {
 
     try {
       const response = await request({
-        url: `http://127.0.0.1:8000/api/v1/project/${projectId}/upload-file/`,
+        url: `http://127.0.0.1:8000/api/v1/project/${resolvedProjectId}/upload-file/`,
         method: "POST",
         data: formData,
         headers: { "Content-Type": "multipart/form-data" },
       });
+      navigate("/");
       console.log("Upload response:", response);
     } catch (error) {
       console.error("Failed to upload file:", error);
@@ -163,10 +173,7 @@ const UploadCsv: React.FC<StepTwoProps> = ({ onBack, projectId }) => {
             {error && <p className="mt-2 text-red-600">{error}</p>}
 
             <div className="flex justify-end mt-6 space-x-3">
-              <button
-                onClick={onBack}
-                className="px-4 py-2 text-black bg-transparent border-[1.5px] border-[#E6EDFF] rounded-md font-semibold hover:bg-gray-300"
-              >
+              <button className="px-4 py-2 text-black bg-transparent border-[1.5px] border-[#E6EDFF] rounded-md font-semibold hover:bg-gray-300">
                 Back
               </button>
               <button

@@ -16,6 +16,8 @@ interface Project {
 
 interface APIContextType {
   projects: Project[];
+  currentProjectId: string | null; // Track the selected project
+  setCurrentProjectId: (id: string) => void; // Update the selected project
   fetchProjects: () => Promise<void>;
   getFilteredProjects: (filter: "recent" | "alphabetical" | null) => Project[];
   isLoading: boolean;
@@ -28,6 +30,7 @@ export const APIProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   const [projects, setProjects] = useState<Project[]>([]);
+  const [currentProjectId, setCurrentProjectId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -74,7 +77,15 @@ export const APIProvider: React.FC<{ children: ReactNode }> = ({
 
   return (
     <APIContext.Provider
-      value={{ projects, fetchProjects, getFilteredProjects, isLoading, error }}
+      value={{
+        projects,
+        currentProjectId,
+        setCurrentProjectId,
+        fetchProjects,
+        getFilteredProjects,
+        isLoading,
+        error,
+      }}
     >
       {children}
     </APIContext.Provider>
