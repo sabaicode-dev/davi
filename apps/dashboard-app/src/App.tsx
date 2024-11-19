@@ -1,11 +1,11 @@
-
 import Visualize from "@/src/components/pages/Visualize";
 import Dataset from "@/src/components/pages/Dataset";
 import Helps from "@/src/components/pages/Helps";
-import AccountSettings from "@/src/components/templates/AccountSettings";import React from "react";
+import AccountSettings from "@/src/components/templates/AccountSettings";
+import React from "react";
 import Layout from "@/src/components/organisms/layout/MainLayout";
 import "@/src/styles.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
 import { APIProvider } from "@/src/context/APIContext";
 import { GetStart } from "@/src/components/molecules/steps/GetStart";
 import CreateProject from "@/src/components/molecules/steps/CreateProject";
@@ -25,10 +25,10 @@ const routes = [
   { path: "/dataset", element: <Dataset /> },
   { path: "/helps", element: <Helps /> },
   { path: "/accountsetting", element: <AccountSettings /> },
-  { path: "/cleaning", element: <AccountSettings /> }
+  { path: "/cleaning", element: <AccountSettings /> },
 ];
 
-export const App:React.FC = () => {
+export const App: React.FC = () => {
   return (
     <BrowserRouter>
       <APIProvider>
