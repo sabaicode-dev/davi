@@ -2,7 +2,7 @@ import Visualize from "@/src/components/pages/Visualize";
 import Dataset from "@/src/components/pages/Dataset";
 import Helps from "@/src/components/pages/Helps";
 import AccountSettings from "@/src/components/templates/AccountSettings";
-import React from "react";
+import React, { Children } from "react";
 import Layout from "@/src/components/organisms/layout/MainLayout";
 import "@/src/styles.css";
 import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";

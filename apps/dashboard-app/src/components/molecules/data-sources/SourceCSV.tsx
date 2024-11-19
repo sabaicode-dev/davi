@@ -13,7 +13,7 @@ const SourceCSV: React.FC = () => {
   return (
     <div
       onClick={goToUploadCsv}
-      className="w-60 h-full mx-auto border rounded-lg bg-red-400 p-3"
+      className="w-60 h-full mx-auto border rounded-lg"
     >
       <div className="bg-green-100 cursor-pointer hover:bg-green-200 h-32 px-6 py-3 flex items-center justify-center rounded-tl-lg rounded-tr-lg">
         {/* Reduced height and padding */}
