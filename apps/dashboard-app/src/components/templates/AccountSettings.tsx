@@ -76,8 +76,7 @@ const AccountSettings: React.FC = () => {
         "http://localhost:4001/v1/auth/updateUsername",
         {
           email: user.email,
-          newUsername: user.firstName,
-          lastName: user.lastName, // Add last name to the update request
+          newUsername: user.firstName, // Add last name to the update request
         },
         { withCredentials: true } // Include cookies
       );
