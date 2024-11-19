@@ -5,8 +5,9 @@ import { AiOutlineLogout } from "react-icons/ai";
 const AccountSettings: React.FC = () => {
   const [user, setUser] = useState({
     firstName: "",
-    lastName: "",
-    email: "", // Adding email to user state
+    lastName: "", // Add lastName field
+    email: "",
+    createdAt: "", // For displaying the creation date
   });
   const [errors, setErrors] = useState({
     firstName: "",
@@ -18,18 +19,22 @@ const AccountSettings: React.FC = () => {
   });
   const [isButtonEnabled, setIsButtonEnabled] = useState(false);
 
-  // Regex for validating name fields
-  const nameRegex = /\b([A-ZÀ-ÿ][-,a-z. ']+[ ]*)+/;
-
   // Fetch user data on component mount
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await axios.get("/v1/auth/updateUsername"); // Fetching the user's details
+        const response = await axios.get("http://localhost:4001/v1/auth/me", {
+          withCredentials: true, // Include cookies
+        });
+
+        console.log("Userdatail", response);
+
+        // Assuming backend returns createdAt as a string
         setUser({
           firstName: response.data.username || "",
           lastName: response.data.lastName || "",
-          email: response.data.email || "", // Set email from the fetched data
+          email: response.data.email || "",
+          createdAt: response.data.createdAt || "", // Set creation date
         });
       } catch (error) {
         console.error("Error fetching user data:", error);
@@ -42,16 +47,8 @@ const AccountSettings: React.FC = () => {
   // Validate inputs when they change
   const validateInputs = () => {
     const newErrors = {
-      firstName: user.firstName
-        ? nameRegex.test(user.firstName)
-          ? ""
-          : "First name must start with a capital letter and contain valid characters."
-        : "First name is required.",
-      lastName: user.lastName
-        ? nameRegex.test(user.lastName)
-          ? ""
-          : "Last name must start with a capital letter and contain valid characters."
-        : "Last name is required.",
+      firstName: user.firstName ? "" : "First name is required.",
+      lastName: user.lastName ? "" : "Last name is required.",
     };
     setErrors(newErrors);
 
@@ -75,11 +72,21 @@ const AccountSettings: React.FC = () => {
   // Function to update user name on the backend
   const updateUser = async () => {
     try {
-      const response = await axios.put("/v1/auth/updateUsername", {
-        firstName: user.firstName,
-        lastName: user.lastName,
-      }); // Backend route to update user details
+      const response = await axios.put(
+        "http://localhost:4001/v1/auth/updateUsername",
+        {
+          email: user.email,
+          newUsername: user.firstName,
+          lastName: user.lastName, // Add last name to the update request
+        },
+        { withCredentials: true } // Include cookies
+      );
       console.log("User updated successfully:", response.data);
+      setUser((prev) => ({
+        ...prev,
+        firstName: response.data.firstName || prev.firstName,
+        lastName: response.data.lastName || prev.lastName,
+      }));
     } catch (error) {
       console.error("Error updating user:", error);
     }
@@ -88,35 +95,32 @@ const AccountSettings: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Mark all fields as touched to trigger validation on all fields
-    setTouched({
-      firstName: true,
-      lastName: true,
-    });
+    // Mark all fields as touched to trigger validation
+    setTouched({ firstName: true, lastName: true });
 
-    // If form is valid, perform the save and reset
+    // If form is valid, update the user
     if (isButtonEnabled) {
       updateUser();
-      setUser({
-        ...user,
-        firstName: "",
-        lastName: "",
-      });
-      setTouched({
-        firstName: false,
-        lastName: false,
-      });
     }
   };
 
   // Logout function
   const handleLogout = async () => {
     try {
-      const response = await axios.post("/api/logout"); // Backend route to log out
-      console.log("Logged out successfully:", response.data);
-      window.location.href = "/login"; // Redirect to login page
+      const response = await axios.put(
+        "http://localhost:4001/v1/auth/logout",
+        { refreshToken: "dummyRefreshToken" }, // Replace with actual refresh token if needed
+        { withCredentials: true } // Include cookies
+      );
+
+      if (response.status === 200) {
+        console.log("User logged out successfully");
+        window.location.href = "http://localhost:3000/login"; // Redirect to login page
+      } else {
+        console.error("Failed to log out:", response.data);
+      }
     } catch (error) {
-      console.error("Error logging out:", error);
+      console.error("Error during logout:", error);
     }
   };
 
@@ -150,7 +154,7 @@ const AccountSettings: React.FC = () => {
             {/* First Name Field */}
             <div>
               <label className="block text-base font-normal text-gray-600 mb-1">
-                First name
+                First Name
               </label>
               <input
                 type="text"
@@ -162,7 +166,7 @@ const AccountSettings: React.FC = () => {
                     ? "border-red-500"
                     : "border-gray-300"
                 }`}
-                placeholder="Enter first name"
+                placeholder="Enter your first name"
               />
               {errors.firstName && touched.firstName && (
                 <p className="text-red-500 text-sm">{errors.firstName}</p>
@@ -184,13 +188,14 @@ const AccountSettings: React.FC = () => {
                     ? "border-red-500"
                     : "border-gray-300"
                 }`}
-                placeholder="Enter last name"
+                placeholder="Enter your last name"
               />
               {errors.lastName && touched.lastName && (
                 <p className="text-red-500 text-sm">{errors.lastName}</p>
               )}
             </div>
-            <p className="text-sm text-gray-500">Created on 12/12/2024</p>
+
+            <p className="text-sm text-gray-500">Created on {user.createdAt}</p>
           </div>
         </div>
       </form>
@@ -199,7 +204,7 @@ const AccountSettings: React.FC = () => {
       <div className="bg-gray-50 shadow-sm rounded-lg pt-3 mb-9 border-2 border-gray-200">
         <h3 className="text-lg font-medium text-gray-700 mb-2 px-5">Email</h3>
         <div className="bg-white px-5 py-4 border-t-2 rounded-br-lg rounded-bl-lg border-gray-200">
-          <p className="text-gray-800 mb-1">{user.email || "Loading..."}</p>
+          <p className="text-gray-800 mb-1">{user.email}</p>
           <p className="text-sm text-gray-500 mb-1">
             Your account is authenticated through Google.
           </p>

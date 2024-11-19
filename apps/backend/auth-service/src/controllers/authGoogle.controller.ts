@@ -5,20 +5,17 @@ import {
   Route,
   Tags,
   Res,
-  Request,
   TsoaResponse,
-  Post,
-  Body,
+  Request,
 } from "tsoa";
 import express, { Response } from "express";
 import {
   googleSignIn,
   exchangeCodeForTokens,
-  exchangeRefreshTokenForNewTokens, // Assuming a function that exchanges refresh token
-} from "../services/authGoogle.service";
-import { setCookie } from "../utils/cookie";
+} from "@/src/services/authGoogle.service";
+import { setCookie } from "@/src/utils/cookie";
 import { jwtDecode } from "jwt-decode";
-import { saveUserToDB } from "../database/services/user.service"; // MongoDB service function to save user data
+import { saveUserToDB } from "@/src/database/services/user.service"; // MongoDB service function to save user data
 
 /**
  * Controller for handling Google authentication.
@@ -67,30 +64,42 @@ export class GoogleAuthController extends Controller {
       // Exchange authorization code for tokens
       const tokens = await exchangeCodeForTokens(code);
 
-      // Set tokens in cookies or handle them as needed
+      // Access the Express Response object
       const response = (request as any).res as Response;
-      setCookie(response, "idToken", tokens.id_token);
-      setCookie(response, "accessToken", tokens.access_token);
-      setCookie(response, "refreshToken", tokens.refresh_token);
 
-      // Decode the ID token to get user information
+      // Decode the ID token to extract user information
       const decodedIdToken: any = jwtDecode(tokens.id_token);
+
       if (!decodedIdToken.email_verified) {
         throw new Error("Email not verified by Google");
       }
 
-      // You can save the user in MongoDB here or take any further action
+      // Extract cognitoUserId from ID token
+      const cognitoUserId = decodedIdToken.sub;
+
+      // Save the user in MongoDB or another database
       const username = decodedIdToken.email.split("@")[0];
       await saveUserToDB({
         username,
         email: decodedIdToken.email,
-        cognitoUserId: decodedIdToken.sub,
+        cognitoUserId,
         confirmed: true,
       });
 
+      // Set cookies securely for tokens and cognitoUserId
+      console.log("Setting cookies...");
+      setCookie(response, "idToken", tokens.id_token);
+      setCookie(response, "accessToken", tokens.access_token);
+      setCookie(response, "refreshToken", tokens.refresh_token);
+      setCookie(response, "cognitoUserId", cognitoUserId);
+
+      console.log("Cookies set successfully!");
+
+      // Respond with success
       response.status(200).json({
         message: "User authenticated and data saved successfully",
         tokens,
+        cognitoUserId,
       });
     } catch (error: any) {
       console.error("Error during Google callback:", error.message || error);
