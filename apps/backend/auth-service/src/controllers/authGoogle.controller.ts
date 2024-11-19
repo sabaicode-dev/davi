@@ -18,7 +18,8 @@ import {
 } from "@/src/services/authGoogle.service";
 import { setCookie } from "@/src/utils/cookie";
 import { jwtDecode } from "jwt-decode";
-import { saveUserToDB } from "@/src/database/services/user.service"; // MongoDB service function to save user data
+import { saveUserToDB } from "../database/services/user.service"; // MongoDB service function to save user data
+import configs from "../config";
 
 /**
  * Controller for handling Google authentication.
@@ -96,8 +97,9 @@ export class GoogleAuthController extends Controller {
       setCookie(response, "refreshToken", tokens.refresh_token);
       setCookie(response, "cognitoUserId", cognitoUserId);
 
-      console.log("Cookies set successfully!");
+      console.log(`configs.clientUrl : ${configs.clientUrl}`);
 
+      response.redirect(configs.clientUrl);
       // Respond with success
       response.status(200).json({
         message: "User authenticated and data saved successfully",

@@ -3,7 +3,7 @@ import {
   signUpUser,
   signInUser,
   confirmSignUp,
-  resendConfirmationCode,
+  resendConfirmationCode, // Import the resend function
 } from "../services/authEmail.service";
 import jwt from "jsonwebtoken";
 import {
@@ -12,12 +12,12 @@ import {
   SignUpRequest,
 } from "./types/authEmail.type";
 
-@Route("/v1/auth")
+@Route("/v1/auth") // Define the base route for the controller
 @Tags("Email Integrate AWS Cognito")
 export class CognitoController extends Controller {
   /**
-   * Sign up a new user.
-   * @param requestBody - The user email and password.
+   * Sign up a new user
+   * @param requestBody The user email and password
    */
   @Post("signup")
   public async signUp(
@@ -26,21 +26,29 @@ export class CognitoController extends Controller {
     const { username, email, password } = requestBody;
     try {
       const result = await signUpUser(username, email, password);
-      this.setStatus(200);
-      return { message: result.message, result };
+      this.setStatus(200); // Set the response status code to 201 (Created)
+      return { message: result.message, result: result }; // Ensure we always return 'result' in case of success
     } catch (error: any) {
-      console.error("Sign-up error:", error.message || error);
-      this.setStatus(error.message === "User already exists." ? 409 : 500);
-      return {
-        message: error.message || "An error occurred during sign-up.",
-        result: {},
-      };
+      console.error("Error during sign-up:", error.message || error);
+
+      let result = {}; // Initialize result to be returned with the error message
+      let message = "An error occurred during sign-up."; // Default error message
+
+      if (error.message === "User already exists. Please try logging in.") {
+        // Handle user already exists error
+        this.setStatus(409); // Conflict (user already exists)
+        message = error.message; // Set the message for already existing user
+      } else {
+        this.setStatus(500); // Internal server error for other cases
+      }
+
+      return { message, result }; // Ensure 'result' is always included, even in error cases
     }
   }
 
   /**
-   * Sign in an existing user.
-   * @param requestBody - The user email and password.
+   * Sign in an existing user
+   * @param requestBody The user email and password
    */
   @Post("signin")
   public async signIn(
@@ -55,7 +63,6 @@ export class CognitoController extends Controller {
     errorResponse: TsoaResponse<401, { message: string }>
   ): Promise<void> {
     const { email, password } = requestBody;
-
     try {
       const result = await signInUser(email, password);
 
@@ -100,8 +107,8 @@ export class CognitoController extends Controller {
   }
 
   /**
-   * Confirm user sign-up.
-   * @param requestBody - The user email and confirmation code.
+   * Confirm user sign up
+   * @param requestBody The user email and confirmation code
    */
   @Post("confirm")
   public async confirmSignUp(
@@ -112,21 +119,23 @@ export class CognitoController extends Controller {
       const result = await confirmSignUp(email, confirmationCode);
       return { message: "User confirmed successfully", result };
     } catch (error: any) {
-      const isCodeError =
+      // Check for specific error codes
+      if (
         error.message.includes("ExpiredCodeException") ||
-        error.message.includes("CodeMismatchException");
-
-      throw new Error(
-        isCodeError
-          ? "The confirmation code is invalid or has expired. Please request a new code."
-          : error.message
-      );
+        error.message.includes("CodeMismatchException")
+      ) {
+        throw new Error(
+          "The confirmation code is invalid or has expired. Please request a new code and try again."
+        );
+      }
+      // Handle other errors
+      throw new Error(error.message);
     }
   }
 
   /**
-   * Resend the confirmation code to a user's email.
-   * @param requestBody - The user's email.
+   * Resend the confirmation code to a user's email
+   * @param requestBody The user's email
    */
   @Post("resend-code")
   public async resendCode(
