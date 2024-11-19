@@ -376,6 +376,59 @@
 				]
 			}
 		},
+		"/v1/auth/refresh-token": {
+			"post": {
+				"operationId": "RefreshToken",
+				"responses": {
+					"204": {
+						"description": "No content"
+					},
+					"500": {
+						"description": "- Error response in case of failure.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"error": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"error"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"description": "Refresh Token",
+				"summary": "Exchanges a valid refresh token for a new set of access and ID tokens.",
+				"tags": [
+					"Google Intergrate AWS Cognito"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"refreshToken": {
+										"type": "string"
+									}
+								},
+								"required": [
+									"refreshToken"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
 		"/v1/auth/signup": {
 			"post": {
 				"operationId": "SignUp",

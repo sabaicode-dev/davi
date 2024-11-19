@@ -1,11 +1,11 @@
 import { Response, CookieOptions } from "express";
 
 /**
- * Sets a cookie on the given Express Response object.
- * @param res - The Express Response object
- * @param name - Name of the cookie
- * @param value - Value of the cookie
- * @param options - Additional options for the cookie
+ * Utility function to set a secure cookie on the Express Response object.
+ * @param res - The Express Response object.
+ * @param name - Name of the cookie.
+ * @param value - Value of the cookie.
+ * @param options - Additional options for the cookie.
  */
 export function setCookie(
   res: Response,
@@ -21,6 +21,5 @@ export function setCookie(
     ...options,
   };
 
-  console.log(`Setting cookie: ${name}, value: ${value}`); // Add logging for debugging
   res.cookie(name, value, defaultOptions);
 }
