@@ -127,6 +127,7 @@ export default function EmailVerification() {
     }
   };
 
+
   return (
     <div className="grid grid-cols-1 h-screen place-content-center w-full">
       <div className="max-w-screen-md mx-auto mt-8 p-6 bg-white rounded-lg shadow-md">
