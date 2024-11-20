@@ -34,7 +34,7 @@ export default function SignUpPage() {
     };
   }
 
-  // Updated to use RegisterFormData type, removed any
+  // Handle the sign-up process
   const handleSignUp = async (data: RegisterFormData) => {
     const { email, password, username } = data;
 
@@ -56,7 +56,7 @@ export default function SignUpPage() {
         setError("Sign-up failed. Please try again.");
       }
     } catch (err) {
-      const errorResponse = err as AxiosErrorResponse; // Type cast error as AxiosErrorResponse
+      const errorResponse = err as AxiosErrorResponse;
       if (errorResponse.response) {
         if (errorResponse.response.status === 409) {
           setError("User already exists. Please try logging in.");
@@ -92,7 +92,7 @@ export default function SignUpPage() {
   };
 
   const handleBack = () => {
-    router.push("/");
+    router.push("/"); // Go back to the homepage
   };
 
   return (
@@ -100,7 +100,7 @@ export default function SignUpPage() {
       {/* Left Section - Form */}
       <div className="flex flex-col justify-center w-full sm:w-1/2 p-8 sm:p-12 lg:p-24 bg-white rounded-r-3xl">
         <div className="sm:max-w-md w-full mx-auto">
-          {/* back button */}
+          {/* Back Button */}
           <button
             onClick={handleBack}
             className="mb-6 text-gray-600 hover:text-gray-800"
@@ -120,7 +120,7 @@ export default function SignUpPage() {
           )}
 
           <form className="space-y-6" onSubmit={handleSubmit(handleSignUp)}>
-            {/* usernaem */}
+            {/* Username */}
             <div>
               <label
                 htmlFor="username"
@@ -145,7 +145,8 @@ export default function SignUpPage() {
                 )}
               </div>
             </div>
-            {/* email */}
+
+            {/* Email */}
             <div>
               <label
                 htmlFor="email"
@@ -167,7 +168,8 @@ export default function SignUpPage() {
                 )}
               </div>
             </div>
-            {/* password  */}
+
+            {/* Password */}
             <div>
               <label
                 htmlFor="password"
@@ -192,13 +194,18 @@ export default function SignUpPage() {
                 >
                   {isPasswordVisible ? <RiEyeCloseLine /> : <RiEyeCloseFill />}
                 </button>
+                {errors.password && (
+                  <p className="text-sm text-red-500">
+                    {errors.password.message}
+                  </p>
+                )}
               </div>
             </div>
 
-            {/* comfirm password */}
+            {/* Confirm Password */}
             <div>
               <label
-                htmlFor="cpassword"
+                htmlFor="confirmPassword"
                 className="block text-sm font-medium text-gray-700"
               >
                 Confirm Password
@@ -238,6 +245,8 @@ export default function SignUpPage() {
               </button>
             </div>
           </form>
+
+          {/* Google Sign Up */}
           <div className="relative flex items-center justify-center text-sm mt-4">
             <div className="flex-grow border-t border-gray-300"></div>
             <span className="px-2 text-gray-500 bg-white">
@@ -251,6 +260,7 @@ export default function SignUpPage() {
               onClick={handleGoogleSignUp}
               className="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
             >
+              {/* Google icon and text */}
               <svg
                 className="w-5 h-5 mr-2"
                 viewBox="0 0 21 20"
@@ -277,9 +287,10 @@ export default function SignUpPage() {
               Sign up with Google
             </button>
           </div>
+
           <div className="mt-4">
             <p className="text-xs text-gray-400">
-              {`I have already account `}
+              I have already account{" "}
               <button
                 onClick={() => router.push("/login")}
                 className="underline text-blue-500"

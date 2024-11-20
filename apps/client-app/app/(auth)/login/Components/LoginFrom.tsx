@@ -16,23 +16,28 @@ type LoginFormData = z.infer<typeof LoginSchema>;
 
 export default function LoginForm({ onSubmit }: LoginFormProps) {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+
+  // Initialize useForm with zodResolver for validation
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<LoginFormData>({
-    resolver: zodResolver(LoginSchema),
+    resolver: zodResolver(LoginSchema), // Use zod schema for validation
   });
 
+  // Toggle password visibility
   const togglePasswordVisibility = () =>
     setIsPasswordVisible(!isPasswordVisible);
 
+  // Handle form submission
   const handleFormSubmit = async (data: LoginFormData) => {
     await onSubmit(data.email, data.password);
   };
 
   return (
     <form className="space-y-6" onSubmit={handleSubmit(handleFormSubmit)}>
+      {/* Email input field */}
       <div>
         <label
           htmlFor="email"
@@ -41,16 +46,19 @@ export default function LoginForm({ onSubmit }: LoginFormProps) {
           Email
         </label>
         <input
-          placeholder="Enter Email"
           id="email"
           type="email"
+          placeholder="Enter Email"
           className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
           {...register("email")}
         />
+        {/* Show email validation error message */}
         {errors.email && (
           <p className="text-sm text-red-500">{errors.email.message}</p>
         )}
       </div>
+
+      {/* Password input field */}
       <div>
         <label
           htmlFor="password"
@@ -60,12 +68,13 @@ export default function LoginForm({ onSubmit }: LoginFormProps) {
         </label>
         <div className="mt-1 relative">
           <input
-            placeholder="Enter Password"
             id="password"
             type={isPasswordVisible ? "text" : "password"}
+            placeholder="Enter Password"
             className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
             {...register("password")}
           />
+          {/* Toggle password visibility */}
           <button
             type="button"
             onClick={togglePasswordVisibility}
@@ -73,11 +82,14 @@ export default function LoginForm({ onSubmit }: LoginFormProps) {
           >
             {isPasswordVisible ? <RiEyeCloseLine /> : <RiEyeCloseFill />}
           </button>
+          {/* Show password validation error message */}
           {errors.password && (
             <p className="text-sm text-red-500">{errors.password.message}</p>
           )}
         </div>
       </div>
+
+      {/* Submit button */}
       <button
         type="submit"
         className="w-full py-2 px-4 rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"

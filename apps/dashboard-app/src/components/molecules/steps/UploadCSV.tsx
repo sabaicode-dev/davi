@@ -1,37 +1,44 @@
 import React, { useRef, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom"; // Import useParams for dynamic routing
 import Logo from "@/public/images/step/step4_pic.png";
 import {
   CheckTick,
   FileIcon,
   UploadFile,
 } from "@/src/components/atoms/icons/Icon";
+import request from "@/src/utils/helper";
 
 interface StepTwoProps {
-  onBack: () => void;
+  projectId?: string;
 }
 
-const UploadCsv: React.FC<StepTwoProps> = ({ onBack }) => {
+const UploadCsv: React.FC<StepTwoProps> = ({ projectId }) => {
+  const navigate = useNavigate();
+  const { projectId: paramProjectId } = useParams<{ projectId: string }>();
+  const resolvedProjectId = projectId || paramProjectId;
+
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [fileName, setFileName] = useState<string>("");
   const [fileSize, setFileSize] = useState<number>(0);
   const [progress, setProgress] = useState<number>(0);
   const [error, setError] = useState<string>("");
 
-  const MAX_FILENAME_LENGTH = 30; // Set your maximum filename length here
-  const MAX_UPLOAD_DURATION = 5000; // Set the max upload duration in ms
+  const MAX_FILENAME_LENGTH = 30;
 
   const handleFileUpload = () => {
     fileInputRef.current?.click();
   };
+
+  console.log("Resolved Project ID:", resolvedProjectId);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       if (file.type === "text/csv" || file.name.endsWith(".csv")) {
         setFileName(file.name);
-        setFileSize(file.size / 1024); // Convert size to KB
-        setError("");
-        simulateUpload(file.size); // Pass file size to simulateUpload
+        setFileSize(file.size / 1024);
+        simulateUpload();
+        uploadFileToDB(file);
       } else {
         setError("Please upload a valid CSV file.");
       }
@@ -40,32 +47,46 @@ const UploadCsv: React.FC<StepTwoProps> = ({ onBack }) => {
     }
   };
 
-  const simulateUpload = (fileSize: number) => {
-    setProgress(0);
-    const intervalDuration = calculateInterval(fileSize);
+  const uploadFileToDB = async (file: File) => {
+    if (!resolvedProjectId) {
+      setError("No project ID provided.");
+      return;
+    }
 
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("filename", file.name);
+    formData.append("size", file.size.toString());
+    formData.append("type", "csv"); // Assuming 'csv' type as a placeholder
+
+    try {
+      const response = await request({
+        url: `http://127.0.0.1:8000/api/v1/project/${resolvedProjectId}/upload-file/`,
+        method: "POST",
+        data: formData,
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      navigate("/");
+      console.log("Upload response:", response);
+    } catch (error) {
+      console.error("Failed to upload file:", error);
+    }
+  };
+
+  const simulateUpload = () => {
+    setProgress(0);
     const interval = setInterval(() => {
       setProgress((prev) => {
         if (prev < 100) return prev + 1;
         clearInterval(interval);
         return 100;
       });
-    }, intervalDuration); // Dynamic interval based on file size
+    }, 50);
   };
 
-  // Function to dynamically calculate interval duration
-  const calculateInterval = (fileSize: number) => {
-    const fileSizeKB = fileSize / 1024; // Convert to KB
-    const interval = (MAX_UPLOAD_DURATION / 100) * (fileSizeKB / 100);
-    // Bound interval within reasonable limits
-    return Math.min(Math.max(interval, 10), 200);
-  };
-
-  // Function to truncate file names
   const truncateFileName = (name: string) => {
     const extension = name.split(".").pop();
     const baseName = name.substring(0, name.lastIndexOf("."));
-
     if (baseName.length > MAX_FILENAME_LENGTH) {
       return baseName.substring(0, MAX_FILENAME_LENGTH) + `...${extension}`;
     }
@@ -76,12 +97,9 @@ const UploadCsv: React.FC<StepTwoProps> = ({ onBack }) => {
     <div>
       <div className="flex justify-center items-center h-full">
         <div className="flex w-full max-w-4xl p-10 space-x-16">
-          {/* Left Image Section */}
           <div className="w-1/2 flex items-center justify-center">
             <img src={Logo} alt="Illustration" className="w-full h-auto" />
           </div>
-
-          {/* Right Form Section */}
           <div className="w-1/2 pt-11 flex flex-col">
             <h2 className="text-xl font-semibold text-gray-800 mb-2">
               Upload and Attach Files
@@ -89,7 +107,6 @@ const UploadCsv: React.FC<StepTwoProps> = ({ onBack }) => {
             <p className="text-sm text-gray-600 mb-10">
               Upload and attach files to this project.
             </p>
-            {/* File Upload Section */}
             <div
               className="border-2 border-dashed border-[#E4E7EC] bg-[#FFFFFF] p-3 rounded-lg text-center cursor-pointer shadow-sm"
               onClick={handleFileUpload}
@@ -126,7 +143,7 @@ const UploadCsv: React.FC<StepTwoProps> = ({ onBack }) => {
                     <FileIcon />
                   </div>
                 </div>
-                <div className="flex flex-col">
+                <div className="flex flex-col w-full">
                   <div className="flex flex-col justify-start">
                     <div className="flex flex-row items-center space-x-4">
                       <p className="text-sm font-medium text-gray-700 truncate max-w-xs">
@@ -138,10 +155,10 @@ const UploadCsv: React.FC<StepTwoProps> = ({ onBack }) => {
                       {fileSize.toFixed(2)} KB
                     </p>
                   </div>
-                  <div className="flex flex-row justify-center items-center mt-3 space-x-4">
+                  <div className="flex flex-row justify-center items-center mt-1 space-x-4 w-full">
                     <div className="h-2 w-full bg-blue-300 rounded-full">
                       <div
-                        className="h-2 bg-[#443DFF] rounded-full"
+                        className="h-2 bg-[#443DFF] rounded-full w-[300px]"
                         style={{ width: `${progress}%` }}
                       ></div>
                     </div>
@@ -155,12 +172,8 @@ const UploadCsv: React.FC<StepTwoProps> = ({ onBack }) => {
 
             {error && <p className="mt-2 text-red-600">{error}</p>}
 
-            {/* Buttons */}
             <div className="flex justify-end mt-6 space-x-3">
-              <button
-                onClick={onBack}
-                className="px-4 py-2 text-black bg-transparent border-[1.5px] border-[#E6EDFF] rounded-md font-semibold hover:bg-gray-300"
-              >
+              <button className="px-4 py-2 text-black bg-transparent border-[1.5px] border-[#E6EDFF] rounded-md font-semibold hover:bg-gray-300">
                 Back
               </button>
               <button
@@ -179,11 +192,10 @@ const UploadCsv: React.FC<StepTwoProps> = ({ onBack }) => {
         </div>
       </div>
 
-      {/* Step Indicator */}
       <div className="flex justify-center">
         <div className="h-1 w-8 bg-blue-600 rounded-full mx-1"></div>
         <div className="h-1 w-8 bg-blue-600 rounded-full mx-1"></div>
-        <div className="h-1 w-8 bg-blue-600 rounded-full mx-1"></div>
+        <div className="h-1 w-8 bg-blue-200 rounded-full mx-1"></div>
       </div>
     </div>
   );

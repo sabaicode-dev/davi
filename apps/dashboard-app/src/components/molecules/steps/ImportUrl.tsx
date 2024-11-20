@@ -1,33 +1,52 @@
-// src/components/Step4.tsx
-import React from "react";
-import { useState } from "react";
+import React, { useState } from "react";
 import Logo from "@/public/images/step/step4_pic.png";
 import Button from "../../atoms/Button";
+import request from "@/src/utils/helper";
 
 interface Step4Props {
-  onNext: () => void;
-  onBack: () => void;
+  selectedSource?: string;
 }
 
-const Step4: React.FC<Step4Props> = ({ onNext, onBack }) => {
-  const [url, setUrl] = useState(""); // State to manage the URL input
-  const [error, setError] = useState(""); // State to manage the error message
-
-  const handleNext = () => {
+const ImportUrl: React.FC<Step4Props> = () => {
+  const [url, setUrl] = useState(""); 
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [scrapedData, setScrapedData] = useState<any>(null);
+  const handleNext = async () => {
     const urlPattern = new RegExp(
       "^(https?:\\/\\/(www\\.)?|www\\.)[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}(:[0-9]{1,5})?(\\/.*)?$"
     );
 
     if (url.trim() === "") {
       setError("Please enter your URL.");
-      return; // Prevent moving to the next step if URL is empty
+      return;
     } else if (!urlPattern.test(url)) {
       setError("Please enter a valid URL.");
-      return; // Prevent moving to the next step if URL is invalid
+      return;
     }
 
-    setError(""); // Clear error if URL is valid
-    onNext(); // Proceed to the next step
+    setError(""); 
+    setIsLoading(true);
+
+    try {
+      const response = await request({
+        url: "http://127.0.0.1:8000/api/v1/scrape/url/",
+        method: "POST",
+        data: { url },
+      });
+
+      if (response.success) {
+        setScrapedData(response.data);
+        console.log("Scraped Data:", response.data);
+      } else {
+        setError(response.message || "Failed to scrape the URL.");
+      }
+    } catch (err) {
+      console.error("Error during scraping:", err);
+      setError("An unexpected error occurred. Please try again.");
+    } finally {
+      setIsLoading(false); 
+    }
   };
 
   return (
@@ -36,7 +55,7 @@ const Step4: React.FC<Step4Props> = ({ onNext, onBack }) => {
         {/* Left Image Section */}
         <div className="flex-1 p-8">
           <img
-            src={Logo} // Update this path to your image
+            src={Logo}
             alt="Data Scraping Tool"
             className="w-full h-auto"
           />
@@ -77,7 +96,7 @@ const Step4: React.FC<Step4Props> = ({ onNext, onBack }) => {
           {/* Button Section */}
           <div className="flex justify-end space-x-3">
             <Button
-              onClick={onBack}
+              // onClick={onBack} // Optional back handler
               children="Back"
               size="medium"
               radius="2xl"
@@ -93,13 +112,11 @@ const Step4: React.FC<Step4Props> = ({ onNext, onBack }) => {
               size="small"
               radius="2xl"
               color="secondary"
-              isLoading={false}
+              isLoading={isLoading}
               isIconOnly={false}
-              isDisabled={false}
+              isDisabled={isLoading}
             />
           </div>
-
-          {/* Step indicator */}
         </div>
       </div>
       <div className="flex justify-center mt-12">
@@ -111,4 +128,4 @@ const Step4: React.FC<Step4Props> = ({ onNext, onBack }) => {
   );
 };
 
-export default Step4;
+export default ImportUrl;
