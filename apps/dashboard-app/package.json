@@ -29,6 +29,7 @@
     "@chromatic-com/storybook": "^1.9.0",
     "@playwright/test": "^1.48.1",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.15",
+    "@shadcn/ui": "^0.0.4",
     "@storybook/addon-coverage": "^1.0.4",
     "@storybook/addon-essentials": "^8.3.6",
     "@storybook/addon-interactions": "^8.3.6",
