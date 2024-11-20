@@ -13,4 +13,5 @@ export interface SignInRequest {
 export interface ConfirmSignUpRequest {
   email: string;
   confirmationCode: string;
+  password: string;
 }

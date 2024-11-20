@@ -66,6 +66,22 @@ function loadConfig(): Config {
     throw new Error(`Config validation error: ${errorMessages}`);
   }
 
+  // Assign clientUrl based on NODE_ENV
+  const clientUrl =
+    envVars.NODE_ENV === "production"
+      ? envVars.CLIENT_URL
+      : "http://localhost:8080/";
+
+  const awsRedirectUri =
+    envVars.NODE_ENV === "production"
+      ? envVars.AWS_REDIRECT_URI
+      : "http://localhost:4001/v1/auth/google/callback/";
+
+  console.log("=======================================");
+
+  console.log(`clientUrl : ${clientUrl}`);
+  console.log(`awsRedirectUri : ${awsRedirectUri}`);
+  console.log("=======================================");
   return {
     env: envVars.NODE_ENV,
     port: envVars.PORT,
@@ -76,8 +92,10 @@ function loadConfig(): Config {
     awsCognitoClientSecret: envVars.AWS_COGNITO_CLIENT_SECRET,
     awsCognitoIdentityPoolId: envVars.AWS_COGNITO_IDENTITY_POOL_ID,
     awsCognitoDomain: envVars.AWS_COGNITO_DOMAIN,
-    awsRedirectUri: envVars.AWS_REDIRECT_URI,
-    clientUrl: envVars.CLIENT_URL,
+    // awsRedirectUri: envVars.AWS_REDIRECT_URI,
+    awsRedirectUri,
+    // clientUrl: envVars.CLIENT_URL,
+    clientUrl, // Dynamically assigned clientUrl
     userServiceUrl: envVars.USER_SERVICE_URL,
     awsAccessKeyId: envVars.AWS_ACCESS_KEY_ID,
     awsSecretAccessKey: envVars.AWS_SECRET_ACCESS_KEY,
