@@ -5,12 +5,12 @@ import FileImg from "@/public/images/header/status-up.png";
 import { AiOutlineLogout } from "react-icons/ai";
 import { FiUser } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/src/contexts/AuthContext";
 
 const Header: React.FC = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
-  const [username, setUsername] = useState<string | null>(null);
-  const [email, setEmail] = useState<string | null>(null);
+  const { username, setUsername, email, setEmail } = useAuth();
 
   const navigate = useNavigate();
 
