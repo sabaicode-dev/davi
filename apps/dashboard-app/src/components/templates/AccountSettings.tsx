@@ -138,7 +138,7 @@ const AccountSettings: React.FC = () => {
         Account Setting
       </h2>
 
-      {/* Profile Details Section */}
+      {/* Profile Details Section uu*/}
       <form onSubmit={handleSubmit}>
         <div className="bg-gray-50 shadow-sm rounded-lg pt-3 mb-9 border-2 border-gray-200">
           <div className="flex justify-between items-center mb-4 px-5">
