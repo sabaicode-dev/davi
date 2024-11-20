@@ -50,6 +50,7 @@ const models: TsoaRoute.Models = {
         "properties": {
             "email": {"dataType":"string","required":true},
             "confirmationCode": {"dataType":"string","required":true},
+            "password": {"dataType":"string","required":true},
         },
         "additionalProperties": false,
     },
@@ -296,6 +297,8 @@ export function RegisterRoutes(app: Router) {
             async function CognitoController_confirmSignUp(request: ExRequest, response: ExResponse, next: any) {
             const args: Record<string, TsoaRoute.ParameterSchema> = {
                     requestBody: {"in":"body","name":"requestBody","required":true,"ref":"ConfirmSignUpRequest"},
+                    successResponse: {"in":"res","name":"200","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"result":{"dataType":"any","required":true},"message":{"dataType":"string","required":true}}},
+                    errorResponse: {"in":"res","name":"401","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"message":{"dataType":"string","required":true}}},
             };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
