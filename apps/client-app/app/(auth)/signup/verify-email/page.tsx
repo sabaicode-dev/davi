@@ -30,9 +30,8 @@ export default function EmailVerification() {
     if (storedEmail && storedPassword) {
       setEmail(storedEmail);
       setPassword(storedPassword);
-      setError(null); // Clear any error related to missing email
     } else {
-      setError("Email is missing. Please try signing up again.");
+      setError("Email or password is missing. Please try signing up again.");
     }
   }, []);
 
@@ -78,42 +77,39 @@ export default function EmailVerification() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    // Join the verification code into a single string
+  
     const code = verificationCode.join("");
-
-    // Validate that the code is 6 digits long
+  
     if (code.length !== 6) {
-      setError("Please enter a 6-digit verification code.");
+      setError("Please enter a valid 6-digit verification code.");
       return;
     }
-
-    // Clear any existing error before starting the verification
+  
+    setIsLoading(true);
     setError(null);
     setSuccess(false);
-    setIsLoading(true);
-
+  
     try {
-      // Call the backend to verify the email and code
       const response = await axiosInstance.post("/v1/auth/confirm", {
-        email, // Email is passed here for confirmation
-        confirmationCode: code, // The 6-digit code entered by the user
-        password, // Password is passed here for password reset
+        email, // Include email from localStorage
+        confirmationCode: code, // 6-digit code entered by the user
+        password, // Include password from localStorage
       });
-
+  
       if (response.status === 200) {
         setSuccess(true);
-        router.push("http://localhost:8080"); // Redirect to the dashboard or success page on verification success
+        router.push("http://localhost:8080"); // Redirect to dashboard
       } else {
-        setError("Failed to verify code. Please try again.");
+        setError("Verification failed. Please try again.");
       }
     } catch (err) {
-      setError("Verification failed. Please try again.");
       console.error("Verification error:", err);
+      setError("Verification failed. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
+  
 
   const handleResendCode = async () => {
     setIsLoading(true);
