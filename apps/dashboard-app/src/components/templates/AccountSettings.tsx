@@ -141,6 +141,7 @@ const AccountSettings: React.FC = () => {
       {/* Profile Details Section uu*/}
       <form onSubmit={handleSubmit}>
         <div className="bg-gray-50 shadow-sm rounded-lg pt-3 mb-9 border-2 border-gray-200">
+          {/* Header Section */}
           <div className="flex justify-between items-center mb-4 px-5">
             <h3 className="text-lg font-medium text-gray-700">
               Profile Details
@@ -158,35 +159,37 @@ const AccountSettings: React.FC = () => {
             </button>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 rounded-br-lg rounded-bl-lg gap-4 bg-white border-t-2 border-gray-200 py-4 px-5">
-            {/* User Field */}
-            <div>
-              <label className="block text-base font-normal  text-gray-600 mb-1">
-                Username
-              </label>
-              <input
-                type="text"
-                name="userName"
-                value={user.userName}
-                onChange={handleChanged}
-                className={`mt-1 w-full text-gray-700 py-2 px-4 border rounded-md focus:outline-none focus:bg-white ${
-                  errors.userName && touched.userName
-                    ? "border-red-500"
-                    : "border-gray-300"
-                }`}
-                placeholder="Enter your first name"
-              />
-              {errors.userName && touched.userName && (
-                <p className="text-red-500 text-sm ">{errors.userName}</p>
-              )}
-            </div>
-            <div className="flex justify-between ">
-              <p className="text-sm text-gray-500 pt-10">
-                Created on {user.createdAt}
-              </p>
-              <p className="text-sm text-gray-500 pt-10">
-                {/* Created on {user.updatedAt} */}
-              </p>
+          {/* Content Section */}
+          <div className="bg-white border-t rounded-br-lg rounded-bl-lg border-gray-200 py-4 px-5">
+            <div className="grid grid-cols-1 gap-4">
+              {/* Username Field */}
+              <div className="flex flex-col">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Username
+                </label>
+                <input
+                  type="text"
+                  name="userName"
+                  value={user.userName}
+                  onChange={handleChanged}
+                  className={`w-full py-2 px-4 text-gray-700 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500 focus:bg-white ${
+                    errors.userName && touched.userName
+                      ? "border-red-500"
+                      : "border-gray-300"
+                  }`}
+                  placeholder="Enter your username"
+                />
+                {errors.userName && touched.userName && (
+                  <p className="text-red-500 text-xs mt-1">{errors.userName}</p>
+                )}
+              </div>
+
+              {/* Created Date */}
+              <div className="flex justify-between items-center">
+                <p className="text-sm text-gray-500">
+                  Created on {user.createdAt}
+                </p>
+              </div>
             </div>
           </div>
         </div>
