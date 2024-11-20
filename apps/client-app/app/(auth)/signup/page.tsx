@@ -38,10 +38,11 @@ export default function SignUpPage() {
   const handleSignUp = async (data: RegisterFormData) => {
     const { email, password, username } = data;
 
-    setIsLoading(true);
-    setError(null);
+    setIsLoading(true); // Start loading spinner
+    setError(null); // Reset error message
 
     try {
+      // Call the signup API
       const response = await axiosInstance.post("/v1/auth/signup", {
         email,
         password,
@@ -69,7 +70,7 @@ export default function SignUpPage() {
       }
       console.error("Sign-up error:", err);
     } finally {
-      setIsLoading(false);
+      setIsLoading(false); // Stop loading spinner
     }
   };
 
@@ -89,6 +90,7 @@ export default function SignUpPage() {
     } catch (err) {
       setError("An error occurred during Google login. Please try again.");
       console.error("Google Sign-up error:", err);
+      setError("An error occurred during Google login. Please try again.");
     }
   };
 
@@ -255,6 +257,7 @@ export default function SignUpPage() {
             </span>
             <div className="flex-grow border-t border-gray-300"></div>
           </div>
+
 
           <div className="mt-4">
             <button
