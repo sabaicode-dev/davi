@@ -19,14 +19,17 @@ export default function EmailVerification() {
   const [success, setSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [countdown, setCountdown] = useState(60);
 
   const router = useRouter();
 
   useEffect(() => {
     const storedEmail = localStorage.getItem("email");
-    if (storedEmail) {
+    const storedPassword = localStorage.getItem("password");
+    if (storedEmail && storedPassword) {
       setEmail(storedEmail);
+      setPassword(storedPassword);
       setError(null); // Clear any error related to missing email
     } else {
       setError("Email is missing. Please try signing up again.");
@@ -95,6 +98,7 @@ export default function EmailVerification() {
       const response = await axiosInstance.post("/v1/auth/confirm", {
         email, // Email is passed here for confirmation
         confirmationCode: code, // The 6-digit code entered by the user
+        password, // Password is passed here for password reset
       });
 
       if (response.status === 200) {
