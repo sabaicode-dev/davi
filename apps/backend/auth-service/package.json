@@ -34,7 +34,7 @@
     "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
-    "@datacatalog2024/ms-libs": "0.0.1",
+    "@sabaicode-dev/ms-libs": "0.0.2",
     "@types/cookie-parser": "^1.4.7",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
