@@ -1,4 +1,4 @@
-import configs from "@/src/config"
+import configs from "@/src/config";
 
 export interface RouteConfig {
   path: string;
@@ -26,7 +26,7 @@ const ROUTE_PATHS: RoutesConfig = {
         methods: {
           GET: {
             authRequired: false,
-          }
+          },
         },
       },
       {
@@ -34,7 +34,7 @@ const ROUTE_PATHS: RoutesConfig = {
         methods: {
           POST: {
             authRequired: false,
-          }
+          },
         },
       },
       {
@@ -42,213 +42,51 @@ const ROUTE_PATHS: RoutesConfig = {
         methods: {
           POST: {
             authRequired: false,
-          }
-        }
+          },
+        },
       },
       {
         path: "/verify",
         methods: {
           POST: {
             authRequired: false,
-          }
-        }
-      },
-      {
-        path: '/login',
-        methods: {
-          POST: {
-            authRequired: false,
-          }
-        }
-      },
-      {
-        path: '/google',
-        methods: {
-          GET: {
-            authRequired: false,
-          }
-        }
-      },
-      {
-        path: '/facebook',
-        methods: {
-          GET: {
-            authRequired: false,
-          }
-        }
-      },
-      {
-        path: '/refresh-token',
-        methods: {
-          POST: {
-            authRequired: false,
-          }
-        }
-      },
-      {
-        path: '/oauth/callback',
-        methods: {
-          GET: {
-            authRequired: false,
-          }
-        }
-      },
-    ]
-  },
-  USER_SERVICE: {
-    path: "/v1/users",
-    target: configs.userServiceUrl,
-    methods: {
-      GET: {
-        authRequired: true, roles: ["user", "admin"]
-      },
-      POST: {
-        authRequired: true, roles: ["user", "admin"]
-      }
-    },
-    nestedRoutes: [
-      {
-        path: "/health",
-        methods: {
-          GET: {
-            authRequired: false,
-          }
-        }
-      },
-      {
-        path: "/me",
-        methods: {
-          GET: {
-            authRequired: true, roles: ["user", "admin"]
-          }
-        },
-        nestedRoutes: [
-          {
-            path: "/favorites",
-            methods: {
-              GET: {
-                authRequired: true, roles: ["user", "admin"]
-              },
-              POST: {
-                authRequired: true, roles: ["user", "admin"]
-              }
-            },
-            nestedRoutes: [
-              {
-                path: "/:id",
-                methods: {
-                  DELETE: {
-                    authRequired: true, roles: ["user", "admin"]
-                  }
-                }
-              }
-            ]
           },
-        ]
-      },
-
-    ]
-  },
-  JOB_SERVICE: {
-    path: "/v1/jobs",
-    target: configs.jobServiceUrl,
-    methods: {
-      GET: {
-        authRequired: false,
-      }
-    },
-    nestedRoutes: [
-      {
-        path: "/health",
-        methods: {
-          GET: {
-            authRequired: false,
-          }
-        }
+        },
       },
       {
-        path: "/:id",
-        methods: {
-          GET: {
-            authRequired: false,
-          }
-        }
-      },
-      {
-        path: "/search-history",
-        methods: {
-          GET: {
-            authRequired: true,
-            roles: ["user", "company"],
-          }
-        }
-      },
-      {
-        path: "/search-trending",
-        methods: {
-          GET: {
-            authRequired: false,
-          }
-        }
-      },
-    ]
-  },
-  NOTIFICATION_SERVICE: {
-    path: "/v1/notifications",
-    target: configs.notificationServiceUrl,
-    nestedRoutes: [
-      {
-        path: "/health",
-        methods: {
-          GET: {
-            authRequired: false
-          }
-        }
-      },
-      {
-        path: "/subscribe",
+        path: "/login",
         methods: {
           POST: {
-            authRequired: false
-          }
-        }
-      }
-    ]
-  },
-  CHAT_SERVICE: {
-    target: configs.chatServiceUrl,
-    path: '/socket.io',
-    methods: {
-      GET: {
-        authRequired: false,
+            authRequired: false,
+          },
+        },
       },
-      POST: {
-        authRequired: false
-      }
-    },
-  },
-  CONVERSATION: {
-    path: '/v1/conversations',
-    target: configs.chatServiceUrl,
-    methods: {
-      POST: {
-        authRequired: true, roles: ["user", "company"]
-      },
-      GET: {
-        authRequired: true, roles: ["user", "company"]
-      }
-    },
-    nestedRoutes: [
       {
-        path: "/:id/messages",
+        path: "/google",
         methods: {
           GET: {
-            authRequired: true, roles: ["user", "company"]
-          }
-        }
-      }
-    ]
-  }
-}
+            authRequired: false,
+          },
+        },
+      },
+      {
+        path: "/refresh-token",
+        methods: {
+          POST: {
+            authRequired: false,
+          },
+        },
+      },
+      {
+        path: "/google/callback",
+        methods: {
+          GET: {
+            authRequired: false,
+          },
+        },
+      },
+    ],
+  },
+};
 
-export default ROUTE_PATHS
+export default ROUTE_PATHS;
