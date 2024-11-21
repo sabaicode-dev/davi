@@ -2,9 +2,9 @@ name: CI/CD Pipeline for Auth Service
 
 on:
   pull_request:
-    branches: [google-conito]
+    branches: [Auth-Service-Smey]
   push:
-    branches: [google-conito]
+    branches: [Auth-Service-Smey]
 
 defaults:
   run:
@@ -45,7 +45,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: build
-    if: github.ref == 'refs/heads/google-conito'
+    if: github.ref == 'refs/heads/Auth-Service-Smey'
 
     steps:
       - name: Checkout code
