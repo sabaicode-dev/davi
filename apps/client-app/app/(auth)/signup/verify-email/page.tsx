@@ -19,17 +19,19 @@ export default function EmailVerification() {
   const [success, setSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [countdown, setCountdown] = useState(60);
 
   const router = useRouter();
 
   useEffect(() => {
     const storedEmail = localStorage.getItem("email");
-    if (storedEmail) {
+    const storedPassword = localStorage.getItem("password");
+    if (storedEmail && storedPassword) {
       setEmail(storedEmail);
-      setError(null); // Clear any error related to missing email
+      setPassword(storedPassword);
     } else {
-      setError("Email is missing. Please try signing up again.");
+      setError("Email or password is missing. Please try signing up again.");
     }
   }, []);
 
@@ -75,41 +77,39 @@ export default function EmailVerification() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    // Join the verification code into a single string
+  
     const code = verificationCode.join("");
-
-    // Validate that the code is 6 digits long
+  
     if (code.length !== 6) {
-      setError("Please enter a 6-digit verification code.");
+      setError("Please enter a valid 6-digit verification code.");
       return;
     }
-
-    // Clear any existing error before starting the verification
+  
+    setIsLoading(true);
     setError(null);
     setSuccess(false);
-    setIsLoading(true);
-
+  
     try {
-      // Call the backend to verify the email and code
       const response = await axiosInstance.post("/v1/auth/confirm", {
-        email, // Email is passed here for confirmation
-        confirmationCode: code, // The 6-digit code entered by the user
+        email, // Include email from localStorage
+        confirmationCode: code, // 6-digit code entered by the user
+        password, // Include password from localStorage
       });
-
+  
       if (response.status === 200) {
         setSuccess(true);
-        router.push("http://localhost:8080"); // Redirect to the dashboard or success page on verification success
+        router.push("http://localhost:8080"); // Redirect to dashboard
       } else {
-        setError("Failed to verify code. Please try again.");
+        setError("Verification failed. Please try again.");
       }
     } catch (err) {
-      setError("Verification failed. Please try again.");
       console.error("Verification error:", err);
+      setError("Verification failed. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
+  
 
   const handleResendCode = async () => {
     setIsLoading(true);
@@ -126,6 +126,7 @@ export default function EmailVerification() {
       setIsLoading(false);
     }
   };
+
 
   return (
     <div className="grid grid-cols-1 h-screen place-content-center w-full">

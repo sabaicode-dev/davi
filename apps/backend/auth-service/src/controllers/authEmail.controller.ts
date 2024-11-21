@@ -112,26 +112,114 @@ export class CognitoController extends Controller {
    */
   @Post("confirm")
   public async confirmSignUp(
-    @Body() requestBody: ConfirmSignUpRequest
-  ): Promise<{ message: string; result: any }> {
-    const { email, confirmationCode } = requestBody;
+    @Body() requestBody: ConfirmSignUpRequest,
+    @Res()
+    successResponse: TsoaResponse<
+      200,
+      { message: string; result: any },
+      { "Set-Cookie": string[] }
+    >,
+    @Res()
+    errorResponse: TsoaResponse<400 | 401, { message: string }>
+  ): Promise<void> {
+    const { email, confirmationCode, password } = requestBody;
     try {
-      const result = await confirmSignUp(email, confirmationCode);
-      return { message: "User confirmed successfully", result };
+      // Confirm the user's sign-up (omit the unused variable)
+      await confirmSignUp(email, confirmationCode);
+
+      // Automatically sign in the user after confirmation
+      const signInResult = await signInUser(email, password);
+
+      if (
+        !signInResult?.IdToken ||
+        !signInResult?.RefreshToken ||
+        !signInResult?.AccessToken
+      ) {
+        errorResponse(401, { message: "Authentication tokens are missing" });
+        return;
+      }
+
+      // Decode the IdToken to extract cognitoUserId
+      const decodedToken = jwt.decode(signInResult.IdToken) as { sub?: string };
+      const cognitoUserId = decodedToken?.sub;
+
+      if (!cognitoUserId) {
+        errorResponse(401, { message: "Unable to retrieve user ID" });
+        return;
+      }
+      console.log(
+        `-----------------------> Sign-UP with Email <------------------------------`
+      );
+      console.log(`signInResult : ${signInResult}`);
+      console.log(`decodedToken : ${decodedToken}`);
+      console.log(`cognitoUserId : ${cognitoUserId}`);
+      console.log(`----------------------------------------------------------`);
+      // Set cookies with authentication tokens
+      const cookies = [
+        `idToken=${signInResult.IdToken}; HttpOnly; Secure; Max-Age=86400; SameSite=Strict`,
+        `refreshToken=${signInResult.RefreshToken}; HttpOnly; Secure; Max-Age=86400; SameSite=Strict`,
+        `accessToken=${signInResult.AccessToken}; HttpOnly; Secure; Max-Age=3600; SameSite=Strict`,
+        `cognitoUserId=${cognitoUserId}; HttpOnly; Secure; Max-Age=86400; SameSite=Strict`,
+      ];
+
+      // Send the response with cookies
+      successResponse(
+        200,
+        {
+          message: "User confirmed and signed in successfully",
+          result: {
+            IdToken: signInResult.IdToken,
+            RefreshToken: signInResult.RefreshToken,
+            AccessToken: signInResult.AccessToken,
+            cognitoUserId,
+          },
+        },
+        { "Set-Cookie": cookies }
+      );
     } catch (error: any) {
-      // Check for specific error codes
+      console.error(
+        "Error during confirmation and sign-in:",
+        error.message || error
+      );
+
       if (
         error.message.includes("ExpiredCodeException") ||
         error.message.includes("CodeMismatchException")
       ) {
-        throw new Error(
-          "The confirmation code is invalid or has expired. Please request a new code and try again."
-        );
+        errorResponse(400, {
+          message:
+            "The confirmation code is invalid or has expired. Please request a new code and try again.",
+        });
+      } else {
+        errorResponse(400, {
+          message: error.message || "Confirmation failed.",
+        });
       }
-      // Handle other errors
-      throw new Error(error.message);
     }
   }
+
+  // @Post("confirm")
+  // public async confirmSignUp(
+  //   @Body() requestBody: ConfirmSignUpRequest
+  // ): Promise<{ message: string; result: any }> {
+  //   const { email, confirmationCode } = requestBody;
+  //   try {
+  //     const result = await confirmSignUp(email, confirmationCode);
+  //     return { message: "User confirmed successfully", result };
+  //   } catch (error: any) {
+  //     // Check for specific error codes
+  //     if (
+  //       error.message.includes("ExpiredCodeException") ||
+  //       error.message.includes("CodeMismatchException")
+  //     ) {
+  //       throw new Error(
+  //         "The confirmation code is invalid or has expired. Please request a new code and try again."
+  //       );
+  //     }
+  //     // Handle other errors
+  //     throw new Error(error.message);
+  //   }
+  // }
 
   /**
    * Resend the confirmation code to a user's email
