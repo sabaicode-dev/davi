@@ -1,3 +1,6 @@
+interface IIcons {
+  className?: string;
+}
 const FilterIcon = () => (
   <svg
     width="20"
@@ -123,7 +126,7 @@ const VisualizeIcon = () => {
   );
 };
 
-const DeleteIcon = () => {
+export const DeleteIcon: React.FC<IIcons> = ({ className }) => {
   return (
     <svg
       width="20"
@@ -131,6 +134,7 @@ const DeleteIcon = () => {
       viewBox="0 0 20 20"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
+      className={className}
     >
       <path
         d="M13.3333 5.0013V4.33464C13.3333 3.40121 13.3333 2.9345 13.1517 2.57798C12.9919 2.26438 12.7369 2.00941 12.4233 1.84962C12.0668 1.66797 11.6001 1.66797 10.6667 1.66797H9.33333C8.39991 1.66797 7.9332 1.66797 7.57668 1.84962C7.26308 2.00941 7.00811 2.26438 6.84832 2.57798C6.66667 2.9345 6.66667 3.40121 6.66667 4.33464V5.0013M8.33333 9.58464V13.7513M11.6667 9.58464V13.7513M2.5 5.0013H17.5M15.8333 5.0013V14.3346C15.8333 15.7348 15.8333 16.4348 15.5608 16.9696C15.3212 17.44 14.9387 17.8225 14.4683 18.0622C13.9335 18.3346 13.2335 18.3346 11.8333 18.3346H8.16667C6.76654 18.3346 6.06647 18.3346 5.53169 18.0622C5.06129 17.8225 4.67883 17.44 4.43915 16.9696C4.16667 16.4348 4.16667 15.7348 4.16667 14.3346V5.0013"
@@ -377,12 +381,71 @@ const CheckTick = () => {
   );
 };
 
+export const EditIcon: React.FC<IIcons> = ({ className }) => {
+  return (
+    <svg
+      width="20px"
+      height="20px"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+    >
+      <path
+        d="M16.6711 4.48785L11.4428 9.78833C11.2429 9.99099 11.143 10.0923 11.0761 10.2152L11.0727 10.2215C11.0067 10.3448 10.9772 10.4832 10.9184 10.7599C10.6297 12.1177 10.4853 12.7966 10.8705 13.1765C10.8766 13.1825 10.8827 13.1885 10.889 13.1943C11.2839 13.5644 11.9721 13.4037 13.3486 13.0822C13.6235 13.0181 13.7609 12.986 13.8822 12.9197L13.8839 12.9187C14.0051 12.8521 14.1048 12.7545 14.3042 12.5592L19.6099 7.36337C20.2676 6.71937 20.5964 6.39736 20.6034 5.99372C20.6103 5.59008 20.2928 5.25743 19.6579 4.59212L19.5804 4.51093C18.9033 3.80151 18.5647 3.4468 18.1347 3.44338C17.7047 3.43997 17.3602 3.78926 16.6711 4.48785Z"
+        stroke="currentColor"
+        stroke-width="1.7"
+        className="my-path"
+      ></path>
+      <path
+        d="M19.0007 8.00004L16 5"
+        stroke="currentColor"
+        stroke-width="1.7"
+        className="my-path"
+      ></path>
+      <path
+        d="M13.5882 3H11C7.22876 3 5.34315 3 4.17157 4.17157C3 5.34315 3 7.22876 3 11V13C3 16.7712 3 18.6569 4.17157 19.8284C5.34315 21 7.22876 21 11 21H13C16.7712 21 18.6569 21 19.8284 19.8284C21 18.6569 21 16.7712 21 13V11.4706"
+        stroke="currentColor"
+        stroke-width="1.7"
+        stroke-linecap="round"
+        className="my-path"
+      ></path>
+    </svg>
+  );
+};
+
+export const CloseIcon: React.FC<IIcons> = ({ className }) => {
+  return (
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+    >
+      <path
+        d="M7.75732 7.75745L16.2426 16.2427"
+        stroke="currentColor"
+        stroke-width="1.7"
+        stroke-linecap="round"
+        
+      ></path>
+      <path
+        d="M16.2426 7.75745L7.75732 16.2427"
+        stroke="currentColor"
+        stroke-width="1.7"
+        stroke-linecap="round"
+        className={className}
+      ></path>
+    </svg>
+  );
+};
 export {
   FilterIcon,
   AIIcon,
   DownloadIcon,
   VisualizeIcon,
-  DeleteIcon,
   ProjectIcon,
   GraphIcon,
   DatasetIcon,
@@ -392,5 +455,5 @@ export {
   DeleteIconCardVisualize,
   UploadFile,
   FileIcon,
-  CheckTick
+  CheckTick,
 };
