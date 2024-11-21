@@ -19,10 +19,16 @@ interface Project {
 interface SelectProjectProps {
   selectedSort?: "recent" | "alphabetical" | null;
   onBack?: () => void;
+  children?: React.ReactNode;
+  onDataFetch?: (data: any[]) => void;
+  onError?: (error: string) => void;
 }
 
 const SelectProject: React.FC<SelectProjectProps> = ({
-  selectedSort = "recent",
+  selectedSort = "recent", 
+  children,
+  onDataFetch,
+  onError
 }) => {
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
   const [projects, setProjects] = useState<Project[]>([]);
@@ -35,10 +41,32 @@ const SelectProject: React.FC<SelectProjectProps> = ({
 
   const navigate = useNavigate();
 
+  // useEffect(() => {
+  //   const fetchProjects = async () => {
+  //     setIsLoading(true);
+  //     setError(null);
+  //     try {
+  //       const response = await request({
+  //         url: `http://127.0.0.1:8000/api/v1/projects/`,
+  //         method: "GET",
+  //       });
+
+  //       if (response.data?.results) {
+  //         setProjects(response.data.results);
+  //       } else {
+  //         throw new Error("Failed to fetch projects.");
+  //       }
+  //     } catch (err: any) {
+  //       setError(err.message || "An error occurred while fetching projects.");
+  //     } finally {
+  //       setIsLoading(false);
+  //     }
+  //   };
+
+  //   fetchProjects();
+  // }, []);
   useEffect(() => {
     const fetchProjects = async () => {
-      setIsLoading(true);
-      setError(null);
       try {
         const response = await request({
           url: `http://127.0.0.1:8000/api/v1/projects/`,
@@ -47,19 +75,35 @@ const SelectProject: React.FC<SelectProjectProps> = ({
 
         if (response.data?.results) {
           setProjects(response.data.results);
+          onDataFetch?.(response.data.results);
         } else {
           throw new Error("Failed to fetch projects.");
         }
       } catch (err: any) {
-        setError(err.message || "An error occurred while fetching projects.");
+        const errorMessage = err.message || "An error occurred while fetching projects.";
+        setError(errorMessage);
+        onError?.(errorMessage);
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchProjects();
-  }, []);
+  }, [onDataFetch, onError]);
 
+
+
+  if (children) {
+    return <>{children}</>;
+  }
+
+  if (isLoading) {
+    return <SkeletonLoader />;
+  }
+
+  if (error) {
+    return <p className="text-red-500">Error: {error}</p>;
+  }
   const handleDeleteProject = async (projectId: string) => {
     setIsDeleting(projectId);
 
@@ -166,7 +210,7 @@ const SelectProject: React.FC<SelectProjectProps> = ({
           isDisabled={false}
         />
       </div>
-      {filteredProjects.map((project: Project) => (
+      {projects.map((project: Project) => (
         <div
           key={project._id}
           className="flex justify-between items-center p-4 shadow-lg rounded-xl cursor-pointer ring-2 hover:ring-blue-500 transition-all"
