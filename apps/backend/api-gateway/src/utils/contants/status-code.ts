@@ -6,6 +6,7 @@ export const HTTP_STATUS_CODE = {
   FORBIDDEN: 403,
   NOT_FOUND: 404,
   CONFLICT: 409,
+  MANY_REQUEST:429,
   SERVER_ERROR: 500,
   // Add More Status Code
 };

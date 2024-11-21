@@ -9,5 +9,6 @@ export const APP_ERROR_MESSAGE = {
   existedEmail: "Email already exists",
   // Product Resource Message Error
   productDoesntExist: "Product does not exist",
+  tooManyRequest: "Too many requests, please try again later.",
   // ...
 };
