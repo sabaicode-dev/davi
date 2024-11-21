@@ -6,8 +6,8 @@ import Button from "@/src/components/atoms/Button";
 import { FaPlus } from "react-icons/fa6";
 import { DeleteIcon, EditIcon } from "@/src/components/atoms/icons/Icon";
 import SkeletonLoader from "@/src/components/loading/SelectProjectSkeleton";
-import CreateProjectModal from "../modals/EditModals";
-import axios from "axios";
+import CreateProjectModal from "@/src/components/molecules/modals/EditModals";
+import request from "@/src/utils/helper";
 
 interface Project {
   _id: string;
@@ -24,6 +24,7 @@ interface SelectProjectProps {
 const SelectProject: React.FC<SelectProjectProps> = ({
   selectedSort = "recent",
 }) => {
+  const [isDeleting, setIsDeleting] = useState<string | null>(null);
   const [projects, setProjects] = useState<Project[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -31,7 +32,7 @@ const SelectProject: React.FC<SelectProjectProps> = ({
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(
     null
   );
-  
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -40,9 +41,11 @@ const SelectProject: React.FC<SelectProjectProps> = ({
       setError(null);
 
       try {
-        const response = await axios.get(
-          `http://127.0.0.1:8000/api/v1/projects/`
-        );
+        const response = await request({
+          url: `http://127.0.0.1:8000/api/v1/projects/`,
+          method: "GET",
+        });
+
         if (response.data?.results) {
           setProjects(response.data.results);
         } else {
@@ -57,6 +60,36 @@ const SelectProject: React.FC<SelectProjectProps> = ({
 
     fetchProjects();
   }, []);
+
+  const handleDeleteProject = async (projectId: string) => {
+    setIsDeleting(projectId);
+
+    try {
+      const response = await request({
+        url: `http://127.0.0.1:8000/api/v1/project/${projectId}/delete/`,
+        method: "DELETE",
+        withCredentials: false,
+      });
+
+      if (
+        response.status === 200 ||
+        response.status === 204 ||
+        response.data?.success
+      ) {
+        setProjects((prevProjects) =>
+          prevProjects.filter((project) => project._id !== projectId)
+        );
+        console.log("Project deleted successfully");
+      } else {
+        alert("Failed to delete project. Please try again.");
+      }
+    } catch (error: any) {
+      console.error("Error deleting project:", error);
+      alert("An error occurred while deleting the project. Please try again.");
+    } finally {
+      setIsDeleting(null);
+    }
+  };
 
   const getFilteredProjects = (filter: "recent" | "alphabetical" | null) => {
     if (filter === "recent") {
@@ -84,6 +117,27 @@ const SelectProject: React.FC<SelectProjectProps> = ({
     setIsModalOpen(true);
   };
 
+  const updateProject = (
+    projectId: string,
+    newName: string,
+    newDescription: string
+  ) => {
+    setProjects((prevProjects) =>
+      prevProjects.map((project) =>
+        project._id === projectId
+          ? {
+              ...project,
+              project_name: newName,
+              project_description: newDescription,
+            }
+          : project
+      )
+    );
+  };
+
+  const newProject = () => {
+    navigate("/create-project");
+  };
   if (isLoading) {
     return <SkeletonLoader />;
   }
@@ -102,7 +156,7 @@ const SelectProject: React.FC<SelectProjectProps> = ({
       <div className="flex justify-end">
         <Button
           className="ml-auto !py-2 !px-4 border-2 border-blue-500"
-          onClick={() => alert("New project")}
+          onClick={newProject}
           startContent={<FaPlus />}
           children="New Project"
           size="small"
@@ -140,9 +194,10 @@ const SelectProject: React.FC<SelectProjectProps> = ({
               onClick={(e) => {
                 e.stopPropagation();
               }}
+              className=""
             >
               <Button
-                className="!px-0 !pl-2 !py-1 bg-transparent border-transparent hover:bg-transparent hover:border-transparent"
+                className="flex !mr-0 !pr-0 !px-0 !pl-2 !py-1 bg-transparent border-transparent hover:bg-transparent hover:border-transparent"
                 onClick={() => handleEditClick(project._id)}
                 startContent={
                   <EditIcon className="!text-blue-500 bg-gray-200 hover:bg-gray-300 duration-150 p-2 w-10 h-10 rounded-xl" />
@@ -162,8 +217,8 @@ const SelectProject: React.FC<SelectProjectProps> = ({
               }}
             >
               <Button
-                className="!px-0 !pl-2  bg-transparent border-transparent hover:bg-transparent hover:border-transparent"
-                onClick={() => alert("Create Project Clicked!")}
+                className="!ml-0 !pl-0  !px-0 bg-transparent border-transparent hover:bg-transparent hover:border-transparent"
+                onClick={() => handleDeleteProject(project._id)}
                 startContent={
                   <DeleteIcon className="!text-red-500 bg-gray-200 hover:bg-gray-300 duration-150 p-2 w-10 h-10 rounded-xl" />
                 }
@@ -173,7 +228,7 @@ const SelectProject: React.FC<SelectProjectProps> = ({
                 color="secondary"
                 isLoading={false}
                 isIconOnly={false}
-                isDisabled={false}
+                isDisabled={isDeleting === project._id}
               />
             </div>
           </div>
@@ -182,6 +237,15 @@ const SelectProject: React.FC<SelectProjectProps> = ({
       {isModalOpen && selectedProjectId && (
         <CreateProjectModal
           projectId={selectedProjectId}
+          initialProjectName={
+            filteredProjects.find((p) => p._id === selectedProjectId)
+              ?.project_name || ""
+          }
+          initialDescription={
+            filteredProjects.find((p) => p._id === selectedProjectId)
+              ?.project_description || ""
+          }
+          onUpdateProject={updateProject}
           onClose={() => {
             setIsModalOpen(false);
           }}

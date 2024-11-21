@@ -7,16 +7,26 @@ import request from "@/src/utils/helper";
 interface ICreateProjectModalProps {
   onClose?: () => void;
   projectId: string;
+  initialProjectName: string;
+  initialDescription: string;
+  onUpdateProject?: (
+    projectId: string,
+    newName: string,
+    newDescription: string
+  ) => void;
 }
 
 const EditProject: React.FC<ICreateProjectModalProps> = ({
   onClose,
   projectId,
+  initialProjectName,
+  initialDescription,
+  onUpdateProject,
 }) => {
   const dialogRef = React.useRef<HTMLDialogElement>(null);
   const [isModalOpen, setIsModalOpen] = useState(true);
-  const [projectName, setProjectName] = useState("");
-  const [description, setDescription] = useState("");
+  const [projectName, setProjectName] = useState<string>(initialProjectName);
+  const [description, setDescription] = useState<string>(initialDescription);
   const [errorMessages, setErrorMessages] = useState<{
     projectName: string;
     description: string;
@@ -67,7 +77,7 @@ const EditProject: React.FC<ICreateProjectModalProps> = ({
     setErrorMessages(newErrorMessages);
     return valid;
   };
-
+  
   const handleUpdate = async () => {
     if (!validateForm()) {
       return;
@@ -78,7 +88,6 @@ const EditProject: React.FC<ICreateProjectModalProps> = ({
     try {
       const response = await request({
         url: `http://127.0.0.1:8000/api/v1/project/${projectId}/update/`,
-        // http://127.0.0.1:8000/api/v1/project/673de0c85887f42017e3396b/update/
         method: "PUT",
         withCredentials: false,
         data: {
@@ -86,9 +95,11 @@ const EditProject: React.FC<ICreateProjectModalProps> = ({
           project_description: description,
         },
       });
-      console.log(response.data);
-      console.log("Project ID",projectId)
+
       if (response.success) {
+        // Call the update method passed from parent component
+        onUpdateProject?.(projectId, projectName, description);
+
         setProjectName("");
         setDescription("");
         setErrorMessages({ projectName: "", description: "" });
@@ -115,7 +126,7 @@ const EditProject: React.FC<ICreateProjectModalProps> = ({
       <dialog
         ref={dialogRef}
         id="modal_project"
-        className="modal flex flex-col justify-center items-center w-1/2 xl:w-1/2 2xl:w-1/3 p-5 rounded-xl shadow-xl border-[1px] z-50"
+        className="modal fixed top-1/4 left-1/2 transform -translate-x-1/2 -translate-y-1/4 flex flex-col justify-center items-center w-1/2 xl:w-1/2 2xl:w-1/3 p-5 rounded-xl shadow-xl border-[1px] z-50"
       >
         <motion.div
           initial="hidden"

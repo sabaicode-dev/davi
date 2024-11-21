@@ -18,7 +18,7 @@ const schema = Joi.object({
   projectName: Joi.string().trim().required().messages({
     "string.empty": "Please input your project name.",
   }),
-  description: Joi.string().allow(""),
+  description: Joi.string().max(255).allow(""),
 });
 
 type ErrorMessages = {
