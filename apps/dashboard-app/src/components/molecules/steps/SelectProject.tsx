@@ -39,7 +39,6 @@ const SelectProject: React.FC<SelectProjectProps> = ({
     const fetchProjects = async () => {
       setIsLoading(true);
       setError(null);
-
       try {
         const response = await request({
           url: `http://127.0.0.1:8000/api/v1/projects/`,
