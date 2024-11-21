@@ -12,9 +12,10 @@ import Helps from "./components/pages/Helps";
 import AccountSettings from "./components/templates/AccountSettings";
 // import Project from "./components/pages/Project";
 import { AuthProvider } from "./contexts/AuthContext";
+import Spinner from "./components/loading/Spinner";
 
 const routes = [
-  { path: "/", element: <GetStart /> },
+  { path: "/", element: <Spinner /> },
   { path: "/create-project", element: <CreateProject /> },
   { path: "/select-project", element: <SelectProject /> },
   { path: "/pick-datasource", element: <PickDataSource /> },
