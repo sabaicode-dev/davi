@@ -6,7 +6,6 @@ import React, { Children } from "react";
 import Layout from "@/src/components/organisms/layout/MainLayout";
 import "@/src/styles.css";
 import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
-import { APIProvider } from "@/src/context/APIContext";
 import { GetStart } from "@/src/components/molecules/steps/GetStart";
 import CreateProject from "@/src/components/molecules/steps/CreateProject";
 import SelectProject from "@/src/components/molecules/steps/SelectProject";
@@ -31,7 +30,6 @@ const routes = [
 export const App: React.FC = () => {
   return (
     <BrowserRouter>
-      <APIProvider>
         <Layout>
           <Routes>
             {routes.map((route) => (
@@ -43,7 +41,6 @@ export const App: React.FC = () => {
             ))}
           </Routes>
         </Layout>
-      </APIProvider>
     </BrowserRouter>
   );
 };

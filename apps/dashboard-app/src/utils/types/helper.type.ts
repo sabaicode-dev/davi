@@ -6,5 +6,6 @@ export interface RequestParams {
   method: HTTPMethod;
   data?: Record<string, any>;
   headers?: Record<string, string>;
+  withCredentials?:boolean;
   onUploadProgress?: (progressEvent: ProgressEvent) => void;
 }

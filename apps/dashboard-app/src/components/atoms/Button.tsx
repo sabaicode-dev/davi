@@ -38,7 +38,7 @@ const Button: React.FC<ButtonProps> = ({
   ...props
 }) => {
   const baseStyles =
-    "bg-blue-500 inline-flex items-center justify-center font-medium transition-colors duration-200 py-2";
+    "bg-blue-500 inline-flex items-center border-2 justify-center font-medium transition-colors duration-200 py-2";
 
   const sizeStyles = {
     small: "px-1 py-1 text-sm",

@@ -13,6 +13,7 @@ interface Step2Props {
   description?: string;
 }
 
+// Joi schema for validation
 const schema = Joi.object({
   projectName: Joi.string().trim().required().messages({
     "string.empty": "Please input your project name.",
@@ -42,15 +43,47 @@ const CreateProject: React.FC<Step2Props> = ({
     navigate("/");
   };
 
+  const validateForm = () => {
+    const { error } = schema.validate(
+      { projectName: projectNameState, description: descriptionState },
+      { abortEarly: false }
+    );
+
+    if (error) {
+      const newErrorMessages: ErrorMessages = {
+        projectName: "",
+        description: "",
+      };
+
+      error.details.forEach((err) => {
+        if (err.path[0] === "projectName") {
+          newErrorMessages.projectName = err.message;
+        } else if (err.path[0] === "description") {
+          newErrorMessages.description = err.message;
+        }
+      });
+
+      setErrorMessages(newErrorMessages);
+      return false;
+    }
+
+    return true;
+  };
+
   const handleNext = async () => {
+    if (!validateForm()) {
+      return;
+    }
+
     setIsLoading(true);
 
     try {
-      const url_api = process.env.REACT_APP_API_URL;
-      console.log(url_api);
       const response = await request({
-        url: `${url_api}`,
+        url: `http://127.0.0.1:8000/api/v1/project/`,
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
         data: {
           project_name: projectNameState,
           project_description: descriptionState,
@@ -59,14 +92,12 @@ const CreateProject: React.FC<Step2Props> = ({
 
       navigate("/select-project");
 
-      console.log(url_api);
       console.log("Project creation response:", response);
 
       if (response.success || response.status === 201) {
         setErrorMessages({ projectName: "", description: "" });
         setProjectName("");
         setDescription("");
-        // Safely call the onNext function if it exists
         onNext?.();
       } else {
         setErrorMessages({
@@ -95,8 +126,8 @@ const CreateProject: React.FC<Step2Props> = ({
   };
 
   return (
-    <div className="mx-auto max-w-4xl p-10">
-      <div className="flex ">
+    <div className="mx-auto max-w-4xl p-1">
+      <div className="flex">
         {/* Left Image Section */}
         <div className="flex-1 p-8">
           <img src={Logo} alt="Project Created" className="w-full h-auto" />
@@ -111,10 +142,10 @@ const CreateProject: React.FC<Step2Props> = ({
             Please enter a Name and Description for this project.
           </p>
 
-          <div className="h-[100px]">
+          <div className="h-[100px] flex flex-col space-y-1">
             <div className="flex flex-row space-x-1">
               <label
-                className="block text-sm font-bold text-gray-700 mb-2"
+                className="block text-sm font-bold text-gray-700"
                 htmlFor="projectName"
               >
                 Project name
@@ -136,7 +167,7 @@ const CreateProject: React.FC<Step2Props> = ({
             )}
           </div>
 
-          <div className="mb-6">
+          <div className="mb-6 mt-2">
             <label
               className="block text-sm font-medium text-gray-700 mb-2"
               htmlFor="description"
@@ -158,7 +189,7 @@ const CreateProject: React.FC<Step2Props> = ({
             )}
           </div>
 
-          <div className="flex justify-end space-x-3">
+          <div className="flex justify-end space-x-2">
             <Button
               onClick={goBackToGetStart}
               children="Back"
@@ -168,6 +199,7 @@ const CreateProject: React.FC<Step2Props> = ({
               isLoading={false}
               isIconOnly={false}
               isDisabled={false}
+              className="!py-2 !px-4"
             />
             <Button
               onClick={handleNext}
