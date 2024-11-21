@@ -61,7 +61,9 @@ const authenticateToken = async (
       const payload = await verifier.verify(token);
 
       if (!payload) {
-        throw new AuthenticationError();
+        throw new AuthenticationError(
+          "Invalid or expired token. Please log in again."
+        );
       }
 
       let role: string[] = [];
