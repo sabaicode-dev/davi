@@ -4,10 +4,10 @@ import { IoFilter } from "react-icons/io5";
 import { FaCheck, FaPlus } from "react-icons/fa6";
 import { FaSortAlphaDown, FaSortAlphaUp } from "react-icons/fa";
 import Button from "@/src/components/atoms/Button";
-import SelectProject from "@/src/components/molecules/steps/SelectProject";
+import SelectProject from '@/src/components/molecules/steps/ShowProject';
 
 interface IHomeProject {
-  onNext: () => void;
+  onNext?: () => void;
 }
 
 const HomeProject: React.FC<IHomeProject> = ({ onNext }) => {
@@ -54,7 +54,7 @@ const HomeProject: React.FC<IHomeProject> = ({ onNext }) => {
           <div className="flex flex-row justify-center items-center space-x-4 lg:w-[500px] xl:w-[600px] 2xl:w-[900px]">
             <div>
               <Button
-                className="bg-transparent hover:bg-transparent"
+                className="bg-transparent hover:bg-transparent border-transparent"
                 size="medium"
                 radius="none"
                 children={<IoFilter className="w-5 h-5 text-gray-950" />}
@@ -100,7 +100,7 @@ const HomeProject: React.FC<IHomeProject> = ({ onNext }) => {
                 </div>
               )}
             </div>
-            <div className="flex flex-row justify-center items-center px-2 p-1 rounded-xl border-[1px] space-x-2 border-gray-800 focus:border-[1px] focus:border-blue-600 w-full lg:w-[500px] xl:w-[600px] 2xl:w-[900px]">
+            <div className="flex flex-row justify-center focus:right-2 focus:ring-blue-500 items-center px-2 p-1 rounded-xl border-[1px] space-x-2 border-gray-800 focus:border-[1px] focus:border-blue-600 w-full lg:w-[500px] xl:w-[600px] 2xl:w-[900px]">
               <IoIosSearch className="w-5 h-5" />
               <input
                 type="text"

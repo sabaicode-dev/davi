@@ -1,6 +1,6 @@
 const SkeletonLoader = () => {
   return (
-    <div className="flex flex-col space-y-5 overflow-auto mt-4 h-full p-2 border-1 pb-12">
+    <div className="flex flex-col space-y-5 overflow-auto mt-4 h-full p-2 border-1 pb-12 w-full">
       <div className="flex justify-end">
         <div className="w-32 h-10 bg-gray-300 rounded-lg animate-pulse"></div>
       </div>

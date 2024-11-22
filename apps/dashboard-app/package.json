@@ -12,7 +12,9 @@
     "test-storybook": "test-storybook"
   },
   "dependencies": {
+    "add": "^2.0.6",
     "apexcharts": "^4.0.0",
+    "button": "^1.1.1",
     "dotenv": "^16.4.5",
     "framer-motion": "^11.11.17",
     "react": "^18.3.1",
@@ -49,7 +51,9 @@
     "axios": "^1.7.7",
     "babel-loader": "^9.2.1",
     "classnames": "^2.5.1",
+    "cookie-parser": "^1.4.7",
     "css-loader": "^7.1.2",
+    "daisyui": "^4.12.14",
     "dotenv-webpack": "^8.1.0",
     "html-webpack-plugin": "^5.6.3",
     "json-server": "^1.0.0-beta.3",

@@ -6,6 +6,10 @@ import { AlertCircle, CheckCircle2 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
+import CryptoJS from "crypto-js";
+
+require("dotenv").config();
+
 export default function EmailVerification() {
   const [verificationCode, setVerificationCode] = useState([
     "",
@@ -21,15 +25,41 @@ export default function EmailVerification() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [countdown, setCountdown] = useState(60);
+  // const [secretKey, setSecretKey] = useState<string>("");
 
   const router = useRouter();
 
+  const secretKey = process.env.NEXT_PUBLIC_SECRET_KEY || "";
+
+ 
   useEffect(() => {
     const storedEmail = localStorage.getItem("email");
-    const storedPassword = localStorage.getItem("password");
-    if (storedEmail && storedPassword) {
-      setEmail(storedEmail);
-      setPassword(storedPassword);
+    const encryptedUsername = localStorage.getItem("username");
+    const encryptedPassword = localStorage.getItem("password");
+
+    if (storedEmail && encryptedUsername && encryptedPassword) {
+      try {
+        if (!secretKey) throw new Error("Secret key is missing");
+        // Decrypt username and password
+        const decryptedUsername = CryptoJS.AES.decrypt(
+          encryptedUsername,
+          String(secretKey)
+        ).toString(CryptoJS.enc.Utf8);
+        const decryptedPassword = CryptoJS.AES.decrypt(
+          encryptedPassword,
+          String(secretKey)
+        ).toString(CryptoJS.enc.Utf8);
+
+        console.log("Decrypted Username:", decryptedUsername);
+        // console.log("Decrypted Password:", decryptedPassword);
+
+        setEmail(storedEmail);
+        setPassword(decryptedPassword);
+      } catch (err) {
+        console.log(err);
+
+        setError("Failed to decrypt data. Please try signing up again.");
+      }
     } else {
       setError("Email or password is missing. Please try signing up again.");
     }
@@ -77,25 +107,25 @@ export default function EmailVerification() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-  
+
     const code = verificationCode.join("");
-  
+
     if (code.length !== 6) {
       setError("Please enter a valid 6-digit verification code.");
       return;
     }
-  
+
     setIsLoading(true);
     setError(null);
     setSuccess(false);
-  
+
     try {
       const response = await axiosInstance.post("/v1/auth/confirm", {
         email, // Include email from localStorage
         confirmationCode: code, // 6-digit code entered by the user
         password, // Include password from localStorage
       });
-  
+
       if (response.status === 200) {
         setSuccess(true);
         router.push("http://localhost:8080"); // Redirect to dashboard
@@ -109,7 +139,6 @@ export default function EmailVerification() {
       setIsLoading(false);
     }
   };
-  
 
   const handleResendCode = async () => {
     setIsLoading(true);
@@ -126,7 +155,6 @@ export default function EmailVerification() {
       setIsLoading(false);
     }
   };
-
 
   return (
     <div className="grid grid-cols-1 h-screen place-content-center w-full">
@@ -150,7 +178,7 @@ export default function EmailVerification() {
               htmlFor="code-0"
               className="block text-sm font-medium text-gray-500 mb-4"
             >
-              Enter the verification code sent to:{" "}
+              Enter the verification code sent to:
               <span className="underline">{email}</span>
             </label>
             <div className="flex gap-2 justify-center">

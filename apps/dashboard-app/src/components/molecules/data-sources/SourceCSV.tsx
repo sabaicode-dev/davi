@@ -1,15 +1,21 @@
 import React from "react";
 import CSV from "@/public/images/step/CSV_logo.png";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
-const SourceCSV: React.FC = () => {
+interface SourceCSVProps {
+  projectId?: string | null;
+}
+
+const SourceCSV: React.FC<SourceCSVProps> = ({ projectId }) => {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const projectId = searchParams.get("projectId");
-  const goToUploadCsv = () => {
-    navigate(`/upload/${projectId}`);
-  };
 
+  const goToUploadCsv = () => {
+    if (!projectId) {
+      console.error("No project ID available");
+      return;
+    }
+    navigate(`/create-project/pick-datasource/upload-csv/${projectId}`);
+  };
   return (
     <div
       onClick={goToUploadCsv}

@@ -11,3 +11,6 @@ build/
 /playwright/.cache/
 tests-examples
 tests
+.env.sample
+
+build/

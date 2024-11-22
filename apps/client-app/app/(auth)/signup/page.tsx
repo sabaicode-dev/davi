@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import axiosInstance from "@/app/utils/axios";
 import { useForm } from "react-hook-form";
@@ -9,6 +9,10 @@ import { z } from "zod"; // Import zod to infer schema types
 import Image from "next/image";
 import { RiEyeCloseFill, RiEyeCloseLine } from "react-icons/ri";
 import { BiArrowBack } from "react-icons/bi";
+import CryptoJS from "crypto-js";
+
+// require("dotenv").config();
+const secretKey = process.env.NEXT_PUBLIC_SECRET_KEY || "";
 
 // Infer the type of RegisterFormData from RegisterSchema
 type RegisterFormData = z.infer<typeof RegisterSchema>;
@@ -25,9 +29,9 @@ export default function SignUpPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
+  // const [secretKey, setSecretKey] = useState<string>("");
 
-  // Define an interface for Axios error response
+  const router = useRouter();
   interface AxiosErrorResponse {
     response?: {
       status: number;
@@ -36,6 +40,7 @@ export default function SignUpPage() {
 
   // Handle the sign-up process
   const handleSignUp = async (data: RegisterFormData) => {
+    // const secretKey = "kf93!@nF3?/$rJQ2@kT6b%rTYqKq9t1n3F!qL";
     const { email, password, username } = data;
 
     setIsLoading(true); // Start loading spinner
@@ -50,9 +55,21 @@ export default function SignUpPage() {
       });
 
       if (response.status === 200) {
-        localStorage.setItem("username", username);
+        // Encrypt username and password
+        const encryptedUsername = CryptoJS.AES.encrypt(
+          username,
+          secretKey
+        ).toString();
+        const encryptedPassword = CryptoJS.AES.encrypt(
+          password,
+          secretKey
+        ).toString();
+        console.log("encrypted Username:", encryptedUsername);
+        console.log("encrypted Password:", encryptedPassword);
+
+        localStorage.setItem("username", encryptedUsername);
+        localStorage.setItem("password", encryptedPassword);
         localStorage.setItem("email", email);
-        localStorage.setItem("password", password);
         router.push("/signup/verify-email"); // Redirect to the verification page
       } else {
         setError("Sign-up failed. Please try again.");
@@ -257,7 +274,6 @@ export default function SignUpPage() {
             </span>
             <div className="flex-grow border-t border-gray-300"></div>
           </div>
-
 
           <div className="mt-4">
             <button
