@@ -1,14 +1,25 @@
 import React from "react";
 import URL from "@/public/images/step/URL_logo.png";
 import { useNavigate, useSearchParams } from "react-router-dom";
-
-const SourceWeb: React.FC = () => {
+interface SourceWebProps {
+  projectId?: string | null;
+}
+const SourceWeb: React.FC<SourceWebProps> = ({ projectId: propProjectId }) => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const projectId = searchParams.get("projectId");
+  const urlProjectId = searchParams.get("projectId");
+  
+  const projectId = propProjectId || urlProjectId;
+
   const goToImportUrl = () => {
-    navigate(`/import/${projectId}`);
+    if (!projectId) {
+      console.error("No project ID available");
+      return;
+    }
+    navigate(`/create-project/pick-datasource/import/${projectId}`);
   };
+
+  
   return (
     <div
       onClick={goToImportUrl}

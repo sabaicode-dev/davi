@@ -28,7 +28,7 @@ const PickDataSource: React.FC<IPickDataSource> = ({
         </h2>
         <div className="flex flex-row  w-full space-x-5">
           <SourceCSV projectId={projectId}/>
-          <SourceWeb />
+          <SourceWeb projectId={projectId} />
           <SourceMySQL />
           <SourceMongoDB />
         </div>

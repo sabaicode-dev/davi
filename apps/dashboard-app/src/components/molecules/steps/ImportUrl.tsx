@@ -2,17 +2,34 @@ import React, { useState } from "react";
 import Logo from "@/public/images/step/step4_pic.png";
 import Button from "@/src/components/atoms/Button";
 import request from "@/src/utils/helper";
+import { useNavigate, useParams } from "react-router-dom";
 
-interface Step4Props {
-  selectedSource?: string;
+interface IImportURL {
+  defaultProjectId?: string;
 }
 
-const ImportUrl: React.FC<Step4Props> = () => {
-  const [url, setUrl] = useState(""); 
+const ImportUrl: React.FC<IImportURL> = ({ defaultProjectId }) => {
+  const { projectId } = useParams<{ projectId: string }>();
+  const navigate = useNavigate();
+
+  const [url, setUrl] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [scrapedData, setScrapedData] = useState<any>(null);
-  const handleNext = async () => {
+  const [progress, setProgress] = useState(0);
+
+  const simulateProgress = () => {
+    setProgress(0);
+    const interval = setInterval(() => {
+      setProgress((prev) => {
+        if (prev < 100) return prev + 1;
+        clearInterval(interval);
+        return 100;
+      });
+    }, 50);
+  };
+
+  const handleScrapeUrl = async () => {
     const urlPattern = new RegExp(
       "^(https?:\\/\\/(www\\.)?|www\\.)[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}(:[0-9]{1,5})?(\\/.*)?$"
     );
@@ -25,19 +42,30 @@ const ImportUrl: React.FC<Step4Props> = () => {
       return;
     }
 
-    setError(""); 
+    if (!projectId) {
+      setError("Project ID is missing.");
+      return;
+    }
+
+    setError("");
     setIsLoading(true);
+    simulateProgress();
 
     try {
       const response = await request({
-        url: "http://127.0.0.1:8000/api/v1/scrape/url/",
+        url: `http://127.0.0.1:8000/api/v1/scrape/url/`,
         method: "POST",
-        data: { url },
+        data: {
+          url,
+          project_id: projectId,
+        },
       });
+      console.log("Project Id in Scraping: ", projectId);
 
-      if (response.success) {
+      if (response.success || response.status === 201) {
         setScrapedData(response.data);
         console.log("Scraped Data:", response.data);
+        navigate("/visualize");
       } else {
         setError(response.message || "Failed to scrape the URL.");
       }
@@ -45,8 +73,12 @@ const ImportUrl: React.FC<Step4Props> = () => {
       console.error("Error during scraping:", err);
       setError("An unexpected error occurred. Please try again.");
     } finally {
-      setIsLoading(false); 
+      setIsLoading(false);
     }
+  };
+
+  const handleBack = () => {
+    navigate(`/create-project/pick-datasource?projectId=${projectId}`);
   };
 
   return (
@@ -54,11 +86,7 @@ const ImportUrl: React.FC<Step4Props> = () => {
       <div className="flex w-full ">
         {/* Left Image Section */}
         <div className="flex-1 p-8">
-          <img
-            src={Logo}
-            alt="Data Scraping Tool"
-            className="w-full h-auto"
-          />
+          <img src={Logo} alt="Data Scraping Tool" className="w-full h-auto" />
         </div>
 
         {/* Right Form Section */}
@@ -74,12 +102,15 @@ const ImportUrl: React.FC<Step4Props> = () => {
             </p>
 
             <div className="mb-6">
-              <label
-                className="block text-sm font-medium text-gray-700 mb-2"
-                htmlFor="shareLink"
-              >
-                Share link
-              </label>
+              <div className="flex flex-row space-x-1">
+                <label
+                  className="block text-base font-medium text-gray-700 mb-2"
+                  htmlFor="shareLink"
+                >
+                  Share link
+                </label>
+                <span className="text-red-500">*</span>
+              </div>
               <input
                 type="url"
                 id="shareLink"
@@ -96,7 +127,7 @@ const ImportUrl: React.FC<Step4Props> = () => {
           {/* Button Section */}
           <div className="flex justify-end space-x-3">
             <Button
-              // onClick={onBack} // Optional back handler
+              onClick={handleBack} // Optional back handler
               children="Back"
               size="medium"
               radius="2xl"
@@ -105,9 +136,8 @@ const ImportUrl: React.FC<Step4Props> = () => {
               isIconOnly={false}
               isDisabled={false}
             />
-
             <Button
-              onClick={handleNext}
+              onClick={handleScrapeUrl}
               children="Next"
               size="small"
               radius="2xl"

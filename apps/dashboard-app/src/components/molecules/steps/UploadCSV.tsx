@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom"; // Import useParams for dynamic routing
+import { useNavigate, useParams } from "react-router-dom";
 import Logo from "@/public/images/step/step4_pic.png";
 import {
   CheckTick,
@@ -8,11 +8,11 @@ import {
 } from "@/src/components/atoms/icons/Icon";
 import request from "@/src/utils/helper";
 
-interface StepTwoProps {
+interface IUploadCSV {
   defaultProjectId?: string;
 }
 
-const UploadCsv: React.FC<StepTwoProps> = ({ defaultProjectId }) => {
+const UploadCsv: React.FC<IUploadCSV> = ({ defaultProjectId }) => {
   const { projectId } = useParams<{ projectId: string }>();
   const navigate = useNavigate();
 
