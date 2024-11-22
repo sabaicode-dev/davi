@@ -10,7 +10,8 @@ import Helps from "@/src/components/pages/Helps";
 import AccountSettings from "@/src/components/templates/AccountSettings";
 import Project from "@/src/components/pages/Project";
 import { AuthProvider } from "@/src/contexts/AuthContext";
-import ShowProject from "@/src/components/molecules/steps/SelectProject";
+import ShowProject from "@/src/components/molecules/steps/ShowProject";
+import ProjectDetail from "@/src/components/molecules/project/ProjectDetail";
 
 const ProjectFlow = () => {
   return (
@@ -25,6 +26,7 @@ const ProjectFlow = () => {
 
 const routes = [
   { path: "/", element: <Project /> },
+  { path: "/project", element: <ProjectDetail /> },
   { path: "/select-project", element: <ShowProject /> },
   { path: "/create-project/*", element: <ProjectFlow /> },
   { path: "/visualize", element: <Visualize /> },

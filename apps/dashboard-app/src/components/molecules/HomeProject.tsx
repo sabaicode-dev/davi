@@ -4,7 +4,7 @@ import { IoFilter } from "react-icons/io5";
 import { FaCheck, FaPlus } from "react-icons/fa6";
 import { FaSortAlphaDown, FaSortAlphaUp } from "react-icons/fa";
 import Button from "@/src/components/atoms/Button";
-import SelectProject from '@/src/components/molecules/steps/SelectProject';
+import SelectProject from '@/src/components/molecules/steps/ShowProject';
 
 interface IHomeProject {
   onNext?: () => void;

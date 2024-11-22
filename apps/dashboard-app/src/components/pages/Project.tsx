@@ -1,6 +1,6 @@
 import { GetStart } from "@/src/components/molecules/steps/GetStart";
 import Spinner from "@/src/components/loading/Spinner";
-import SelectProject from "@/src/components/molecules/steps/SelectProject";
+import SelectProject from "@/src/components/molecules/steps/ShowProject";
 import { useState } from "react";
 
 export default function Project() {

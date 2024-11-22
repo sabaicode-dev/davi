@@ -24,7 +24,7 @@ interface SelectProjectProps {
   onError?: (error: string) => void;
 }
 
-const SelectProject: React.FC<SelectProjectProps> = ({
+const ShowProject: React.FC<SelectProjectProps> = ({
   selectedSort = "recent", 
   children,
   onDataFetch,
@@ -127,7 +127,7 @@ const SelectProject: React.FC<SelectProjectProps> = ({
   const filteredProjects = getFilteredProjects(selectedSort);
 
   const handleProjectSelect = (projectId: string) => {
-    navigate(`/pick-datasource?projectId=${projectId}`);
+    navigate(`/project?${projectId}`);
   };
 
   const handleEditClick = (projectId: string) => {
@@ -168,7 +168,7 @@ const SelectProject: React.FC<SelectProjectProps> = ({
     <div className="space-y-5 overflow-auto mt-4 p-2 w-full pb-12">
       {/* Add backdrop blur overlay when modal is open */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-40" />
+        <div className="fixed inset-0 bg-black bg-opacity-10 backdrop-blur-sm z-40" />
       )}
 
       <div className="flex justify-end">
@@ -273,4 +273,4 @@ const SelectProject: React.FC<SelectProjectProps> = ({
   );
 };
 
-export default SelectProject;
+export default ShowProject;
