@@ -50,7 +50,7 @@ export default function EmailVerification() {
           String(secretKey)
         ).toString(CryptoJS.enc.Utf8);
 
-        // console.log("Decrypted Username:", decryptedUsername);
+        console.log("Decrypted Username:", decryptedUsername);
         // console.log("Decrypted Password:", decryptedPassword);
 
         setEmail(storedEmail);
