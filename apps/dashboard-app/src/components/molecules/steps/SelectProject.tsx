@@ -40,31 +40,6 @@ const SelectProject: React.FC<SelectProjectProps> = ({
   );
 
   const navigate = useNavigate();
-
-  // useEffect(() => {
-  //   const fetchProjects = async () => {
-  //     setIsLoading(true);
-  //     setError(null);
-  //     try {
-  //       const response = await request({
-  //         url: `http://127.0.0.1:8000/api/v1/projects/`,
-  //         method: "GET",
-  //       });
-
-  //       if (response.data?.results) {
-  //         setProjects(response.data.results);
-  //       } else {
-  //         throw new Error("Failed to fetch projects.");
-  //       }
-  //     } catch (err: any) {
-  //       setError(err.message || "An error occurred while fetching projects.");
-  //     } finally {
-  //       setIsLoading(false);
-  //     }
-  //   };
-
-  //   fetchProjects();
-  // }, []);
   useEffect(() => {
     const fetchProjects = async () => {
       try {

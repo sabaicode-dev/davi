@@ -9,13 +9,12 @@ import {
 import request from "@/src/utils/helper";
 
 interface StepTwoProps {
-  projectId?: string;
+  defaultProjectId?: string;
 }
 
-const UploadCsv: React.FC<StepTwoProps> = ({ projectId }) => {
+const UploadCsv: React.FC<StepTwoProps> = ({ defaultProjectId }) => {
+  const { projectId } = useParams<{ projectId: string }>();
   const navigate = useNavigate();
-  const { projectId: paramProjectId } = useParams<{ projectId: string }>();
-  const resolvedProjectId = projectId || paramProjectId;
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [fileName, setFileName] = useState<string>("");
@@ -24,52 +23,70 @@ const UploadCsv: React.FC<StepTwoProps> = ({ projectId }) => {
   const [error, setError] = useState<string>("");
 
   const MAX_FILENAME_LENGTH = 30;
+  console.log("Project ID from URL:", projectId);
 
   const handleFileUpload = () => {
     fileInputRef.current?.click();
   };
 
-  console.log("Resolved Project ID:", resolvedProjectId);
-
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = event.target.files?.[0];
-    if (file) {
-      if (file.type === "text/csv" || file.name.endsWith(".csv")) {
-        setFileName(file.name);
-        setFileSize(file.size / 1024);
-        simulateUpload();
-        uploadFileToDB(file);
-      } else {
-        setError("Please upload a valid CSV file.");
-      }
-    } else {
+    if (!file) {
       setError("No file selected.");
-    }
-  };
-
-  const uploadFileToDB = async (file: File) => {
-    if (!resolvedProjectId) {
-      setError("No project ID provided.");
       return;
     }
 
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("filename", file.name);
-    formData.append("size", file.size.toString());
-    formData.append("type", "csv"); // Assuming 'csv' type as a placeholder
+    if (!projectId) {
+      setError("No project ID available. Please try again.");
+      return;
+    }
+
+    if (file.type === "text/csv" || file.name.endsWith(".csv")) {
+      setFileName(file.name);
+      setFileSize(file.size / 1024);
+      simulateUpload();
+      await uploadFileToDB(file);
+    } else {
+      setError("Please upload a valid CSV file.");
+    }
+  };
+  const uploadFileToDB = async (file: File) => {
+    if (!projectId) {
+      setError("Project ID is missing.");
+      return;
+    }
+
+    setError("");
 
     try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("filename", file.name);
+      formData.append("size", file.size.toString());
+      formData.append("type", "csv");
+      formData.append("project_id", projectId); // Use the projectId from URL params
+
       const response = await request({
-        url: `http://127.0.0.1:8000/api/v1/project/${resolvedProjectId}/upload-file/`,
+        url: `http://127.0.0.1:8000/api/v1/project/${projectId}/file/upload/`,
         method: "POST",
         data: formData,
-        headers: { "Content-Type": "multipart/form-data" },
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       });
-      navigate("/");
+
       console.log("Upload response:", response);
+
+      if (response.success || response.status === 201) {
+        navigate("/visualize");
+      } else {
+        setError("Failed to upload file. Please try again.");
+      }
     } catch (error) {
       console.error("Failed to upload file:", error);
+      setError("Failed to upload file. Please try again.");
     }
   };
 
@@ -91,6 +108,10 @@ const UploadCsv: React.FC<StepTwoProps> = ({ projectId }) => {
       return baseName.substring(0, MAX_FILENAME_LENGTH) + `...${extension}`;
     }
     return name;
+  };
+
+  const handleBack = () => {
+    navigate(`/create-project/pick-datasource?projectId=${projectId}`);
   };
 
   return (
@@ -173,7 +194,10 @@ const UploadCsv: React.FC<StepTwoProps> = ({ projectId }) => {
             {error && <p className="mt-2 text-red-600">{error}</p>}
 
             <div className="flex justify-end mt-6 space-x-3">
-              <button className="px-4 py-2 text-black bg-transparent border-[1.5px] border-[#E6EDFF] rounded-md font-semibold hover:bg-gray-300">
+              <button
+                onClick={handleBack}
+                className="px-4 py-2 text-black bg-transparent border-[1.5px] border-[#E6EDFF] rounded-md font-semibold hover:bg-gray-300"
+              >
                 Back
               </button>
               <button

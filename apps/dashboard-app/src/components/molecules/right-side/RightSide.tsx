@@ -2,12 +2,11 @@ import React, { useState } from "react";
 import PieChartIcon from "@/public/images/right-side-icons/pie_chart.png";
 import BarChartIcon from "@/public/images/right-side-icons/bar_chart.png";
 import LineChartIcon from "@/public/images/right-side-icons/line_chart.png";
-import Button from "../../atoms/Button";
+import Button from "@/src/components/atoms/Button";
 import { BsX } from "react-icons/bs";
-import { BarChartTest } from "../charts/BarChart";
-import { LineChartTest } from "../charts/LineChart";
-import { PieChartTest } from "../charts/PieChart";
-import Modal from "../modals/Modal";
+import { BarChartTest } from "@/src/components/molecules/charts/BarChart";
+import { LineChartTest } from "@/src/components/molecules/charts/LineChart";
+import { PieChartTest } from "@/src/components/molecules/charts/PieChart";
 
 // Define the props interface for RightSide
 interface RightSideProps {
@@ -26,7 +25,7 @@ const RightSide: React.FC<RightSideProps> = ({ onClose }) => {
       </h1>
     );
   };
- 
+
   return (
     <div className="flex flex-col w-[400px] h-[1000px] shadow-2xl">
       <div className="flex flex-row justify-between items-center px-6">

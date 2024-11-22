@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Logo from "@/public/images/step/step4_pic.png";
-import Button from "../../atoms/Button";
+import Button from "@/src/components/atoms/Button";
 import request from "@/src/utils/helper";
 
 interface Step4Props {

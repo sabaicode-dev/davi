@@ -1,9 +1,10 @@
 import React from "react";
 import Button from "@/src/components/atoms/Button";
-import SourceCSV from "../data-sources/SourceCSV";
-import SourceWeb from "../data-sources/SourceWeb";
-import SourceMySQL from "../data-sources/SourceMySQL";
-import SourceMongoDB from "../data-sources/SourceMongoDB";
+import SourceCSV from "@/src/components/molecules/data-sources/SourceCSV";
+import SourceWeb from "@/src/components/molecules/data-sources/SourceWeb";
+import SourceMySQL from "@/src/components/molecules/data-sources/SourceMySQL";
+import SourceMongoDB from "@/src/components/molecules/data-sources/SourceMongoDB";
+import { useSearchParams } from "react-router-dom";
 
 interface IPickDataSource {
   onNext?: () => void;
@@ -14,6 +15,10 @@ interface IPickDataSource {
 const PickDataSource: React.FC<IPickDataSource> = ({
   onBack,
 }) => {
+  const [searchParams] = useSearchParams();
+  const projectId = searchParams.get("projectId");
+  console.log('ProjectId in PickDataSource:', projectId);
+  console.log('Search params:', Object.fromEntries(searchParams.entries()));
 
   return (
     <div className="py-6 flex flex-col justify-center items-center">
@@ -22,7 +27,7 @@ const PickDataSource: React.FC<IPickDataSource> = ({
           Pick a data source to start
         </h2>
         <div className="flex flex-row  w-full space-x-5">
-          <SourceCSV />
+          <SourceCSV projectId={projectId}/>
           <SourceWeb />
           <SourceMySQL />
           <SourceMongoDB />

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import Button from "../../atoms/Button";
-import { CloseIcon } from "../../atoms/icons/Icon";
+import Button from "@/src/components/atoms/Button";
+import { CloseIcon } from "@/src/components/atoms/icons/Icon";
 import request from "@/src/utils/helper";
 
 interface ICreateProjectModalProps {

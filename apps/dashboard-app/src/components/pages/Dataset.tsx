@@ -1,5 +1,4 @@
-import CardContainer from "../atoms/CardContainer";
-import Card from "../atoms/Card";
+import CardContainer from "@/src/components/atoms/CardContainer";
 export default function Dataset() {
   return (
     <div className="container max-w-[80%] w-full ml-32">
