@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import axiosInstance from "@/app/utils/axios";
 import { useForm } from "react-hook-form";

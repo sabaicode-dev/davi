@@ -7,8 +7,9 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 import CryptoJS from "crypto-js";
+import "dotenv/config";
 
-
+// require("dotenv").config();
 
 export default function EmailVerification() {
   const [verificationCode, setVerificationCode] = useState([
@@ -31,7 +32,6 @@ export default function EmailVerification() {
 
   const secretKey = process.env.NEXT_PUBLIC_SECRET_KEY || "";
 
- 
   useEffect(() => {
     const storedEmail = localStorage.getItem("email");
     const encryptedUsername = localStorage.getItem("username");
@@ -40,7 +40,6 @@ export default function EmailVerification() {
     if (storedEmail && encryptedUsername && encryptedPassword) {
       try {
         if (!secretKey) throw new Error("Secret key is missing");
-        // Decrypt username and password
         const decryptedUsername = CryptoJS.AES.decrypt(
           encryptedUsername,
           String(secretKey)
@@ -50,20 +49,18 @@ export default function EmailVerification() {
           String(secretKey)
         ).toString(CryptoJS.enc.Utf8);
 
-        // console.log("Decrypted Username:", decryptedUsername);
-        // console.log("Decrypted Password:", decryptedPassword);
+        console.log("Decrypted Username:", decryptedUsername);
 
         setEmail(storedEmail);
         setPassword(decryptedPassword);
       } catch (err) {
         console.log(err);
-
         setError("Failed to decrypt data. Please try signing up again.");
       }
     } else {
       setError("Email or password is missing. Please try signing up again.");
     }
-  }, []);
+  }, [secretKey]); // Include secretKey
 
   useEffect(() => {
     if (countdown > 0) {
@@ -229,7 +226,7 @@ export default function EmailVerification() {
             className={`text-blue-400 ${
               isLoading || countdown > 0 ? "opacity-50 cursor-not-allowed" : ""
             }`}
-            disabled={isLoading || countdown > 0} // Disable if loading or countdown > 0
+            disabled={isLoading || countdown > 0}
           >
             Resend
           </button>
