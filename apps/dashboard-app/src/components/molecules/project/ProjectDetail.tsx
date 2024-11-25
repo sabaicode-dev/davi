@@ -5,8 +5,8 @@ import DataSourceDetail from "../data-sources/DataSourceDetail";
 
 const ProjectDetail: React.FC = () => {
   return (
-    <div className="flex flex-col p-6 px-32">
-      <div className="flex justify-between items-center w-full ">
+    <div className="flex flex-col p-6 px-32 md:px-2 lg:px-3 xl:px-5 2xl:px-16">
+      <div className="flex justify-between items-center w-full">
         <div>
           <h1 className="font-bold text-lg">Title</h1>
           <p className="text-gray-700">Description</p>
@@ -27,8 +27,8 @@ const ProjectDetail: React.FC = () => {
         </div>
       </div>
       <div className="border-b-2 border-[#443DFF] my-4" />
-      <div>
-      <DataSourceDetail/>
+      <div className="">
+        <DataSourceDetail />
       </div>
     </div>
   );
