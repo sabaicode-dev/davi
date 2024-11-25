@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 
 import CryptoJS from "crypto-js";
 
-require("dotenv").config();
+
 
 export default function EmailVerification() {
   const [verificationCode, setVerificationCode] = useState([

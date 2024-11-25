@@ -11,7 +11,6 @@ import { RiEyeCloseFill, RiEyeCloseLine } from "react-icons/ri";
 import { BiArrowBack } from "react-icons/bi";
 import CryptoJS from "crypto-js";
 
-// require("dotenv").config();
 const secretKey = process.env.NEXT_PUBLIC_SECRET_KEY || "";
 
 // Infer the type of RegisterFormData from RegisterSchema
