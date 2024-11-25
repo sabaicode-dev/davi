@@ -44,7 +44,7 @@ const ShowCleaningResult: React.FC = () => {
     <div>
       <Table
         headers={headers}
-        editable={false}
+        editable={true}
         data={data}
         showCheckbox={true}  
         showIndex={true}

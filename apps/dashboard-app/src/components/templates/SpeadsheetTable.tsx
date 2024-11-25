@@ -1,11 +1,13 @@
 import React from "react";
-import Button from "@/src/components/atoms/Button";
 import icon from "@/public/images/icon-cleaning.png";
-import Input from "@/src/components/atoms/Input";
-import { DeleteIcon, DownloadIcon } from "@/src/components/atoms/icons/Icon";
+import Button from "../atoms/Button";
+import { DeleteIcon, DownloadIcon } from "../atoms/icons/Icon";
+import Input from "../atoms/Input";
 import { CiFilter } from "react-icons/ci";
+import ShowTable from "../molecules/tables/NotFoundTable";
+import ShowCleaningResult from "../molecules/tables/ShowCleaningResult";
 
-const CleaningPage: React.FC = () => {
+const SpeadsheetTable: React.FC = () => {
   return (
     <div className="flex flex-col mt-8" style={{ width: "100%" }}>
       <div className="flex flex-row justify-between items-center mb-3">
@@ -80,27 +82,11 @@ const CleaningPage: React.FC = () => {
           />
         </div>
       </div>
-
-      <div className="flex justify-end items-center gap-x-4 mr-2 mt-6 max-h-12">
-        <Button
-          children={"Transform"}
-          size="medium"
-          radius="2xl"
-          isLoading={false}
-          color="outline"
-          isIconOnly={false}
-        />
-        <Button
-          children={"Next"}
-          size="medium"
-          radius="2xl"
-          isLoading={false}
-          color="secondary"
-          isIconOnly={false}
-        />
-      </div>
+      {/* <div>
+        <ShowCleaningResult/>
+      </div> */}
     </div>
   );
 };
 
-export default CleaningPage;
+export default SpeadsheetTable;
