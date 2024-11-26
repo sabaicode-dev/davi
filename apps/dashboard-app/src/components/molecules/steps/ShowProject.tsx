@@ -6,7 +6,7 @@ import Button from "@/src/components/atoms/Button";
 import { FaPlus } from "react-icons/fa6";
 import { DeleteIcon, EditIcon } from "@/src/components/atoms/icons/Icon";
 import SkeletonLoader from "@/src/components/loading/SelectProjectSkeleton";
-import CreateProjectModal from "@/src/components/molecules/modals/EditModals";
+import EditProject from "@/src/components/molecules/modals/EditProject";
 import request from "@/src/utils/helper";
 
 interface Project {
@@ -25,10 +25,10 @@ interface SelectProjectProps {
 }
 
 const ShowProject: React.FC<SelectProjectProps> = ({
-  selectedSort = "recent", 
+  selectedSort = "recent",
   children,
   onDataFetch,
-  onError
+  onError,
 }) => {
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
   const [projects, setProjects] = useState<Project[]>([]);
@@ -41,32 +41,45 @@ const ShowProject: React.FC<SelectProjectProps> = ({
 
   const navigate = useNavigate();
   useEffect(() => {
+    let isMounted = true;
+
     const fetchProjects = async () => {
+      if (!isMounted) return;
+
+      setIsLoading(true);
       try {
         const response = await request({
           url: `http://127.0.0.1:8000/api/v1/projects/`,
           method: "GET",
         });
 
-        if (response.data?.results) {
+        if (isMounted && response.data?.results) {
           setProjects(response.data.results);
           onDataFetch?.(response.data.results);
-        } else {
+          console.log(`Show project`);
+        } else if (isMounted) {
           throw new Error("Failed to fetch projects.");
         }
       } catch (err: any) {
-        const errorMessage = err.message || "An error occurred while fetching projects.";
-        setError(errorMessage);
-        onError?.(errorMessage);
+        if (isMounted) {
+          const errorMessage =
+            err.message || "An error occurred while fetching projects.";
+          setError(errorMessage);
+          onError?.(errorMessage);
+        }
       } finally {
-        setIsLoading(false);
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
     };
 
     fetchProjects();
-  }, [onDataFetch, onError]);
 
-
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   if (children) {
     return <>{children}</>;
@@ -126,10 +139,14 @@ const ShowProject: React.FC<SelectProjectProps> = ({
 
   const filteredProjects = getFilteredProjects(selectedSort);
 
-  const handleProjectSelect = (projectId: string) => {
-    navigate(`/project?${projectId}`);
+  const handleProjectSelect = (project: Project) => {
+    navigate(`/project/${project._id}`, {
+      state: {
+        projectName: project.project_name,
+        projectDescription: project.project_description
+      }
+    });
   };
-
   const handleEditClick = (projectId: string) => {
     setSelectedProjectId(projectId);
     setIsModalOpen(true);
@@ -154,7 +171,7 @@ const ShowProject: React.FC<SelectProjectProps> = ({
   };
 
   const newProject = () => {
-    navigate("/create-project");
+    navigate("/project");
   };
   if (isLoading) {
     return <SkeletonLoader />;
@@ -189,7 +206,7 @@ const ShowProject: React.FC<SelectProjectProps> = ({
         <div
           key={project._id}
           className="flex justify-between items-center p-4 shadow-lg rounded-xl cursor-pointer ring-2 hover:ring-blue-500 transition-all"
-          onClick={() => handleProjectSelect(project._id)}
+          onClick={() => handleProjectSelect(project)}
         >
           <div className="flex flex-row space-x-4">
             <img
@@ -253,7 +270,7 @@ const ShowProject: React.FC<SelectProjectProps> = ({
         </div>
       ))}
       {isModalOpen && selectedProjectId && (
-        <CreateProjectModal
+        <EditProject
           projectId={selectedProjectId}
           initialProjectName={
             filteredProjects.find((p) => p._id === selectedProjectId)

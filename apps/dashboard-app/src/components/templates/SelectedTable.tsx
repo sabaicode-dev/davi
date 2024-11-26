@@ -13,7 +13,7 @@ interface ListTable {
   table: string;
 }
 const SelectedTable = () => {
-  const [listTable] = useState(initialList); // Fixed list
+  const [listTable] = useState(initialList);
 
   const [selectedTable, setSelectedTable] = useState<ListTable | null>(null);
   return (

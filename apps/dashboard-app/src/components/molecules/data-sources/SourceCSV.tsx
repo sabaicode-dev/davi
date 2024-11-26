@@ -14,7 +14,7 @@ const SourceCSV: React.FC<SourceCSVProps> = ({ projectId }) => {
       console.error("No project ID available");
       return;
     }
-    navigate(`/create-project/pick-datasource/upload-csv/${projectId}`);
+    navigate(`/project/pick-datasource/upload-csv/${projectId}`);
   };
   return (
     <div

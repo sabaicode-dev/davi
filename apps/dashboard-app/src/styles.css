@@ -20,3 +20,38 @@
 .overflow-x-auto {
   overflow-x: auto;
 }
+
+
+.responsive-table-height {
+  height: 76vh;
+}
+
+@media (max-width: 1536px) {
+  .responsive-table-height {
+    height: 12vh;
+  }
+}
+
+@media (max-width: 1280px) {
+  .responsive-table-height {
+    height: 90vh;
+  }
+}
+
+@media (max-width: 1024px) {
+  .responsive-table-height {
+    height: 55vh;
+  }
+}
+
+@media (max-width: 768px) {
+  .responsive-table-height {
+    height: 45vh;
+  }
+}
+
+@media (max-width: 480px) {
+  .responsive-table-height {
+    height: 50vh;
+  }
+}
