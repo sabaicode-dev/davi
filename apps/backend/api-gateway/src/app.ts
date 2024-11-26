@@ -5,7 +5,7 @@ import cookieParser from 'cookie-parser';
 import { authenticateToken, authorizeRole, routeConfigMiddleware } from '@/src/middlewares/auth';
 import cors from 'cors';
 import corsOptions from '@/src/middlewares/cors';
-
+import { limiter } from './middlewares/rate-limit';
 
 // ========================
 // Initialize App Express
@@ -18,7 +18,7 @@ const app = express();
 // ========================
 app.use(cors(corsOptions));
 app.use(cookieParser())
-
+app.use(limiter)
 // ========================
 // Gateway Health
 // ========================
