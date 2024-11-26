@@ -4,7 +4,7 @@ import SourceCSV from "@/src/components/molecules/data-sources/SourceCSV";
 import SourceWeb from "@/src/components/molecules/data-sources/SourceWeb";
 import SourceMySQL from "@/src/components/molecules/data-sources/SourceMySQL";
 import SourceMongoDB from "@/src/components/molecules/data-sources/SourceMongoDB";
-import { useSearchParams } from "react-router-dom";
+import { useLocation, useSearchParams } from "react-router-dom";
 
 interface IPickDataSource {
   onNext?: () => void;
@@ -15,11 +15,11 @@ interface IPickDataSource {
 const PickDataSource: React.FC<IPickDataSource> = ({
   onBack,
 }) => {
+  const location = useLocation();
   const [searchParams] = useSearchParams();
-  const projectId = searchParams.get("projectId");
+  const projectId = location.state?.projectId || searchParams.get("projectId");
   console.log('ProjectId in PickDataSource:', projectId);
   console.log('Search params:', Object.fromEntries(searchParams.entries()));
-
   return (
     <div className="py-6 flex flex-col justify-center items-center">
       <div className="flex flex-col justify-center items-center p-8">

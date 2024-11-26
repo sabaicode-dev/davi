@@ -6,7 +6,7 @@ import Button from "@/src/components/atoms/Button";
 import { FaPlus } from "react-icons/fa6";
 import { DeleteIcon, EditIcon } from "@/src/components/atoms/icons/Icon";
 import SkeletonLoader from "@/src/components/loading/SelectProjectSkeleton";
-import CreateProjectModal from "@/src/components/molecules/modals/EditModals";
+import EditProject from "@/src/components/molecules/modals/EditProject";
 import request from "@/src/utils/helper";
 
 interface Project {
@@ -139,11 +139,6 @@ const ShowProject: React.FC<SelectProjectProps> = ({
 
   const filteredProjects = getFilteredProjects(selectedSort);
 
-  // const handleProjectSelect = (projectId: string) => {
-  //   // navigate(`/project?${projectId}`);
-  //   navigate(`/project/${projectId}`);
-  // };
-
   const handleProjectSelect = (project: Project) => {
     navigate(`/project/${project._id}`, {
       state: {
@@ -176,7 +171,7 @@ const ShowProject: React.FC<SelectProjectProps> = ({
   };
 
   const newProject = () => {
-    navigate("/create-project");
+    navigate("/project");
   };
   if (isLoading) {
     return <SkeletonLoader />;
@@ -275,7 +270,7 @@ const ShowProject: React.FC<SelectProjectProps> = ({
         </div>
       ))}
       {isModalOpen && selectedProjectId && (
-        <CreateProjectModal
+        <EditProject
           projectId={selectedProjectId}
           initialProjectName={
             filteredProjects.find((p) => p._id === selectedProjectId)

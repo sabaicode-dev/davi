@@ -111,7 +111,7 @@ const UploadCsv: React.FC<IUploadCSV> = ({ defaultProjectId }) => {
   };
 
   const handleBack = () => {
-    navigate(`/create-project/pick-datasource?projectId=${projectId}`);
+    navigate(`/project/pick-datasource?projectId=${projectId}`);
   };
 
   return (

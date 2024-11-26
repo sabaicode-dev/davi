@@ -5,7 +5,7 @@ import formatDate from "@/src/utils/formatDate";
 import formatFileSize from "@/src/utils/formatSizeFile";
 import ImageProject from "@/public/images/saveImage.png";
 import request from "@/src/utils/helper";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Spinner from "../../loading/Spinner";
 
 interface ProjectFile {
@@ -22,11 +22,15 @@ interface ProjectFile {
 
 const DataSourceDetail: React.FC = () => {
   const { projectId } = useParams();
-console.log('projectId:', projectId);
+  console.log("projectId:", projectId);
   const [projectFiles, setProjectFiles] = useState<ProjectFile[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
+  const handleCardClick = (fileId: string) => {
+    navigate(`/project/${projectId}/file/${fileId}/details`);
+  };
   useEffect(() => {
     const fetchProjectFiles = async () => {
       if (!projectId) return;
@@ -62,35 +66,10 @@ console.log('projectId:', projectId);
 
     fetchProjectFiles();
   }, []);
-  // useEffect(() => {
-  //   setCurrentProjectId(projectId || null);
-  //   const fetchProjectFiles = async () => {
-  //     if (!currentProjectId) return;
-
-  //     try {
-  //       const response = await request({
-  //         url: `http://127.0.0.1:8000/api/v1/projects/${currentProjectId}/files/`,
-  //         method: "GET",
-  //       });
-
-  //       if (response.success && response.data?.data) {
-  //         setProjectFiles(response.data.data);
-  //       } else {
-  //         throw new Error(response.message || "Failed to fetch files");
-  //       }
-  //     } catch (err: any) {
-  //       setError(err.message || "An error occurred while fetching data.");
-  //     } finally {
-  //       setIsLoading(false);
-  //     }
-  //   };
-
-  //   // Use the projectId from the URL parameters
-  //   setCurrentProjectId(projectId || null);
-  //   fetchProjectFiles();
-  // }, [currentProjectId, location.pathname]);
 
   const handleDeleteFile = async (fileId: string) => {
+    alert("Error url delete file,")
+    return false
     try {
       const response = await request({
         url: `http://127.0.0.1:8000/api/v1/projects/${projectId}/files/${fileId}`,
@@ -136,6 +115,7 @@ console.log('projectId:', projectId);
           projectFiles.map((file, index) => (
             <div
               key={file._id}
+              onClick={() => handleCardClick(file._id)}
               className="flex justify-between items-center p-5 xl:p-2 2xl:p-3 bg-[#f2f5fd] shadow-lg rounded-xl cursor-pointer ring-1 hover:ring-blue-500 transition-all"
             >
               <div className="flex flex-row space-x-16 xl:space-x-6 2xl:space-x-12">
@@ -175,34 +155,45 @@ console.log('projectId:', projectId);
                 </div>
               </div>
               <div className="flex flex-row justify-between items-center">
-                <Button
-                  className="flex !mr-0 !pr-0 !px-0 !pl-2 !py-1 bg-transparent border-transparent hover:bg-transparent hover:border-transparent"
-                  // onClick={() => handleEditClick(project._id)}
-                  onClick={() => alert("Edit")}
-                  startContent={
-                    <EditIcon className="!text-blue-500 bg-gray-200 hover:bg-gray-300 duration-150 p-2 w-10 h-10 rounded-xl" />
-                  }
-                  children=""
-                  size="small"
-                  radius="2xl"
-                  color="secondary"
-                  isLoading={false}
-                  isIconOnly={false}
-                  isDisabled={false}
-                />
-                <Button
-                  className="!ml-0 !pl-0 !px-0 bg-transparent border-transparent hover:bg-transparent hover:border-transparent"
-                  startContent={
-                    <DeleteIcon className="!text-red-500 bg-gray-200 hover:bg-gray-300 duration-150 p-2 w-10 h-10 xl:w-9 xl:h-w-9 2xl:w-10 2xl:h-10 rounded-xl" />
-                  }
-                  onClick={() => handleDeleteFile(file._id)}
-                  // onClick={() => alert("Delete")}
-                  size="small"
-                  radius="2xl"
-                  color="secondary"
-                  isLoading={false}
-                  isIconOnly={false}
-                />
+                <div
+                  onClick={(e) => {
+                    e.stopPropagation();
+                  }}
+                >
+                  <Button
+                    className="flex !mr-0 !pr-0 !px-0 !pl-2 !py-1 bg-transparent border-transparent hover:bg-transparent hover:border-transparent"
+                    // onClick={() => handleEditClick(file._id)}
+                    onClick={() => alert("Edit")}
+                    startContent={
+                      <EditIcon className="!text-blue-500 bg-gray-200 hover:bg-gray-300 duration-150 p-2 w-10 h-10 rounded-xl" />
+                    }
+                    children=""
+                    size="small"
+                    radius="2xl"
+                    color="secondary"
+                    isLoading={false}
+                    isIconOnly={false}
+                    isDisabled={false}
+                  />
+                </div>
+                <div
+                  onClick={(e) => {
+                    e.stopPropagation();
+                  }}
+                >
+                  <Button
+                    className="!ml-0 !pl-0 !px-0 bg-transparent border-transparent hover:bg-transparent hover:border-transparent"
+                    startContent={
+                      <DeleteIcon className="!text-red-500 bg-gray-200 hover:bg-gray-300 duration-150 p-2 w-10 h-10 xl:w-9 xl:h-w-9 2xl:w-10 2xl:h-10 rounded-xl" />
+                    }
+                    onClick={() => handleDeleteFile(file._id)}
+                    size="small"
+                    radius="2xl"
+                    color="secondary"
+                    isLoading={false}
+                    isIconOnly={false}
+                  />
+                </div>
               </div>
             </div>
           ))

@@ -10,8 +10,11 @@ const ProjectDetail: React.FC = () => {
   const location = useLocation();
   const { projectName, projectDescription } = location.state || {};
   const goToPickDataSource = () => {
-    navigate("/create-project/pick-datasource");
-    alert("Go to PickDataSource");
+    const projectId = location.pathname.split('/').pop();
+    
+    navigate(`/project/pick-datasource?projectId=${projectId}`, {
+      state: { projectId }
+    });
   };
   return (
     <div className="flex flex-col p-6 px-32 md:px-2 lg:px-3 xl:px-5 2xl:px-16">

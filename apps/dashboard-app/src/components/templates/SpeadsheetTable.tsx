@@ -4,12 +4,11 @@ import Button from "../atoms/Button";
 import { DeleteIcon, DownloadIcon } from "../atoms/icons/Icon";
 import Input from "../atoms/Input";
 import { CiFilter } from "react-icons/ci";
-import ShowTable from "../molecules/tables/NotFoundTable";
-import ShowCleaningResult from "../molecules/tables/ShowCleaningResult";
+import TestTableCPN from "../molecules/tables/TableProject";
 
 const SpeadsheetTable: React.FC = () => {
   return (
-    <div className="flex flex-col mt-8" style={{ width: "100%" }}>
+    <div className="flex flex-col mt-8 h-[200px]" style={{ width: "100%",height:"30%" }}>
       <div className="flex flex-row justify-between items-center mb-3">
         {/* Content Left */}
         <div className="flex flex-row gap-x-3 justify-center items-center">
@@ -82,9 +81,9 @@ const SpeadsheetTable: React.FC = () => {
           />
         </div>
       </div>
-      {/* <div>
-        <ShowCleaningResult/>
-      </div> */}
+      <div className="">
+        <TestTableCPN/>
+      </div>
     </div>
   );
 };

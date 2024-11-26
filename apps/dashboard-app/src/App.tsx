@@ -13,6 +13,7 @@ import { AuthProvider } from "@/src/contexts/AuthContext";
 import ShowProject from "@/src/components/molecules/steps/ShowProject";
 import ProjectDetail from "@/src/components/molecules/project/ProjectDetail";
 import SpeadsheetTable from "./components/templates/SpeadsheetTable";
+import TableProject from "./components/molecules/tables/TableProject";
 
 const ProjectFlow = () => {
   return (
@@ -32,13 +33,17 @@ const routes = [
   { path: "/", element: <Project /> },
   { path: "/project/:projectId", element: <ProjectDetail /> },
   { path: "/select-project", element: <ShowProject /> },
-  { path: "/create-project/*", element: <ProjectFlow /> },
+  { path: "/project/*", element: <ProjectFlow /> },
+  { path: "/project/pick-datasource", element: <PickDataSource /> },
   { path: "/visualize", element: <Visualize /> },
   { path: "/dataset", element: <Dataset /> },
   { path: "/helps", element: <Helps /> },
   { path: "/accountsetting", element: <AccountSettings /> },
   { path: "/cleaning", element: <AccountSettings /> },
-  { path: "/template-table", element: <SpeadsheetTable /> },
+  { path: "/template-table", element: <SpeadsheetTable /> }, {
+    path: "/project/:projectId/file/:fileId/details", 
+    element: <SpeadsheetTable /> 
+  },
 ];
 
 export const App = () => {
