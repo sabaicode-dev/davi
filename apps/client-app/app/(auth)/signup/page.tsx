@@ -69,6 +69,10 @@ export default function SignUpPage() {
         localStorage.setItem("username", encryptedUsername);
         localStorage.setItem("password", encryptedPassword);
         localStorage.setItem("email", email);
+
+        const { token } = response.data;
+        localStorage.setItem("authToken", token);
+
         router.push("/signup/verify-email"); // Redirect to the verification page
       } else {
         setError("Sign-up failed. Please try again.");
