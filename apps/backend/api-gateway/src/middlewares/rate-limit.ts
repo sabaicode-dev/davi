@@ -7,7 +7,7 @@ export const limiter = rateLimit({
   message: {
     status: HTTP_STATUS_CODE.MANY_REQUEST,
     error: APP_ERROR_MESSAGE.tooManyRequest,
-  }, // Limit each IP to 100 requests per `window` (here, per 15 minutes).
+  }, // Limit each IP to 50 requests per `window` (here, per 15 minutes).
   standardHeaders: "draft-7", // draft-6: `RateLimit-*` headers; draft-7: combined `RateLimit` header
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers.
   // store: ... , // Redis, Memcached, etc. See below.
