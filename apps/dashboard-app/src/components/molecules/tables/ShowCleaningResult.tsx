@@ -46,7 +46,7 @@ const ShowCleaningResult: React.FC = () => {
         headers={headers}
         editable={false}
         data={data}
-        showCheckbox={true}  
+        showCheckbox={true}
         showIndex={true}
         selectableColumns={"all"}
         firstRowHasChildren={true}

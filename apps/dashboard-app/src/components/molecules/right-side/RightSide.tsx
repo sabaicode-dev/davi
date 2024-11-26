@@ -26,7 +26,6 @@ const RightSide: React.FC<RightSideProps> = ({ onClose }) => {
       </h1>
     );
   };
- 
   return (
     <div className="flex flex-col w-[400px] h-[1000px] shadow-2xl">
       <div className="flex flex-row justify-between items-center px-6">
