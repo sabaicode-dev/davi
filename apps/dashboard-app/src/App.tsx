@@ -1,5 +1,5 @@
 import Layout from "@/src/components/organisms/layout/MainLayout";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import CreateProject from "@/src/components/molecules/steps/CreateProject";
 import PickDataSource from "@/src/components/molecules/steps/PickDataSource";
 import UploadCsv from "@/src/components/molecules/steps/UploadCSV";
@@ -13,12 +13,13 @@ import { AuthProvider } from "@/src/contexts/AuthContext";
 import ShowProject from "@/src/components/molecules/steps/ShowProject";
 import ProjectDetail from "@/src/components/molecules/project/ProjectDetail";
 import SpeadsheetTable from "./components/templates/SpeadsheetTable";
-import TableProject from "./components/molecules/tables/TableProject";
+import { QueryClientProvider } from 'react-query';
+import { queryClient } from "./utils/globle-cache";
 
 const ProjectFlow = () => {
   return (
     <Routes>
-      <Route path="/" element={<CreateProject />} />
+      <Route path="/project" element={<CreateProject />} />
       <Route path="pick-datasource" element={<PickDataSource />} />
       <Route
         path="pick-datasource/upload-csv/:projectId"
@@ -30,7 +31,11 @@ const ProjectFlow = () => {
 };
 
 const routes = [
-  { path: "/", element: <Project /> },
+  {
+    path: "/",
+    element: <Navigate to="/project" replace />,
+  },
+  { path: "/project", element: <Project /> },
   { path: "/project/:projectId", element: <ProjectDetail /> },
   { path: "/select-project", element: <ShowProject /> },
   { path: "/project/*", element: <ProjectFlow /> },
@@ -40,28 +45,31 @@ const routes = [
   { path: "/helps", element: <Helps /> },
   { path: "/accountsetting", element: <AccountSettings /> },
   { path: "/cleaning", element: <AccountSettings /> },
-  { path: "/template-table", element: <SpeadsheetTable /> }, {
-    path: "/project/:projectId/file/:fileId/details", 
-    element: <SpeadsheetTable /> 
+  { path: "/template-table", element: <SpeadsheetTable /> },
+  {
+    path: "/project/:projectId/file/:fileId/details",
+    element: <SpeadsheetTable />,
   },
 ];
 
 export const App = () => {
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <Layout>
-          <Routes>
-            {routes.map((route) => (
-              <Route
-                key={route.path}
-                path={route.path}
-                element={route.element}
-              />
-            ))}
-          </Routes>
-        </Layout>
-      </BrowserRouter>
-    </AuthProvider>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <BrowserRouter>
+          <Layout>
+            <Routes>
+              {routes.map((route) => (
+                <Route
+                  key={route.path}
+                  path={route.path}
+                  element={route.element}
+                />
+              ))}
+            </Routes>
+          </Layout>
+        </BrowserRouter>
+      </AuthProvider>
+    </QueryClientProvider>
   );
 };
