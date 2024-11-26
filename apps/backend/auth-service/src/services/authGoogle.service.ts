@@ -73,6 +73,7 @@ export const exchangeCodeForTokens = async (code: string): Promise<any> => {
  * @param refreshToken - The refresh token to be exchanged.
  * @returns The new tokens (access_token, id_token, and optionally refresh_token).
  */
+
 export const exchangeRefreshTokenForNewTokens = async (
   refreshToken: string
 ): Promise<any> => {
@@ -80,7 +81,6 @@ export const exchangeRefreshTokenForNewTokens = async (
     `${AWS_COGNITO_CLIENT_ID}:${AWS_COGNITO_CLIENT_SECRET}`
   ).toString("base64")}`;
 
-  // Construct the request body for the token exchange
   const requestBody = new URLSearchParams({
     grant_type: "refresh_token",
     client_id: AWS_COGNITO_CLIENT_ID as string,
@@ -88,7 +88,6 @@ export const exchangeRefreshTokenForNewTokens = async (
   });
 
   try {
-    // Make the request to exchange the refresh token for new tokens
     const response = await axios.post(
       `${AWS_COGNITO_DOMAIN}/oauth2/token`,
       requestBody,
@@ -100,12 +99,15 @@ export const exchangeRefreshTokenForNewTokens = async (
       }
     );
 
-    return response.data; // Contains new access_token, id_token, and refresh_token (optional)
-  } catch (error) {
-    const err = error as any;
+    if (!response.data.access_token || !response.data.id_token) {
+      throw new Error("Invalid token response: Missing access or ID token");
+    }
+
+    return response.data;
+  } catch (error: any) {
     console.error(
       "Error exchanging refresh token:",
-      err.response?.data || err.message
+      error.response?.data || error.message
     );
     throw new Error("Failed to refresh tokens");
   }
