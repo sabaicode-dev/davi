@@ -16,7 +16,7 @@ const SourceWeb: React.FC<SourceWebProps> = ({ projectId: propProjectId }) => {
       console.error("No project ID available");
       return;
     }
-    navigate(`/create-project/pick-datasource/import/${projectId}`);
+    navigate(`/project/pick-datasource/import/${projectId}`);
   };
 
   

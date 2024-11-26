@@ -16,7 +16,8 @@ interface ICreateProjectModalProps {
   ) => void;
 }
 
-const EditProject: React.FC<ICreateProjectModalProps> = ({
+
+const Modal: React.FC<ICreateProjectModalProps> = ({
   onClose,
   projectId,
   initialProjectName,
@@ -34,7 +35,6 @@ const EditProject: React.FC<ICreateProjectModalProps> = ({
     projectName: "",
     description: "",
   });
-  console.log(projectName, description);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleClose = () => {
@@ -235,4 +235,4 @@ const EditProject: React.FC<ICreateProjectModalProps> = ({
   );
 };
 
-export default EditProject;
+export default Modal;

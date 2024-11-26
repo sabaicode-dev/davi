@@ -7,7 +7,7 @@ export const GetStart = function () {
   const navigate = useNavigate();
 
   const goToCreateProject = () => {
-    navigate("/create-project");
+    navigate("/project");
   };
 
 

@@ -1,221 +1,273 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
-interface TableHeader {
-  label: string;
-  key: string;
+interface TableProps {
+  headers: string[];
+  data: Array<Record<string, any>>;
+  isCheckBox?: boolean;
+  isEditCell?: boolean;
+  isSelectColumn?: boolean;
+  onSaveCell?: (
+    rowId: string | number,
+    field: string,
+    value: string
+  ) => Promise<boolean>;
+  onColumnSelect?: (selectedColumns: string[], columnData: any[]) => void;
 }
 
-interface TableRowData {
-  [key: string]: string | number;
-}
-
-interface ITableProps {
-  headers: TableHeader[];
-  data: TableRowData[];
-  showCheckbox?: boolean;
-  showIndex?: boolean;
-  editable?: boolean;
-  allowColumnSelection?: boolean;
-  selectableColumns?: string[] | "all";
-  firstRowHasChildren?: boolean;
-  childrenContent?: React.ReactNode;
-}
-
-const Table: React.FC<ITableProps> = ({
-  headers,
-  data,
-  showCheckbox = true,
-  showIndex = true,
-  editable = true,
-  allowColumnSelection = true,
-  selectableColumns = [],
-  firstRowHasChildren = false,
-  childrenContent = null,
+const Table: React.FC<TableProps> = ({
+  headers = [],
+  data = [],
+  isCheckBox = false,
+  isEditCell = false,
+  isSelectColumn = false,
+  onSaveCell,
+  onColumnSelect,
 }) => {
-  const [rows, setRows] = useState(data);
-  const [editCell, setEditCell] = useState<{
-    rowIndex: number;
-    key: string;
-  } | null>(null);
-  const [checkedItems, setCheckedItems] = useState<{ [key: number]: boolean }>(
-    {}
+  const [tableData, setTableData] = useState<Array<Record<string, any>>>(data);
+  const [editingCell, setEditingCell] = useState<{
+    row: number | null;
+    header: string | null;
+  }>({ row: null, header: null });
+  const [selectedColumns, setSelectedColumns] = useState<Set<string>>(new Set());
+  const [selectedRows, setSelectedRows] = useState<Set<string | number>>(
+    new Set()
   );
-  const [selectedColumns, setSelectedColumns] = useState<string[]>([]);
-  const [allChecked, setAllChecked] = useState(false);
 
-  const isColumnSelectable = (key: string) => {
-    return selectableColumns === "all" || selectableColumns.includes(key);
+  // Update tableData when data prop changes
+  useEffect(() => {
+    if (Array.isArray(data)) {
+      setTableData(data);
+    }
+  }, [data]);
+
+  // Notify parent component when selected columns change
+  useEffect(() => {
+    if (onColumnSelect) {
+      // Gather the data for the selected columns
+      const selectedColumnData = getDataForSelectedColumns();
+      onColumnSelect(Array.from(selectedColumns), selectedColumnData);
+    }
+  }, [selectedColumns, onColumnSelect]);
+
+  const capitalizeFirstChar = (word: string) => {
+    return word.charAt(0).toUpperCase() + word.slice(1);
   };
 
-  const handleColumnClick = (key: string) => {
-    if (allowColumnSelection && isColumnSelectable(key)) {
-      setSelectedColumns((prevSelected) =>
-        prevSelected.includes(key)
-          ? prevSelected.filter((col) => col !== key)
-          : [...prevSelected, key]
-      );
+  const handleSelectRow = (id: string | number) => {
+    const newSelectedRows = new Set(selectedRows);
+    if (newSelectedRows.has(id)) {
+      newSelectedRows.delete(id);
+    } else {
+      newSelectedRows.add(id);
+    }
+    setSelectedRows(newSelectedRows);
+  };
+
+  const handleSelectColumn = (header: string) => {
+    if (isSelectColumn) {
+      const newSelectedColumns = new Set(selectedColumns);
+      if (newSelectedColumns.has(header)) {
+        newSelectedColumns.delete(header);
+      } else {
+        newSelectedColumns.add(header);
+      }
+      setSelectedColumns(newSelectedColumns);
     }
   };
 
-  const handleCellClick = (rowIndex: number, key: string) => {
-    if (editable) {
-      setEditCell({ rowIndex, key });
+  const handleCellEdit = (rowIndex: number, header: string, value: string) => {
+    const updatedData = [...tableData];
+    updatedData[rowIndex] = { ...updatedData[rowIndex], [header]: value };
+    setTableData(updatedData);
+  };
+
+  const handleCellClick = (rowIndex: number, header: string) => {
+    if (isEditCell) {
+      setEditingCell({ row: rowIndex, header });
     }
   };
 
-  const handleCheckboxChange = (rowIndex: number) => {
-    setCheckedItems((prev) => ({
-      ...prev,
-      [rowIndex]: !prev[rowIndex],
-    }));
+  const handleInputBlur = () => {
+    setEditingCell({ row: null, header: null });
   };
 
-  const handleAllCheckboxChange = () => {
-    const newCheckedState = !allChecked;
-    setAllChecked(newCheckedState);
-    const updatedCheckedItems = rows.reduce((acc, _, index) => {
-      acc[index] = newCheckedState;
-      return acc;
-    }, {} as { [key: number]: boolean });
-    setCheckedItems(updatedCheckedItems);
-  };
-
-  const handleCellChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    rowIndex: number,
-    key: string
+  const handleInputKeyDown = async (
+    e: React.KeyboardEvent,
+    _rowIndex: number,
+    header: string
   ) => {
-    const updatedRows = [...rows];
-    updatedRows[rowIndex][key] = e.target.value;
-    setRows(updatedRows);
-  };
+    if (
+      e.key === "Enter" &&
+      editingCell.row !== null &&
+      editingCell.header &&
+      onSaveCell
+    ) {
+      const rowId = tableData[editingCell.row].id || editingCell.row;
+      const value = tableData[editingCell.row][editingCell.header];
 
-  const handleSaveCell = () => {
-    setEditCell(null);
-  };
+      const success = await onSaveCell(rowId, header, value);
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      handleSaveCell();
+      if (success) {
+        handleInputBlur();
+      }
     }
   };
+
+  // Function to get data for selected columns
+  const getDataForSelectedColumns = () => {
+    return tableData.map((row) => {
+      const selectedRowData: Record<string, any> = {};
+      selectedColumns.forEach((column) => {
+        selectedRowData[column] = row[column];
+      });
+      return selectedRowData;
+    });
+  };
+
+  // Guard clause for empty data
+  if (!Array.isArray(headers) || !Array.isArray(data) || headers.length === 0) {
+    return <div>No data to display</div>;
+  }
 
   return (
-    <div className="flex flex-col max-height-percentage-table overflow-x-scroll">
-      <div className="overflow-x-auto">
-        <table
-          className="min-w-full border-collapse border border-gray-300"
-          style={{ tableLayout: "fixed" }}
-        >
-          <thead className="bg-[#E6EDFF] border border-gray-300">
-            <tr>
-              {showCheckbox && (
-                <th className="px-4 py-2 w-16 text-center font-bold text-gray-500 tracking-wider border-r-0 sticky top-0 bg-[#E6EDFF] z-10 h-16">
-                  <input
-                    type="checkbox"
-                    checked={allChecked}
-                    onChange={handleAllCheckboxChange}
-                    className="w-4 h-4 cursor-pointer"
-                  />
-                </th>
-              )}
-              {showIndex && !showCheckbox && (
-                <th className="px-4 py-2 w-16 text-center font-bold text-gray-500 tracking-wider border sticky top-0 bg-[#E6EDFF] z-10">
-                  #
-                </th>
-              )}
-              {headers.map((header, index) => (
-                <th
-                  key={header.key}
-                  onClick={() => handleColumnClick(header.key)}
-                  className={`px-6 py-2 text-left font-bold text-gray-700 tracking-wider border sticky top-0 bg-[#E6EDFF] z-10 ${
-                    selectedColumns.includes(header.key) ? "bg-blue-200" : ""
-                  } ${
-                    allowColumnSelection && isColumnSelectable(header.key)
-                      ? "cursor-pointer"
-                      : "cursor-default"
-                  }`}
-                  style={{ width: "200px" }}
-                >
-                  {header.label}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200 overflow-auto">
-            {firstRowHasChildren && (
-              <tr>
-                <td
-                  colSpan={
-                    headers.length +
-                    (showCheckbox ? 1 : 0) +
-                    (showIndex ? 1 : 0)
-                  }
-                >
-                  <div>{childrenContent}</div>
-                </td>
-              </tr>
-            )}
-            {rows.map((row, rowIndex) => (
-              <tr
-                key={rowIndex}
-                className={`transition duration-200 ${
-                  checkedItems[rowIndex] ? "bg-blue-200" : "hover:bg-gray-100"
-                }`}
+    <div className="overflow-auto w-full h-" style={{ height: "75%" }}>
+      <table
+        className="border-collapse table-fixed"
+        style={{ tableLayout: "fixed", width: "100%" }}
+      >
+        <thead className="h-12">
+          <tr className="px-4 py-2 text-center font-bold text-gray-500 tracking-wider sticky bg-[#E6EDFF] z-10 top-0">
+            {headers.map((header) => (
+              <th
+                key={header}
+                className={`border-[1px] border-gray-500 px-2 w-[210px] cursor-pointer relative group
+                  ${selectedColumns.has(header) ? "bg-blue-200" : ""}`}
+                onClick={() => handleSelectColumn(header)}
               >
-                {showCheckbox && (
-                  <td className="px-4 py-2 text-center border-r-0">
-                    <input
-                      type="checkbox"
-                      checked={!!checkedItems[rowIndex]}
-                      onChange={() => handleCheckboxChange(rowIndex)}
-                      className="w-4 h-4 cursor-pointer"
-                    />
-                  </td>
+                <div className="flex items-center justify-center">
+                  {capitalizeFirstChar(header)}
+                </div>
+                {isSelectColumn && (
+                  <div className="absolute inset-0 group-hover:bg-blue-100 opacity-0 group-hover:opacity-20 transition-opacity" />
                 )}
-                {!showCheckbox && showIndex && (
-                  <td className="px-4 py-2 text-center font-semibold text-gray-700 border">
-                    {rowIndex + 1}
-                  </td>
-                )}
-                {headers.map((header) => (
-                  <td
-                    key={header.key}
-                    onClick={() => handleCellClick(rowIndex, header.key)}
-                    className={`px-4 py-2 text-gray-900 border ${
-                      selectedColumns.includes(header.key) ? "bg-gray-200" : ""
-                    } ${
-                      editCell?.rowIndex === rowIndex &&
-                      editCell.key === header.key
-                        ? "border-blue-500"
-                        : "border-gray-300"
-                    }`}
-                    style={{ width: "200px" }}
-                  >
-                    {editable &&
-                    editCell?.rowIndex === rowIndex &&
-                    editCell.key === header.key ? (
-                      <input
-                        type="text"
-                        value={row[header.key]}
-                        onChange={(e) =>
-                          handleCellChange(e, rowIndex, header.key)
-                        }
-                        onBlur={handleSaveCell}
-                        onKeyDown={handleKeyDown}
-                        className="w-full border-none outline-none bg-transparent"
-                        autoFocus
-                      />
-                    ) : (
-                      row[header.key]
-                    )}
-                  </td>
-                ))}
-              </tr>
+              </th>
             ))}
-          </tbody>
-        </table>
-      </div>
+          </tr>
+        </thead>
+        <tbody className="bg-white">
+          {tableData.map((row, index) => {
+            const rowId = row?.id || index;
+
+            return (
+              <tr
+                key={rowId}
+                className={` border-[1px] border-gray-500 w-[210px] ${
+                  selectedRows.has(rowId) ? "bg-gray-300" : ""
+                }`}
+                style={{ width: "50px" }}
+              >
+                {isCheckBox ? (
+                  <>
+                    <td
+                      className="border-[1px] border-gray-500"
+                      style={{ width: "250px" }}
+                    >
+                      <div className="flex flex-row space-x-1">
+                        <div className="w-10 flex justify-center items-center">
+                          <input
+                            type="checkbox"
+                            checked={selectedRows.has(rowId)}
+                            onChange={() => handleSelectRow(rowId)}
+                            className="w-4 h-4 transition duration-200 ease-in-out transform scale-100 hover:scale-105 focus:scale-110 rounded-2xl"
+                            style={{
+                              backgroundColor: selectedRows.has(rowId)
+                                ? "#4A90E2"
+                                : "transparent",
+                            }}
+                          />
+                        </div>
+                         <div className="flex-1">
+                          <div
+                            className="overflow-hidden whitespace-nowrap text-ellipsis px-2 py-[3px]"
+                            style={{ maxWidth: "163px" }}
+                          >
+                            {Array.isArray(row[headers[0]])
+                              ? row[headers[0]][0]
+                              : row[headers[0]]}
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    {headers.slice(1).map((header) => (
+                      <td
+                        key={header}
+                        onClick={() => handleCellClick(index, header)}
+                        className={`border-[1px] border-gray-500 overflow-hidden whitespace-nowrap text-ellipsis px-2 py-[3px]
+                          ${selectedColumns.has(header) ? "bg-blue-50" : ""}`}
+                        style={{ maxWidth: "163px" }}
+                      >
+                        {isEditCell &&
+                        editingCell.row === index &&
+                        editingCell.header === header ? (
+                          <input
+                            type="text"
+                            value={row[header] || ""}
+                            onChange={(e) =>
+                              handleCellEdit(index, header, e.target.value)
+                            }
+                            onBlur={handleInputBlur}
+                            onKeyDown={(e) =>
+                              handleInputKeyDown(e, index, header)
+                            }
+                            autoFocus
+                            className="border-[1px] px-1 w-full bg-red-100 rounded-none outline-none"
+                          />
+                        ) : Array.isArray(row[header]) ? (
+                          row[header][0]
+                        ) : (
+                          row[header]
+                        )}
+                      </td>
+                    ))}
+                  </>
+                ) : (
+                  headers.map((header) => (
+                    <td
+                      key={header}
+                      onClick={() => handleCellClick(index, header)}
+                      className={`border-[1px] border-gray-500 overflow-hidden whitespace-nowrap text-ellipsis px-2 py-[3px]
+                        ${selectedColumns.has(header) ? "bg-blue-50" : ""}`}
+                      style={{ maxWidth: "163px" }}
+                    >
+                      {isEditCell &&
+                      editingCell.row === index &&
+                      editingCell.header === header ? (
+                        <input
+                          type="text"
+                          value={row[header] || ""}
+                          onChange={(e) =>
+                            handleCellEdit(index, header, e.target.value)
+                          }
+                          onBlur={handleInputBlur}
+                          onKeyDown={(e) =>
+                            handleInputKeyDown(e, index, header)
+                          }
+                          autoFocus
+                          className="border-[1px] px-1 w-full bg-red-100 rounded-none outline-none"
+                        />
+                      ) : Array.isArray(row[header]) ? (
+                        row[header][0]
+                      ) : (
+                        row[header]
+                      )}
+                    </td>
+                  ))
+                )}
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
     </div>
   );
 };
