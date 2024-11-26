@@ -34,7 +34,7 @@ const TableProject: React.FC = () => {
     try {
       setIsLoading(true);
       const response = await fetch(
-        "http://127.0.0.1:8000/api/v1/project/6744bc4fc5d9d0a957c97588/file/6744bc5bc5d9d0a957c97589/details/"
+        "http://127.0.0.1:8000/api/v1/project/67453602c3462451de1c6ab3/file/6745369581b28662d4f407dd/details/"
       );
       
       if (!response.ok) {
