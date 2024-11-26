@@ -1,0 +1,27 @@
+version: "3.8"
+services:
+  auth-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "4001:4001"
+    volumes:
+      - ./src:/project/src # Adjusted for hot reloading
+    env_file: ./src/configs/.env.development
+    command: ["npm", "run", "dev"]
+    depends_on:
+      - mongo_db
+
+  mongo_db:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=smey09
+    volumes:
+      - mongo_data:/data/db
+
+volumes:
+  mongo_data:

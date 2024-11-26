@@ -1,43 +1,68 @@
 import React, { useState, ChangeEvent, useEffect } from "react";
+import axios from "axios";
 import { AiOutlineLogout } from "react-icons/ai";
+import { useAuth } from "@/src/contexts/AuthContext";
 
 const AccountSettings: React.FC = () => {
-  // State for input values and errors
   const [user, setUser] = useState({
-    firstName: "",
-    lastName: "",
+    userName: "",
+    // Add lastName field
+    email: "",
+    createdAt: "", // For displaying the creation date
+  });
+  const [initialUser, setInitialUser] = useState({
+    userName: "",
+    email: "",
+    createdAt: "",
   });
   const [errors, setErrors] = useState({
-    firstName: "",
-    lastName: "",
+    userName: "",
   });
   const [touched, setTouched] = useState({
-    firstName: false,
-    lastName: false,
+    userName: false,
   });
   const [isButtonEnabled, setIsButtonEnabled] = useState(false);
+  const { setUsername, setEmail } = useAuth();
 
-  // Regex for validating name fields
-  const nameRegex = /\b([A-ZÀ-ÿ][-,a-z. ']+[ ]*)+/;
+  // Fetch user data on component mount
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await axios.get("http://localhost:4001/v1/auth/me", {
+          withCredentials: true,
+        });
+
+        console.log("User data", response);
+
+        const fetchedUser = {
+          userName: response.data.username || "",
+          email: response.data.email || "",
+          createdAt: response.data.createdAt || "",
+        };
+        setUsername(fetchedUser.userName);
+        setEmail(fetchedUser.email);
+
+        setUser(fetchedUser);
+        setInitialUser(fetchedUser);
+        // Store the initial fetched values
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
 
   // Validate inputs when they change
   const validateInputs = () => {
     const newErrors = {
-      firstName: user.firstName
-        ? nameRegex.test(user.firstName)
-          ? ""
-          : "First name must start with a capital letter and contain valid characters."
-        : "First name is required.",
-      lastName: user.lastName
-        ? nameRegex.test(user.lastName)
-          ? ""
-          : "Last name must start with a capital letter and contain valid characters."
-        : "Last name is required.",
+      userName: user.userName ? "" : "Username is required.",
     };
     setErrors(newErrors);
 
-    // Enable button if there are no errors and fields are not empty
-    setIsButtonEnabled(newErrors.firstName === "" && newErrors.lastName === "");
+    // Enable button only if the current values differ from the initial ones
+    const hasChanges = user.userName !== initialUser.userName;
+    setIsButtonEnabled(hasChanges && newErrors.userName === "");
   };
 
   // Handle changes in input fields
@@ -49,32 +74,61 @@ const AccountSettings: React.FC = () => {
     setTouched((prevTouched) => ({ ...prevTouched, [name]: true }));
   };
 
-  // Revalidate inputs whenever user data changes
   useEffect(() => {
     validateInputs();
-  }, [user]);
+  }, [user.userName]);
+
+  // Function to update user name on the backend
+  const updateUser = async () => {
+    try {
+      const response = await axios.put(
+        "http://localhost:4001/v1/auth/updateUsername",
+        {
+          email: user.email,
+          newUsername: user.userName, // Add last name to the update request
+        },
+        { withCredentials: true } // Include cookies
+      );
+      console.log("User updated successfully:", response.data);
+      setUser((prev) => ({
+        ...prev,
+        userName: response.data.result.username || prev.userName,
+      }));
+      setUsername(response.data.result.username);
+      setEmail(response.data.result.email);
+    } catch (error) {
+      console.error("Error updating user:", error);
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    // Mark all fields as touched to trigger validation
+    setTouched({ userName: true });
 
-    // Mark all fields as touched to trigger validation on all fields
-    setTouched({
-      firstName: true,
-      lastName: true,
-    });
-
-    // If form is valid, perform the save and reset
+    // If form is valid, update the user
     if (isButtonEnabled) {
-      console.log("Form submitted successfully:", user);
-      // Reset form and touched state after successful submission
-      setUser({
-        firstName: "",
-        lastName: "",
-      });
-      setTouched({
-        firstName: false,
-        lastName: false,
-      });
+      updateUser();
+    }
+  };
+
+  // Logout function
+  const handleLogout = async () => {
+    try {
+      const response = await axios.put(
+        "http://localhost:4001/v1/auth/logout",
+        { refreshToken: "dummyRefreshToken" }, // Replace with actual refresh token if needed
+        { withCredentials: true } // Include cookies
+      );
+
+      if (response.status === 200) {
+        console.log("User logged out successfully");
+        window.location.href = "http://localhost:3000/login"; // Redirect to login page
+      } else {
+        console.error("Failed to log out:", response.data);
+      }
+    } catch (error) {
+      console.error("Error during logout:", error);
     }
   };
 
@@ -84,9 +138,10 @@ const AccountSettings: React.FC = () => {
         Account Setting
       </h2>
 
-      {/* Profile Details Section */}
+      {/* Profile Details Section uu*/}
       <form onSubmit={handleSubmit}>
         <div className="bg-gray-50 shadow-sm rounded-lg pt-3 mb-9 border-2 border-gray-200">
+          {/* Header Section */}
           <div className="flex justify-between items-center mb-4 px-5">
             <h3 className="text-lg font-medium text-gray-700">
               Profile Details
@@ -104,60 +159,47 @@ const AccountSettings: React.FC = () => {
             </button>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 rounded-br-lg rounded-bl-lg gap-4 bg-white border-t-2 border-gray-200 py-4 px-5">
-            {/* First Name Field */}
-            <div>
-              <label className="block text-base font-normal text-gray-600 mb-1">
-                First name
-              </label>
-              <input
-                type="text"
-                name="firstName"
-                value={user.firstName}
-                onChange={handleChanged}
-                className={`mt-1 w-full text-gray-700 py-2 px-4 border rounded-md focus:outline-none focus:bg-white ${
-                  errors.firstName && touched.firstName
-                    ? "border-red-500"
-                    : "border-gray-300"
-                }`}
-                placeholder="Enter first name"
-              />
-              {errors.firstName && touched.firstName && (
-                <p className="text-red-500 text-sm">{errors.firstName}</p>
-              )}
-            </div>
+          {/* Content Section */}
+          <div className="bg-white border-t rounded-br-lg rounded-bl-lg border-gray-200 py-4 px-5">
+            <div className="grid grid-cols-1 gap-4">
+              {/* Username Field */}
+              <div className="flex flex-col">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Username
+                </label>
+                <input
+                  type="text"
+                  name="userName"
+                  value={user.userName}
+                  onChange={handleChanged}
+                  className={`w-full py-2 px-4 text-gray-700 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500 focus:bg-white ${
+                    errors.userName && touched.userName
+                      ? "border-red-500"
+                      : "border-gray-300"
+                  }`}
+                  placeholder="Enter your username"
+                />
+                {errors.userName && touched.userName && (
+                  <p className="text-red-500 text-xs mt-1">{errors.userName}</p>
+                )}
+              </div>
 
-            {/* Last Name Field */}
-            <div>
-              <label className="block text-base font-normal text-gray-600 mb-1">
-                Last Name
-              </label>
-              <input
-                type="text"
-                name="lastName"
-                value={user.lastName}
-                onChange={handleChanged}
-                className={`mt-1 w-full text-gray-700 py-2 px-4 border rounded-md focus:outline-none focus:bg-white ${
-                  errors.lastName && touched.lastName
-                    ? "border-red-500"
-                    : "border-gray-300"
-                }`}
-                placeholder="Enter last name"
-              />
-              {errors.lastName && touched.lastName && (
-                <p className="text-red-500 text-sm">{errors.lastName}</p>
-              )}
+              {/* Created Date */}
+              <div className="flex justify-between items-center">
+                <p className="text-sm text-gray-500">
+                  Created on {user.createdAt}
+                </p>
+              </div>
             </div>
-            <p className="text-sm text-gray-500">Created on 12/12/2024</p>
           </div>
         </div>
       </form>
 
-      {/* Email Section */}
+      {/* Dynamic Email Display */}
       <div className="bg-gray-50 shadow-sm rounded-lg pt-3 mb-9 border-2 border-gray-200">
         <h3 className="text-lg font-medium text-gray-700 mb-2 px-5">Email</h3>
         <div className="bg-white px-5 py-4 border-t-2 rounded-br-lg rounded-bl-lg border-gray-200">
-          <p className="text-gray-800 mb-1">KImkim@gmail.com</p>
+          <p className="text-gray-800 mb-1">{user.email}</p>
           <p className="text-sm text-gray-500 mb-1">
             Your account is authenticated through Google.
           </p>
@@ -170,7 +212,10 @@ const AccountSettings: React.FC = () => {
           <h3 className="text-lg font-medium text-gray-700">
             Login Management
           </h3>
-          <button className="bg-[#443DFF] text-white px-4 py-2 rounded-md text-sm font-medium flex items-center hover:bg-blue-600 transition">
+          <button
+            onClick={handleLogout}
+            className="bg-[#F21616] text-white px-4 py-2 rounded-md text-sm font-medium flex items-center hover:bg-red-600 transition"
+          >
             <AiOutlineLogout size={16} className="mt-[3px] mr-1" />
             Log Out
           </button>

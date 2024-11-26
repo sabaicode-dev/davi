@@ -145,7 +145,7 @@ const TestUI: React.FC = () => {
         <div>
         <UniqueValue
             value={51} // Example unique value count
-            total={100} // Example total count
+            total={500} // Example total count
             onClick={() => handleBoxClick({ category: "Unique Value Data", percentage: 51 })}
           />
         </div>

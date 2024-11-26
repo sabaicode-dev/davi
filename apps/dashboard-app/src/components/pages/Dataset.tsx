@@ -1,5 +1,4 @@
-import CardContainer from "../atoms/CardContainer";
-import Card from "../atoms/Card";
+import CardContainer from "@/src/components/atoms/CardContainer";
 export default function Dataset() {
   return (
     <div className="container max-w-[80%] w-full ml-32">
@@ -9,7 +8,7 @@ export default function Dataset() {
 
       {/* card1 */}
       <div className="mt-10 space-y-5">
-        <CardContainer numCards={7} />
+        <CardContainer numCards={5} />
       </div>
     </div>
   );

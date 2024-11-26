@@ -1,6 +1,6 @@
 import React from 'react'
 
-const ShowTable = () => {
+const NotFoundTable:React.FC = () => {
   return (
     <div className='container w-full ml-5 border border-[#C4C1D8] rounded-lg'>
       <div className='p-10 h-full'>
@@ -13,4 +13,4 @@ const ShowTable = () => {
   )
 }
 
-export default ShowTable
+export default NotFoundTable

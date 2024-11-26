@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { AiOutlineEdit, AiOutlineCheck } from "react-icons/ai"; // Import icons for edit and save
-import { Xicon } from "../../atoms/icons/Icon";
+import { XIcon } from "../../atoms/icons/Icon";
+
 
 type AnalysisProps = {
   selectedData: { category: string; percentage: number } | null;
@@ -56,7 +57,7 @@ const Analysis: React.FC<AnalysisProps> = ({ selectedData, onClose }) => {
         onClick={onClose}
         className="float-right text-2xl text-gray-600 hover:text-gray-800 focus:outline-none"
       >
-        <Xicon/>
+        <XIcon/>
       </button>
 
       {/* Header */}

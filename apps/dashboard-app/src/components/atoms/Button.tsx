@@ -13,7 +13,7 @@ export interface ButtonProps
     | "3xl"
     | "full"
     | "none";
-  color?: "primary" | "secondary" | "danger" | "outline"|"none";
+  color?: "primary" | "secondary" | "danger" | "outline" | "none";
   isLoading?: boolean;
   isDisabled?: boolean;
   isIconOnly?: boolean;
@@ -38,7 +38,7 @@ const Button: React.FC<ButtonProps> = ({
   ...props
 }) => {
   const baseStyles =
-    "bg-blue-500 inline-flex items-center justify-center font-medium transition-colors duration-200 py-2";
+    "bg-blue-500 inline-flex items-center border-2 justify-center font-medium transition-colors duration-200 py-2";
 
   const sizeStyles = {
     small: "px-1 py-1 text-sm",
@@ -63,8 +63,8 @@ const Button: React.FC<ButtonProps> = ({
     secondary:
       "bg-blue-500 text-white border-2 border-blue-500 hover:bg-blue-600 hover:border-blue-600",
     outline:
-      "bg-white text-black border-gray-500 border-2 border-gray-200 hover:bg-gray-100",
-      none:"!bg-[#E6EDFF] text-gray-900 px-2 py-2"
+      "bg-white text-black border-gray-500 border-2 border-gray-500 hover:bg-gray-100",
+    none: "!bg-[#E6EDFF] text-gray-900 px-2 py-2",
   }[color];
 
   const loadingSpinner = (

@@ -7,11 +7,12 @@ import { usePathname } from "next/navigation";
 import { disableNavWithFooter } from "./utils/disableNavWithFooter";
 import { Suspense } from "react";
 import Loading from "./loading";
+import { ReactNode } from "react";
 
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: ReactNode;
 }>) {
   const path = usePathname();
   return (

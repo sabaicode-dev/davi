@@ -1,5 +1,3 @@
-import TableTest from "../molecules/tables/CleaningPage";
-
 interface ShowTableProps {
   selectedTable: { table: string } | null;
 }
@@ -15,7 +13,7 @@ const ShowTable = ({ selectedTable }: ShowTableProps) => {
             </header>
             <div>
               {selectedTable.table === "table1" ? (
-                <TableTest />
+                <div> Table 1</div>
               ) : selectedTable.table === "table2" ? (
                 <div> Table 2</div>
               ) : selectedTable.table === "table3" ? (

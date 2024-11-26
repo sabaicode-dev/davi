@@ -1,6 +1,11 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
-import { DatasetIcon, GraphIcon, HelpIcon, ProjectIcon } from "@/src/components/atoms/icons/Icon";
+import {
+  DatasetIcon,
+  GraphIcon,
+  HelpIcon,
+  ProjectIcon,
+} from "@/src/components/atoms/icons/Icon";
 
 interface MenuItem {
   name: string;

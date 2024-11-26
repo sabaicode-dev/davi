@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 services:
   auth:
     container_name: auth_service_container
@@ -11,7 +11,7 @@ services:
     env_file: ./auth-service/src/configs/.env.development
     environment:
       - DOCKER_ENV=true
-    volumes:                          
+    volumes:
       - ./auth-service/src:/app/src # HOT RELOAD WHEN MADE CHANGE IN SRC DIR.
       - volume-store:/app/storage
 volumes:

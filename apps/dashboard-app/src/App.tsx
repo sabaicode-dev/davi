@@ -1,32 +1,68 @@
 import Layout from "@/src/components/organisms/layout/MainLayout";
-import "./styles.css";
-import Button from "./components/atoms/Button";
-import { InputTest } from "./components/atoms/Input";
-import {
-  BrowserRouter as Router,
-  Route,
-  BrowserRouter,
-  Routes,
-} from "react-router-dom";
-import Visualize from "./components/pages/Visualize";
-import Dataset from "./components/pages/Dataset";
-import Project from "./components/pages/Project";
-import Helps from "./components/pages/Helps";
-import AccountSettings from "./components/templates/AccountSettings";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import CreateProject from "@/src/components/molecules/steps/CreateProject";
+import PickDataSource from "@/src/components/molecules/steps/PickDataSource";
+import UploadCsv from "@/src/components/molecules/steps/UploadCSV";
+import ImportUrl from "@/src/components/molecules/steps/ImportUrl";
+import Visualize from "@/src/components/pages/Visualize";
+import Dataset from "@/src/components/pages/Dataset";
+import Helps from "@/src/components/pages/Helps";
+import AccountSettings from "@/src/components/templates/AccountSettings";
+import Project from "@/src/components/pages/Project";
+import { AuthProvider } from "@/src/contexts/AuthContext";
+import ShowProject from "@/src/components/molecules/steps/ShowProject";
+import ProjectDetail from "@/src/components/molecules/project/ProjectDetail";
+import SpeadsheetTable from "./components/templates/SpeadsheetTable";
+import TableProject from "./components/molecules/tables/TableProject";
+
+const ProjectFlow = () => {
+  return (
+    <Routes>
+      <Route path="/" element={<CreateProject />} />
+      <Route path="pick-datasource" element={<PickDataSource />} />
+      <Route
+        path="pick-datasource/upload-csv/:projectId"
+        element={<UploadCsv />}
+      />
+      <Route path="pick-datasource/import/:projectId" element={<ImportUrl />} />
+    </Routes>
+  );
+};
+
+const routes = [
+  { path: "/", element: <Project /> },
+  { path: "/project/:projectId", element: <ProjectDetail /> },
+  { path: "/select-project", element: <ShowProject /> },
+  { path: "/project/*", element: <ProjectFlow /> },
+  { path: "/project/pick-datasource", element: <PickDataSource /> },
+  { path: "/visualize", element: <Visualize /> },
+  { path: "/dataset", element: <Dataset /> },
+  { path: "/helps", element: <Helps /> },
+  { path: "/accountsetting", element: <AccountSettings /> },
+  { path: "/cleaning", element: <AccountSettings /> },
+  { path: "/template-table", element: <SpeadsheetTable /> },
+  {
+    path: "/project/:projectId/file/:fileId/details",
+    element: <SpeadsheetTable />,
+  },
+];
 
 export const App = () => {
   return (
-    <BrowserRouter>
-      <Layout>
-        <Routes>
-          <Route path="/" element={<Project />} />
-          <Route path="/visualize" element={<Visualize />} />
-          <Route path="/dataset" element={<Dataset />} />
-          <Route path="/helps" element={<Helps />} />
-          <Route path="/accountsetting" element={<AccountSettings />} />
-        </Routes>
-      </Layout>
-    </BrowserRouter>
+    <AuthProvider>
+      <BrowserRouter>
+        <Layout>
+          <Routes>
+            {routes.map((route) => (
+              <Route
+                key={route.path}
+                path={route.path}
+                element={route.element}
+              />
+            ))}
+          </Routes>
+        </Layout>
+      </BrowserRouter>
+    </AuthProvider>
   );
 };
-export default App;
