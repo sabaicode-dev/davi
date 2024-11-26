@@ -115,15 +115,22 @@ const AccountSettings: React.FC = () => {
   // Logout function
   const handleLogout = async () => {
     try {
+      // Call the logout API with the refresh token
       const response = await axios.put(
         "http://localhost:4001/v1/auth/logout",
-        { refreshToken: "dummyRefreshToken" }, // Replace with actual refresh token if needed
-        { withCredentials: true } // Include cookies
+        { refreshToken: localStorage.getItem("refreshToken") }, // Retrieve actual refresh token
+        { withCredentials: true } // Ensure cookies are included in the request
       );
-
+  
       if (response.status === 200) {
         console.log("User logged out successfully");
-        window.location.href = "http://localhost:3000/login"; // Redirect to login page
+  
+        // Clear authentication-related data from localStorage
+        localStorage.removeItem("authToken");
+        localStorage.removeItem("refreshToken");
+  
+        // Redirect to the login page
+        window.location.href = "http://localhost:3000/login";
       } else {
         console.error("Failed to log out:", response.data);
       }
