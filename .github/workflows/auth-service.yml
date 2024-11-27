@@ -10,24 +10,7 @@ defaults:
   run:
     working-directory: ./apps/backend/auth-service
 
-jobs:
-cleanup:
-    runs-on: ubuntu-latest
-    steps:
-      - name: List and delete old artifacts
-        run: |
-          # List artifacts
-          artifacts=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            https://api.github.com/repos/${{ github.repository }}/actions/artifacts)
-
-          # Extract artifact IDs and delete them (customize logic as needed)
-          artifact_ids=$(echo "$artifacts" | jq '.[].id')
-          
-          for id in $artifact_ids; do
-            curl -X DELETE \
-              -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-              "https://api.github.com/repos/${{ github.repository }}/actions/artifacts/$id"
-          done
+jobs:       
   build:
     runs-on: ubuntu-latest
 
