@@ -13,8 +13,6 @@ import { AuthProvider } from "@/src/contexts/AuthContext";
 import ShowProject from "@/src/components/molecules/steps/ShowProject";
 import ProjectDetail from "@/src/components/molecules/project/ProjectDetail";
 import SpeadsheetTable from "./components/templates/SpeadsheetTable";
-import { QueryClientProvider } from 'react-query';
-import { queryClient } from "./utils/globle-cache";
 
 const ProjectFlow = () => {
   return (
@@ -54,7 +52,6 @@ const routes = [
 
 export const App = () => {
   return (
-    <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <BrowserRouter>
           <Layout>
@@ -70,6 +67,5 @@ export const App = () => {
           </Layout>
         </BrowserRouter>
       </AuthProvider>
-    </QueryClientProvider>
   );
 };
