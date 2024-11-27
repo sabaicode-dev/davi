@@ -10,35 +10,9 @@ import { useAuth } from "@/src/contexts/AuthContext";
 const Header: React.FC = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
-  const { username, setUsername, email, setEmail } = useAuth();
+  const { setUsername, username, setEmail, email } = useAuth();
 
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const fetchUserDetails = async () => {
-      try {
-        const response = await fetch("http://localhost:4001/v1/auth/me", {
-          method: "GET",
-          credentials: "include", // Include cookies in the request
-        });
-
-        console.log("response", response);
-
-        if (response.ok) {
-          const data = await response.json();
-          console.log("User data", data);
-          setUsername(data.username);
-          setEmail(data.email);
-        } else {
-          console.error("Failed to fetch user details");
-        }
-      } catch (error) {
-        console.error("Error fetching user details:", error);
-      }
-    };
-
-    fetchUserDetails();
-  }, []);
 
   const handleProfileClick = () => {
     navigate("/accountsetting");
@@ -47,29 +21,46 @@ const Header: React.FC = () => {
 
   const handleLogout = async () => {
     try {
+      // Retrieve tokens from localStorage
+      const authToken = localStorage.getItem("authToken");
+      const refreshToken = localStorage.getItem("refreshToken"); // Replace "dummyRefreshToken" with the real token
+
+      // Check if tokens are available
+      if (!authToken || !refreshToken) {
+        console.warn("No tokens found. Redirecting to login...");
+        window.location.href = "http://localhost:3000/login";
+        return;
+      }
+
       // Call the logout API with the refresh token
       const response = await fetch("http://localhost:4001/v1/auth/logout", {
         method: "PUT",
-        credentials: "include", // Include cookies in the request
+        credentials: "include", // Include cookies if necessary
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${authToken}`, // Include authToken in the header
         },
         body: JSON.stringify({
-          refreshToken: "dummyRefreshToken", // Replace with the actual token if needed
+          refreshToken, // Send the refreshToken in the body
         }),
       });
 
       if (response.ok) {
         console.log("User logged out successfully");
 
-        // Clear the state in the frontend
-        setUsername(null);
-        setEmail(null);
+        // Clear tokens and user state from the frontend
+        localStorage.removeItem("authToken");
+        localStorage.removeItem("refreshToken");
 
-        // Redirect the user to the login page
+        // Clear any additional user-related state (if necessary)
+        setUsername && setUsername(null);
+        setEmail && setEmail(null);
+
+        // Redirect to the login or signup page
         window.location.href = "http://localhost:3000/login";
       } else {
-        console.error("Failed to log out:", await response.json());
+        const errorData = await response.json();
+        console.error("Failed to log out:", errorData);
       }
     } catch (error) {
       console.error("Error during logout:", error);

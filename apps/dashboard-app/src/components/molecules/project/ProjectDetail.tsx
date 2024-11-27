@@ -12,12 +12,12 @@ const ProjectDetail: React.FC = () => {
   const goToPickDataSource = () => {
     const projectId = location.pathname.split('/').pop();
     
-    navigate(`/project/pick-datasource?projectId=${projectId}`, {
+    navigate(`/project/create/pick-datasource?projectId=${projectId}`, {
       state: { projectId }
     });
   };
   return (
-    <div className="flex flex-col p-6 px-32 md:px-2 lg:px-3 xl:px-5 2xl:px-16">
+    <div className="flex flex-col p-6 px-40 ">
       <div className="flex justify-between items-center w-full">
       <div>
           <h1 className="font-bold text-lg">
@@ -32,7 +32,7 @@ const ProjectDetail: React.FC = () => {
             className="ml-auto py-3 !px-4 flex flex-row"
             onClick={goToPickDataSource}
             startContent={<FaPlus />}
-            children="Create New File"
+            children="Create New File v1"
             size="small"
             radius="2xl"
             color="secondary"
