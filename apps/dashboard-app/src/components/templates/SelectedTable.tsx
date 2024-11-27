@@ -1,27 +1,19 @@
-import ShowTable from "@/src/components/templates/ShowTable";
+import DisplayTable from "../templates/DisplayTable";
+import ShowTable from "../templates/ShowTable";
 import { useState } from "react";
-import DisplayTable from "@/src/components/templates/DisplayTable";
-const initialList = [
-  { id: 1, table: "table1" },
-  { id: 2, table: "table2" },
-  { id: 3, table: "table3" },
-  { id: 4, table: "table4" },
-  { id: 5, table: "table5" },
-];
-interface ListTable {
-  id: number;
-  table: string;
-}
-const SelectedTable = () => {
-  const [listTable] = useState(initialList);
+export default function SelectedTable() {
+  const [selectedTable, setSelectedTable] = useState(null);
 
-  const [selectedTable, setSelectedTable] = useState<ListTable | null>(null);
+  const handleTableSelection = (tableName: any) => {
+    setSelectedTable(tableName);
+  };
   return (
-    <div className="flex mx-5 my-5">
-      <DisplayTable listTable={listTable} setSelectedTable={setSelectedTable} />
+    <div className="flex w-auto h-full pt-2">
+      {/* DisplayTable component handles table selection */}
+      <DisplayTable onSelectTable={handleTableSelection} />
+
+      {/* ShowTable component displays selected table */}
       <ShowTable selectedTable={selectedTable} />
     </div>
   );
-};
-
-export default SelectedTable;
+}
