@@ -22,13 +22,16 @@ const Table: React.FC<TableProps> = ({
   isSelectColumn = false,
   onSaveCell,
   onColumnSelect,
+  
 }) => {
   const [tableData, setTableData] = useState<Array<Record<string, any>>>(data);
   const [editingCell, setEditingCell] = useState<{
     row: number | null;
     header: string | null;
   }>({ row: null, header: null });
-  const [selectedColumns, setSelectedColumns] = useState<Set<string>>(new Set());
+  const [selectedColumns, setSelectedColumns] = useState<Set<string>>(
+    new Set()
+  );
   const [selectedRows, setSelectedRows] = useState<Set<string | number>>(
     new Set()
   );
@@ -130,17 +133,20 @@ const Table: React.FC<TableProps> = ({
   }
 
   return (
-    <div className="overflow-auto w-full h-" style={{ height: "75%" }}>
+    <div
+      className="overflow-auto w-full border-[1px] border-gray-400"
+      style={{ height: "80%" }}
+    >
       <table
-        className="border-collapse table-fixed"
+        className="  border-collapse table-fixed"
         style={{ tableLayout: "fixed", width: "100%" }}
       >
-        <thead className="h-12">
-          <tr className="px-4 py-2 text-center font-bold text-gray-500 tracking-wider sticky bg-[#E6EDFF] z-10 top-0">
+        <thead className="h-12 ">
+          <tr className="px-4 text-center font-medium text-black  tracking-wider sticky top-0 bg-[#E6EDFF] z-10 ">
             {headers.map((header) => (
               <th
                 key={header}
-                className={`border-[1px] border-gray-500 px-2 w-[210px] cursor-pointer relative group
+                className={`border-[1px] border-t-0 border-gray-500  px-2 w-[210px]  cursor-pointer relative group
                   ${selectedColumns.has(header) ? "bg-blue-200" : ""}`}
                 onClick={() => handleSelectColumn(header)}
               >
@@ -186,7 +192,7 @@ const Table: React.FC<TableProps> = ({
                             }}
                           />
                         </div>
-                         <div className="flex-1">
+                        <div className="flex-1">
                           <div
                             className="overflow-hidden whitespace-nowrap text-ellipsis px-2 py-[3px]"
                             style={{ maxWidth: "163px" }}

@@ -103,7 +103,7 @@ const TableProject:React.FC <TableProjectProps> = ({ onFileDetailsUpdate }) => {
   if (error) return <div className="p-4 text-red-500">Error: {error}</div>;
 
   return (
-    <div className="responsive-table-height">
+    <div className="responsive-table-height ">
       <Table
         headers={tableData.headers}
         data={tableData.data}

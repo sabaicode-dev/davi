@@ -153,24 +153,5 @@ jobs:
             else
               echo "Application is not running. Starting..."
               pm2 start server.js --name auth-service --update-env
-
-  cleanup:
-    runs-on: ubuntu-latest
-    needs: deploy # Ensure cleanup only runs after deploy finishes
-    steps:
-      - name: Delete old artifacts
-        run: |
-          # Fetch the list of artifacts
-          artifacts=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            https://api.github.com/repos/${{ github.repository }}/actions/artifacts)
-
-          # Extract artifact IDs and delete them
-          artifact_ids=$(echo "$artifacts" | jq '.[].id')
-
-          # Loop through and delete each artifact
-          for id in $artifact_ids; do
-            echo "Deleting artifact with ID: $id"
-            curl -X DELETE \
-              -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-              "https://api.github.com/repos/${{ github.repository }}/actions/artifacts/$id"
-          done
+            fi
+      

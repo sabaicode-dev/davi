@@ -22,7 +22,7 @@ const SpeadsheetTable: React.FC = () => {
   };
   return (
     <div
-      className="flex flex-col mt-8 h-[200px]"
+      className="flex flex-col overflow-hidden mt-8 h-[200px]"
       style={{ width: "100%", height: "30%" }}
     >
       <div className="flex flex-row justify-between items-center mb-3">
@@ -56,7 +56,7 @@ const SpeadsheetTable: React.FC = () => {
           startContent={<DownloadIcon />}
         />
       </div>
-      <div className="flex flex-row justify-between items-center border-t-2 border-[#443DFF] ">
+      <div className="flex flex-row  justify-between items-center border-t-2 border-[#443DFF] ">
         <div
           className="flex justify-between items-center gap-x-4 my-4"
           style={{ width: "60%" }}
