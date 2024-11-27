@@ -56,7 +56,6 @@ const ShowProject: React.FC<SelectProjectProps> = ({
         if (isMounted && response.data?.results) {
           setProjects(response.data.results);
           onDataFetch?.(response.data.results);
-          console.log(`Show project`);
         } else if (isMounted) {
           throw new Error("Failed to fetch projects.");
         }
@@ -81,17 +80,6 @@ const ShowProject: React.FC<SelectProjectProps> = ({
     };
   }, []);
 
-  if (children) {
-    return <>{children}</>;
-  }
-
-  if (isLoading) {
-    return <SkeletonLoader />;
-  }
-
-  if (error) {
-    return <p className="text-red-500">Error: {error}</p>;
-  }
   const handleDeleteProject = async (projectId: string) => {
     setIsDeleting(projectId);
 
@@ -121,6 +109,10 @@ const ShowProject: React.FC<SelectProjectProps> = ({
       setIsDeleting(null);
     }
   };
+
+  if (children) {
+    return <>{children}</>;
+  }  
 
   const getFilteredProjects = (filter: "recent" | "alphabetical" | null) => {
     if (filter === "recent") {
@@ -182,7 +174,7 @@ const ShowProject: React.FC<SelectProjectProps> = ({
   }
 
   return (
-    <div className="space-y-5 overflow-auto mt-4 p-2 w-full pb-12">
+    <div className="space-y-5 overflow-auto  mt-4 px-40 w-full pb-12">
       {/* Add backdrop blur overlay when modal is open */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-10 backdrop-blur-sm z-40" />
@@ -205,10 +197,10 @@ const ShowProject: React.FC<SelectProjectProps> = ({
       {projects.map((project: Project) => (
         <div
           key={project._id}
-          className="flex justify-between items-center p-4 shadow-lg rounded-xl cursor-pointer ring-2 hover:ring-blue-500 transition-all"
+          className="flex justify-between items-center px-4 py-2 shadow-lg rounded-md cursor-pointer ring-2 hover:ring-blue-500 transition-all"
           onClick={() => handleProjectSelect(project)}
         >
-          <div className="flex flex-row space-x-4">
+          <div className="flex flex-row items-center space-x-4">
             <img
               src={ImageProject}
               alt="Project icon"

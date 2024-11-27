@@ -23,8 +23,8 @@ export default function LoginPage() {
       if (response.status === 200) {
         // On successful login, navigate to your dashboard page
         // router.push("http://localhost:8080");
-        const { token } = response.data;
-        localStorage.setItem("authToken", token);
+        // const { token } = response.data;
+        // localStorage.setItem("authToken", token);
 
         window.location.href = "http://localhost:8080";
       } else {
