@@ -13,9 +13,8 @@ import { AuthProvider } from "@/src/contexts/AuthContext";
 import ShowProject from "@/src/components/molecules/steps/ShowProject";
 import ProjectDetail from "@/src/components/molecules/project/ProjectDetail";
 import SpeadsheetTable from "./components/templates/SpeadsheetTable";
-import TableProject from "./components/molecules/tables/TableProject";
-
-
+// import TableProject from "./components/molecules/tables/TableProject";
+import PrivateRoute from "@/src/ProtectedRoute/PrivateRoute";
 
 const ProjectFlow = () => {
   return (
@@ -42,9 +41,10 @@ const routes = [
   { path: "/helps", element: <Helps /> },
   { path: "/accountsetting", element: <AccountSettings /> },
   { path: "/cleaning", element: <AccountSettings /> },
-  { path: "/template-table", element: <SpeadsheetTable /> }, {
-    path: "/project/:projectId/file/:fileId/details", 
-    element: <SpeadsheetTable /> 
+  { path: "/template-table", element: <SpeadsheetTable /> },
+  {
+    path: "/project/:projectId/file/:fileId/details",
+    element: <SpeadsheetTable />,
   },
 ];
 
@@ -52,17 +52,19 @@ export const App = () => {
   return (
     <AuthProvider>
       <BrowserRouter>
-        <Layout>
-          <Routes>
-            {routes.map((route) => (
-              <Route
-                key={route.path}
-                path={route.path}
-                element={route.element}
-              />
-            ))}
-          </Routes>
-        </Layout>
+        <PrivateRoute>
+          <Layout>
+            <Routes>
+              {routes.map((route) => (
+                <Route
+                  key={route.path}
+                  path={route.path}
+                  element={route.element}
+                />
+              ))}
+            </Routes>
+          </Layout>
+        </PrivateRoute>
       </BrowserRouter>
     </AuthProvider>
   );

@@ -10,35 +10,9 @@ import { useAuth } from "@/src/contexts/AuthContext";
 const Header: React.FC = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
-  const { username, setUsername, email, setEmail } = useAuth();
+  const { setUsername, username, setEmail, email } = useAuth();
 
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const fetchUserDetails = async () => {
-      try {
-        const response = await fetch("http://localhost:4001/v1/auth/me", {
-          method: "GET",
-          credentials: "include", // Include cookies in the request
-        });
-
-        console.log("response", response);
-
-        if (response.ok) {
-          const data = await response.json();
-          console.log("User data", data);
-          setUsername(data.username);
-          setEmail(data.email);
-        } else {
-          console.error("Failed to fetch user details");
-        }
-      } catch (error) {
-        console.error("Error fetching user details:", error);
-      }
-    };
-
-    fetchUserDetails();
-  }, []);
 
   const handleProfileClick = () => {
     navigate("/accountsetting");
@@ -50,14 +24,14 @@ const Header: React.FC = () => {
       // Retrieve tokens from localStorage
       const authToken = localStorage.getItem("authToken");
       const refreshToken = localStorage.getItem("refreshToken"); // Replace "dummyRefreshToken" with the real token
-  
+
       // Check if tokens are available
       if (!authToken || !refreshToken) {
         console.warn("No tokens found. Redirecting to login...");
         window.location.href = "http://localhost:3000/login";
         return;
       }
-  
+
       // Call the logout API with the refresh token
       const response = await fetch("http://localhost:4001/v1/auth/logout", {
         method: "PUT",
@@ -70,18 +44,18 @@ const Header: React.FC = () => {
           refreshToken, // Send the refreshToken in the body
         }),
       });
-  
+
       if (response.ok) {
         console.log("User logged out successfully");
-  
+
         // Clear tokens and user state from the frontend
         localStorage.removeItem("authToken");
         localStorage.removeItem("refreshToken");
-  
+
         // Clear any additional user-related state (if necessary)
         setUsername && setUsername(null);
         setEmail && setEmail(null);
-  
+
         // Redirect to the login or signup page
         window.location.href = "http://localhost:3000/login";
       } else {
@@ -92,8 +66,7 @@ const Header: React.FC = () => {
       console.error("Error during logout:", error);
     }
   };
-  
-  
+
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
     if (isProfileDropdownOpen) {

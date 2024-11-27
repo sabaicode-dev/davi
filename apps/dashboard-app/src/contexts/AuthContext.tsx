@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  ReactNode,
+  useEffect,
+} from "react";
 
 interface AuthContextType {
   username: string | null;
@@ -16,10 +22,39 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [username, setUsername] = useState<string | null>(null);
   const [email, setEmail] = useState<string | null>(null);
+  const [isLoading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    const fetchUserDetails = async () => {
+      try {
+        const response = await fetch("http://localhost:4001/v1/auth/me", {
+          method: "GET",
+          credentials: "include", // Include cookies in the request
+        });
+
+        console.log("response", response);
+
+        if (response.ok) {
+          const data = await response.json();
+          console.log("User data", data);
+          setUsername(data.username);
+          setEmail(data.email);
+        } else {
+          console.error("Failed to fetch user details");
+        }
+      } catch (error) {
+        console.error("Error fetching user details:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserDetails();
+  }, []);
 
   return (
     <AuthContext.Provider value={{ username, email, setUsername, setEmail }}>
-      {children}
+      {isLoading ? "loading..." : children}
     </AuthContext.Provider>
   );
 };
