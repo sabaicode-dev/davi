@@ -135,7 +135,7 @@ const Table: React.FC<TableProps> = ({
   return (
     <div
       className="overflow-auto w-full border-[1px] border-gray-400"
-      style={{ height: "80%" }}
+      style={{ height: "90%" }}
     >
       <table
         className="  border-collapse table-fixed"

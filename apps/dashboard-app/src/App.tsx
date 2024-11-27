@@ -12,15 +12,14 @@ import Project from "@/src/components/pages/Project";
 import { AuthProvider } from "@/src/contexts/AuthContext";
 import ShowProject from "@/src/components/molecules/steps/ShowProject";
 import ProjectDetail from "@/src/components/molecules/project/ProjectDetail";
-import SpeadsheetTable from "./components/templates/SpeadsheetTable";
-// import TableProject from "./components/molecules/tables/TableProject";
+import SpeadsheetTable from "./components/molecules/steps/SpeadsheetTable";
 import PrivateRoute from "@/src/ProtectedRoute/PrivateRoute";
 
 const ProjectFlow = () => {
   return (
     <Routes>
-      <Route path="/" element={<CreateProject />} />
-      <Route path="pick-datasource" element={<PickDataSource />} />
+      {/* <Route path="/project/create" element={<CreateProject />} /> */}
+      <Route path="/pick-datasource" element={<PickDataSource />} />
       <Route
         path="pick-datasource/upload-csv/:projectId"
         element={<UploadCsv />}
@@ -36,10 +35,11 @@ const routes = [
     element: <Navigate to="/project" replace />,
   },
   { path: "/project", element: <Project /> },
+  { path: "/project/create", element: <CreateProject /> },
   { path: "/project/:projectId", element: <ProjectDetail /> },
   { path: "/select-project", element: <ShowProject /> },
   { path: "/project/*", element: <ProjectFlow /> },
-  { path: "/project/pick-datasource", element: <PickDataSource /> },
+  { path: "/project/create/pick-datasource", element: <PickDataSource /> },
   { path: "/visualize", element: <Visualize /> },
   { path: "/dataset", element: <Dataset /> },
   { path: "/helps", element: <Helps /> },

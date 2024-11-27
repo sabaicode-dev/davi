@@ -7,7 +7,7 @@ export const GetStart = function () {
   const navigate = useNavigate();
 
   const goToCreateProject = () => {
-    navigate("/project");
+    navigate("/project/create");
   };
 
   return (
@@ -37,9 +37,9 @@ export const GetStart = function () {
             <Button
               className="ml-auto py-3 !px-4 flex flex-row"
               // onClick={goToCreateProject}
-              onClick={() => alert("Clicked")}
+              onClick={ goToCreateProject}
               startContent={<FaPlus />}
-              children="Start New Project ss"
+              children="Start New Project v1"
               size="small"
               radius="2xl"
               color="secondary"

@@ -1,16 +1,19 @@
 import React, { useContext, useEffect, useState } from "react";
 import icon from "@/public/images/icon-cleaning.png";
-import Button from "../atoms/Button";
-import { DeleteIcon, DownloadIcon } from "../atoms/icons/Icon";
-import Input from "../atoms/Input";
+import Button from "../../atoms/Button";
+import { DeleteIcon, DownloadIcon } from "../../atoms/icons/Icon";
+import Input from "../../atoms/Input";
 import { CiFilter } from "react-icons/ci";
-import TableProject from "../molecules/tables/TableProject";
+import TableProject from "../tables/TableProject";
+import { useNavigate } from "react-router-dom";
+
+
 
 const SpeadsheetTable: React.FC = () => {
   const [fileDetails, setFileDetails] = useState({
     filename: "Employee Survey.CSV",
     totalRows: 0,
-    totalColumns: 0
+    totalColumns: 0,
   });
 
   const handleFileDetailsUpdate = (details: {
@@ -98,7 +101,7 @@ const SpeadsheetTable: React.FC = () => {
         </div>
       </div>
       <div className="">
-        <TableProject onFileDetailsUpdate={handleFileDetailsUpdate}/>
+        <TableProject onFileDetailsUpdate={handleFileDetailsUpdate} />
       </div>
     </div>
   );
