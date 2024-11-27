@@ -13,6 +13,8 @@ import { AuthProvider } from "@/src/contexts/AuthContext";
 import ShowProject from "@/src/components/molecules/steps/ShowProject";
 import ProjectDetail from "@/src/components/molecules/project/ProjectDetail";
 import SpeadsheetTable from "./components/templates/SpeadsheetTable";
+// import TableProject from "./components/molecules/tables/TableProject";
+import PrivateRoute from "@/src/ProtectedRoute/PrivateRoute";
 
 const ProjectFlow = () => {
   return (
@@ -52,8 +54,9 @@ const routes = [
 
 export const App = () => {
   return (
-      <AuthProvider>
-        <BrowserRouter>
+    <AuthProvider>
+      <BrowserRouter>
+        <PrivateRoute>
           <Layout>
             <Routes>
               {routes.map((route) => (
@@ -65,7 +68,8 @@ export const App = () => {
               ))}
             </Routes>
           </Layout>
-        </BrowserRouter>
-      </AuthProvider>
+        </PrivateRoute>
+      </BrowserRouter>
+    </AuthProvider>
   );
 };
