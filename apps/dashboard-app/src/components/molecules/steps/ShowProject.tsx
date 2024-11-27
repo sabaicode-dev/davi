@@ -163,7 +163,9 @@ const ShowProject: React.FC<SelectProjectProps> = ({
   };
 
   const newProject = () => {
-    navigate("/project");
+    navigate("/project/create", { 
+      state: { from: 'showProject' }
+    });
   };
   if (isLoading) {
     return <SkeletonLoader />;
@@ -185,7 +187,7 @@ const ShowProject: React.FC<SelectProjectProps> = ({
           className="ml-auto !py-2 !px-4 border-2 border-blue-500"
           onClick={newProject}
           startContent={<FaPlus />}
-          children="New Project"
+          children="New Project v1"
           size="small"
           radius="2xl"
           color="secondary"
