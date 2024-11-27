@@ -16,7 +16,9 @@ const SourceCSV: React.FC<SourceCSVProps> = ({ projectId }) => {
     }
     navigate(`/project/pick-datasource/upload-csv/${projectId}`);
   };
+  console.log(`Fix hx nov`)
   return (
+    
     <div
       onClick={goToUploadCsv}
       className="w-60 h-full mx-auto border rounded-lg"
