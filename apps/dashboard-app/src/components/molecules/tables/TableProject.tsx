@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Table from "./Table";
+import { useParams } from "react-router-dom";
+import Spinner from "../../loading/Spinner";
 
 interface ApiResponse {
   count: number;
@@ -10,15 +12,32 @@ interface ApiResponse {
   headers: string[];
   file: string;
   filename: string;
-  total: number;
+  dataset_summary?: {
+    total_rows: number;
+    total_columns: number;
+    file_type: string;
+    file_size: number;
+  };
 }
 
 interface TableProps {
   headers: string[];
   data: any[];
+  total_rows?: number;
+  total_column?: number;
+  filename?: string;
 }
 
-const TableProject: React.FC = () => {
+interface TableProjectProps {
+  onFileDetailsUpdate?: (details: {
+    filename: string;
+    totalRows: number;
+    totalColumns: number;
+  }) => void;
+}
+
+const TableProject:React.FC <TableProjectProps> = ({ onFileDetailsUpdate }) => {
+  const { projectId, fileId } = useParams();
   const [tableData, setTableData] = useState<TableProps>({
     headers: [],
     data: [],
@@ -28,13 +47,19 @@ const TableProject: React.FC = () => {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [projectId, fileId]);
 
   const fetchData = async () => {
+    if (!projectId || !fileId) {
+      setError("Project ID or File ID is missing");
+      setIsLoading(false);
+      return;
+    }
+
     try {
       setIsLoading(true);
       const response = await fetch(
-        "http://127.0.0.1:8000/api/v1/project/674569eb024769d8a9f73968/file/674569f7024769d8a9f73969/details/"
+        `http://127.0.0.1:8000/api/v1/project/${projectId}/file/${fileId}/details/`
       );
 
       if (!response.ok) {
@@ -42,11 +67,25 @@ const TableProject: React.FC = () => {
       }
 
       const jsonData: ApiResponse = await response.json();
+      console.log("Filename:", jsonData.filename);
+      console.log("Total Rows:", jsonData.dataset_summary?.total_rows);
+      console.log("Total Columns:", jsonData.dataset_summary?.total_columns);
 
       setTableData({
         headers: jsonData.headers,
         data: jsonData.results,
+        total_rows: jsonData.dataset_summary?.total_rows,
+        total_column: jsonData.dataset_summary?.total_columns,
+        filename: jsonData.filename,
       });
+
+      if (onFileDetailsUpdate) {
+        onFileDetailsUpdate({
+          filename: jsonData.filename || '',
+          totalRows: jsonData.dataset_summary?.total_rows || 0,
+          totalColumns: jsonData.dataset_summary?.total_columns || 0
+        });
+      }
     } catch (error) {
       setError(error instanceof Error ? error.message : "An error occurred");
       console.error("Error fetching data:", error);
@@ -55,7 +94,12 @@ const TableProject: React.FC = () => {
     }
   };
 
-  if (isLoading) return <div className="p-4">Loading...</div>;
+  if (isLoading)
+    return (
+      <div className="flex w-full justify-center items-center h-full">
+        <Spinner />
+      </div>
+    );
   if (error) return <div className="p-4 text-red-500">Error: {error}</div>;
 
   return (

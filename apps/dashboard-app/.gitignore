@@ -2,7 +2,7 @@
 .env.local
 node_modules/
 _README.md
-build/
+build
 .DS_Store
 *storybook.log
 /test-results/

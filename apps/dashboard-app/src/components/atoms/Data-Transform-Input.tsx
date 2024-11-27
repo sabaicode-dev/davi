@@ -1,7 +1,6 @@
 import React from "react";
 import Button from "./Button";
 import { CloseModalIcon } from "./icons/Icon";
-// import TableTest from "@/src/components/molecules/tables/ShowCleaningResult";
 import Table from "../molecules/tables/Table";
 type DataTransformInputProps = {
   hideDataTransformInput: () => void;

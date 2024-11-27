@@ -17,7 +17,7 @@ const ProjectDetail: React.FC = () => {
     });
   };
   return (
-    <div className="flex flex-col p-6 px-32 md:px-2 lg:px-3 xl:px-5 2xl:px-16">
+    <div className="flex flex-col p-6 px-40 ">
       <div className="flex justify-between items-center w-full">
       <div>
           <h1 className="font-bold text-lg">

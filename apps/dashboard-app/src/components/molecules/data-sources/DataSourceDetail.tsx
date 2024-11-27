@@ -22,7 +22,6 @@ interface ProjectFile {
 
 const DataSourceDetail: React.FC = () => {
   const { projectId } = useParams();
-  console.log("projectId:", projectId);
   const [projectFiles, setProjectFiles] = useState<ProjectFile[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -41,14 +40,8 @@ const DataSourceDetail: React.FC = () => {
           method: "GET",
         });
 
-        // Detailed logging
-        console.log("Full response:", response);
-        console.log("Response success:", response.success);
-        console.log("Response data:", response.data);
-        console.log("Response data.data:", response.data?.data);
-
         if (response.success && response.data?.data) {
-          console.log("Setting project files:", response.data.data);
+          console.log("All file response:", response.data.data);
           setProjectFiles(response.data.data);
         } else {
           console.log("Throwing error due to unsuccessful response");
@@ -115,8 +108,8 @@ const DataSourceDetail: React.FC = () => {
           projectFiles.map((file, index) => (
             <div
               key={file._id}
-              onClick={() => handleCardClick(file._id)}
-              className="flex justify-between items-center p-5 xl:p-2 2xl:p-3 bg-[#f2f5fd] shadow-lg rounded-xl cursor-pointer ring-1 hover:ring-blue-500 transition-all"
+              onClick={() => {handleCardClick(file._id)}}
+              className="flex justify-between items-center p-2  bg-[#f2f5fd] shadow-lg rounded-md cursor-pointer ring-1 hover:ring-blue-500 transition-all"
             >
               <div className="flex flex-row space-x-16 xl:space-x-6 2xl:space-x-12">
                 <div className="flex flex-row justify-center items-center space-x-16 pl-10 xl:space-x-6 2xl:space-x-12">
@@ -125,7 +118,7 @@ const DataSourceDetail: React.FC = () => {
                   </p>
                   <div className="border-l-2 border-gray-500 h-12" />
                 </div>
-                <div className="flex flex-row space-x-4">
+                <div className="flex flex-row items-center space-x-4">
                   <img
                     src={ImageProject}
                     alt="File icon"
