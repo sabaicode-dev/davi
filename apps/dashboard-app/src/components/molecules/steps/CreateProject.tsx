@@ -91,10 +91,9 @@ const CreateProject: React.FC<Step2Props> = ({
         },
       });
       const newProjectId = response.data._id;
-      console.log("Project Id: ",newProjectId)
+      console.log("Project Id: ", newProjectId);
       setProjectId(newProjectId);
       navigate(`pick-datasource?projectId=${newProjectId}`);
-
 
       console.log("Project creation response:", response);
 

@@ -2,9 +2,9 @@ name: CI/CD Pipeline for Auth Service
 
 on:
   pull_request:
-    branches: [Auth-Service-Smey]
+    branches: [analyze]
   push:
-    branches: [Auth-Service-Smey]
+    branches: [analyze]
 
 defaults:
   run:

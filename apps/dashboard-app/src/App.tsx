@@ -19,7 +19,7 @@ import PrivateRoute from "@/src/ProtectedRoute/PrivateRoute";
 const ProjectFlow = () => {
   return (
     <Routes>
-      <Route path="/project" element={<CreateProject />} />
+      <Route path="/" element={<CreateProject />} />
       <Route path="pick-datasource" element={<PickDataSource />} />
       <Route
         path="pick-datasource/upload-csv/:projectId"

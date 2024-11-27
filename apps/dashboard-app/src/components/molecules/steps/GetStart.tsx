@@ -10,7 +10,6 @@ export const GetStart = function () {
     navigate("/project");
   };
 
-
   return (
     <div className="flex justify-center items-center">
       <div className="flex w-full max-w-4xl rounded-lg">
@@ -37,9 +36,10 @@ export const GetStart = function () {
           <div className="flex mt-10 mr-20">
             <Button
               className="ml-auto py-3 !px-4 flex flex-row"
-              onClick={goToCreateProject}
+              // onClick={goToCreateProject}
+              onClick={() => alert("Clicked")}
               startContent={<FaPlus />}
-              children="Start New Project"
+              children="Start New Project ss"
               size="small"
               radius="2xl"
               color="secondary"
