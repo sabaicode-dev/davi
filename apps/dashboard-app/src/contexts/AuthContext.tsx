@@ -5,6 +5,7 @@ import React, {
   ReactNode,
   useEffect,
 } from "react";
+import { API_ENDPOINTS } from "../utils/const/apiEndpoint";
 
 interface AuthContextType {
   username: string | null;
@@ -27,7 +28,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     const fetchUserDetails = async () => {
       try {
-        const response = await fetch("http://localhost:4001/v1/auth/me", {
+        const response = await fetch(API_ENDPOINTS. USER_PROFILE, {
           method: "GET",
           credentials: "include", // Include cookies in the request
         });

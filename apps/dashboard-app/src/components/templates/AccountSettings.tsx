@@ -2,6 +2,7 @@ import React, { useState, ChangeEvent, useEffect } from "react";
 import axios from "axios";
 import { AiOutlineLogout } from "react-icons/ai";
 import { useAuth } from "@/src/contexts/AuthContext";
+import { API_ENDPOINTS } from "@/src/utils/const/apiEndpoint";
 
 const AccountSettings: React.FC = () => {
   const [user, setUser] = useState({
@@ -28,7 +29,7 @@ const AccountSettings: React.FC = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await axios.get("http://localhost:4001/v1/auth/me", {
+        const response = await axios.get(API_ENDPOINTS.USER_PROFILE, {
           withCredentials: true,
         });
 
@@ -82,7 +83,7 @@ const AccountSettings: React.FC = () => {
   const updateUser = async () => {
     try {
       const response = await axios.put(
-        "http://localhost:4001/v1/auth/updateUsername",
+        API_ENDPOINTS.UPDATE_USER_NAME,
         {
           email: user.email,
           newUsername: user.userName, // Add last name to the update request
@@ -117,7 +118,7 @@ const AccountSettings: React.FC = () => {
     try {
       // Call the logout API with the refresh token
       const response = await axios.put(
-        "http://localhost:4001/v1/auth/logout",
+        API_ENDPOINTS.SIGN_OUT,
         { refreshToken: localStorage.getItem("refreshToken") }, // Retrieve actual refresh token
         { withCredentials: true } // Ensure cookies are included in the request
       );
