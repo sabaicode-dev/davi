@@ -117,7 +117,7 @@ export default function EmailVerification() {
     setSuccess(false);
 
     try {
-      const response = await axiosInstance.post("/v1/auth/confirm", {
+      const response = await axiosInstance.post("/confirm", {
         email, // Include email from localStorage
         confirmationCode: code, // 6-digit code entered by the user
         password, // Include password from localStorage

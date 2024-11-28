@@ -1,5 +1,9 @@
+import dotenv from "dotenv";
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 
+dotenv.config();
+
+console.log("Loaded Auth Endpoint:", process.env.NEXT_PUBLIC_AUTH_ENDPOINT);
 // Extend AxiosRequestConfig to include `_retry` flag
 interface CustomAxiosRequestConfig extends AxiosRequestConfig {
   _retry?: boolean;
@@ -21,7 +25,8 @@ async function refreshToken(): Promise<{
 }> {
   try {
     const response = await axios.post(
-      `${"http://localhost:4001"}/v1/auth/refresh-token`,
+      // `${"http://localhost:4001"}/v1/auth/refresh-token`,
+      `${process.env.NEXT_PUBLIC_AUTH_ENDPOINT}/refresh-token`,
       null,
       {
         withCredentials: true,
@@ -58,7 +63,8 @@ function extractTokensFromResponse(response: AxiosResponse): {
 }
 
 const axiosInstance = axios.create({
-  baseURL: "http://localhost:4001",
+  // baseURL: "http://localhost:4001",
+  baseURL: process.env.NEXT_PUBLIC_AUTH_ENDPOINT, 
   withCredentials: true,
 });
 
