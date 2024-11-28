@@ -10,7 +10,6 @@ export const GetStart = function () {
     navigate("/project/create");
   };
 
-
   return (
     <div className="flex justify-center items-center">
       <div className="flex w-full max-w-4xl rounded-lg">
