@@ -122,14 +122,14 @@ const AccountSettings: React.FC = () => {
         { refreshToken: localStorage.getItem("refreshToken") }, // Retrieve actual refresh token
         { withCredentials: true } // Ensure cookies are included in the request
       );
-  
+
       if (response.status === 200) {
         console.log("User logged out successfully");
-  
+
         // Clear authentication-related data from localStorage
         localStorage.removeItem("authToken");
         localStorage.removeItem("refreshToken");
-  
+
         // Redirect to the login page
         window.location.href = "http://localhost:3000/login";
       } else {
