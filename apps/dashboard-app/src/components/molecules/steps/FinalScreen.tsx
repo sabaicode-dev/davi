@@ -1,32 +1,30 @@
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import icon from "@/public/images/icon-cleaning.png";
 import Button from "../../atoms/Button";
 import { DeleteIcon, DownloadIcon, V } from "../../atoms/icons/Icon";
 import Input from "../../atoms/Input";
 import { CiFilter } from "react-icons/ci";
 import TableProject from "../tables/TableProject";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
 
-const SpeadsheetTable: React.FC = () => {
+const FinalScreen: React.FC = () => {
   const [fileDetails, setFileDetails] = useState({
     filename: "Employee Survey.CSV",
     totalRows: 0,
     totalColumns: 0,
   });
 
-  const navigate = useNavigate(); // Initialize useNavigate hook
-
-  const handleFileDetailsUpdate = (details: { filename: string; totalRows: number; totalColumns: number }) => {
+  const handleFileDetailsUpdate = (details: {
+    filename: string;
+    totalRows: number;
+    totalColumns: number;
+  }) => {
     setFileDetails(details);
   };
-
-  const handleNextClick = () => {
-    // Navigate to the final screen when Next button is clicked
-    navigate("/project/:projectId/file/:fileId/details/finalscreen"); // Update with the correct path
-  };
-
   return (
-    <div className="flex flex-col overflow-hidden mt-8 h-[200px]" style={{ width: "100%", height: "30%" }}>
+    <div
+      className="flex flex-col overflow-hidden mt-8 h-[200px]"
+      style={{ width: "100%", height: "30%" }}
+    >
       <div className="flex flex-row justify-between items-center mb-3">
         {/* Content Left */}
         <div className="flex flex-row gap-x-3 justify-center items-center">
@@ -57,12 +55,24 @@ const SpeadsheetTable: React.FC = () => {
             isLoading={false}
             color="outline"
             startContent={<DownloadIcon />}
+            className="mr-2"
+          />
+          <Button
+            children={"Visualize"}
+            size="medium"
+            radius="2xl"
+            isLoading={false}
+            color="primary"
+            startContent={<V />}
+            className=" border-blue-500"
           />
         </div>
       </div>
-
-      <div className="flex flex-row justify-between items-center border-t-2 border-[#443DFF]">
-        <div className="flex justify-between items-center gap-x-4 my-4" style={{ width: "60%" }}>
+      <div className="flex flex-row  justify-between items-center border-t-2 border-[#443DFF] ">
+        <div
+          className="flex justify-between items-center gap-x-4 my-4"
+          style={{ width: "60%" }}
+        >
           <Input
             type="text"
             label=""
@@ -99,32 +109,11 @@ const SpeadsheetTable: React.FC = () => {
           />
         </div>
       </div>
-
-      <div>
-        <TableProject onFileDetailsUpdate={handleFileDetailsUpdate}  />
-        <div className="relative">
-          {/* Positioning the buttons */}
-          <Button
-            children={"Transform"}
-            size="medium"
-            radius="2xl"
-            isLoading={false}
-            color="outline"
-            className="absolute right-0 bottom-0 mr-[90px]"
-          />
-          <Button
-            children={"Next"}
-            size="medium"
-            radius="2xl"
-            isLoading={false}
-            color="primary"
-            className="absolute right-0 bottom-0 border-blue-500 w-20"
-            onClick={handleNextClick} // Attach the onClick handler to the Next button
-          />
+      <div className="">
+        <TableProject  onFileDetailsUpdate={handleFileDetailsUpdate} />
         </div>
-      </div>
     </div>
   );
 };
 
-export default SpeadsheetTable;
+export default FinalScreen;

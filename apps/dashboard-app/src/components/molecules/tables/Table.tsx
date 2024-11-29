@@ -12,6 +12,7 @@ interface TableProps {
     value: string
   ) => Promise<boolean>;
   onColumnSelect?: (selectedColumns: string[], columnData: any[]) => void;
+  
 }
 
 const Table: React.FC<TableProps> = ({
@@ -135,7 +136,7 @@ const Table: React.FC<TableProps> = ({
   return (
     <div
       className="overflow-auto w-full border-[1px] border-gray-400"
-      style={{ height: "90%" }}
+      style={{ height: "92%" }} 
     >
       <table
         className="  border-collapse table-fixed"
@@ -159,6 +160,7 @@ const Table: React.FC<TableProps> = ({
               </th>
             ))}
           </tr>
+          
         </thead>
         <tbody className="bg-white">
           {tableData.map((row, index) => {

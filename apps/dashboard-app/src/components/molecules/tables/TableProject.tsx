@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import Table from "./Table";
 import { useParams } from "react-router-dom";
 import Spinner from "../../loading/Spinner";
-import Button from "../../atoms/Button";
+
 
 
 interface ApiResponse {
@@ -47,6 +46,7 @@ const TableProject:React.FC <TableProjectProps> = ({ onFileDetailsUpdate }) => {
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
 
   useEffect(() => {
     fetchData();
@@ -108,6 +108,11 @@ const TableProject:React.FC <TableProjectProps> = ({ onFileDetailsUpdate }) => {
     );
   if (error) return <div className="p-4 text-red-500">Error: {error}</div>;
 
+
+// Correct
+
+
+
   return (
     <div className="responsive-table-height">
       <Table
@@ -116,25 +121,8 @@ const TableProject:React.FC <TableProjectProps> = ({ onFileDetailsUpdate }) => {
         isCheckBox={true}
         isEditCell={true}
         isSelectColumn={true}
+     
       />
-      <div className="flex justify-end my-6">
-      <Button
-            children={"Transform"}
-            size="medium"
-            radius="2xl"
-            isLoading={false}
-            color="outline"
-            className="mr-3"
-          />
-          <Button
-            children={"Next"}
-            size="medium"
-            radius="2xl"
-            isLoading={false}
-            color="primary"
-            className="border-blue-500"
-          />
-      </div>
     </div>
   );
 };
