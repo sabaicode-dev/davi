@@ -52,27 +52,29 @@ const routes = [
     element: <SpeadsheetTable />,
   },
   // Add the route for FinalScreen
-  { path: "/project/:projectId/file/:fileId/details/finalscreen", element: <FinalScreen/> },
+  {
+    path: "/project/:projectId/file/:fileId/details/finalscreen",
+    element: <FinalScreen />,
+  },
 ];
-
 
 export const App = () => {
   return (
     <AuthProvider>
       <BrowserRouter>
-        <PrivateRoute>
-          <Layout>
-            <Routes>
-              {routes.map((route) => (
-                <Route
-                  key={route.path}
-                  path={route.path}
-                  element={route.element}
-                />
-              ))}
-            </Routes>
-          </Layout>
-        </PrivateRoute>
+        {/* <PrivateRoute> */}
+        <Layout>
+          <Routes>
+            {routes.map((route) => (
+              <Route
+                key={route.path}
+                path={route.path}
+                element={route.element}
+              />
+            ))}
+          </Routes>
+        </Layout>
+        {/* </PrivateRoute> */}
       </BrowserRouter>
     </AuthProvider>
   );
