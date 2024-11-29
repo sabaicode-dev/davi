@@ -116,24 +116,46 @@ const AccountSettings: React.FC = () => {
   // Logout function
   const handleLogout = async () => {
     try {
-      // Call the logout API with the refresh token
-      const response = await axios.put(
-        API_ENDPOINTS.SIGN_OUT,
-        { refreshToken: localStorage.getItem("refreshToken") }, // Retrieve actual refresh token
-        { withCredentials: true } // Ensure cookies are included in the request
-      );
+      // Retrieve tokens from localStorage
+      const authToken = localStorage.getItem("authToken");
+      const refreshToken = localStorage.getItem("refreshToken"); // Replace "dummyRefreshToken" with the real token
 
-      if (response.status === 200) {
+      // Check if tokens are available
+      if (!authToken || !refreshToken) {
+        console.warn("No tokens found. Redirecting to login...");
+        window.location.href = "http://localhost:3000/login";
+        return;
+      }
+
+      // Call the logout API with the refresh token
+      const response = await fetch(API_ENDPOINTS.SIGN_OUT, {
+        method: "PUT",
+        credentials: "include", // Include cookies if necessary
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authToken}`, // Include authToken in the header
+        },
+        body: JSON.stringify({
+          refreshToken, // Send the refreshToken in the body
+        }),
+      });
+
+      if (response.ok) {
         console.log("User logged out successfully");
 
-        // Clear authentication-related data from localStorage
+        // Clear tokens and user state from the frontend
         localStorage.removeItem("authToken");
         localStorage.removeItem("refreshToken");
 
-        // Redirect to the login page
+        // Clear any additional user-related state (if necessary)
+        setUsername && setUsername(null);
+        setEmail && setEmail(null);
+
+        // Redirect to the login or signup page
         window.location.href = "http://localhost:3000/login";
       } else {
-        console.error("Failed to log out:", response.data);
+        const errorData = await response.json();
+        console.error("Failed to log out:", errorData);
       }
     } catch (error) {
       console.error("Error during logout:", error);
