@@ -12,8 +12,9 @@ import Project from "@/src/components/pages/Project";
 import { AuthProvider } from "@/src/contexts/AuthContext";
 import ShowProject from "@/src/components/molecules/steps/ShowProject";
 import ProjectDetail from "@/src/components/molecules/project/ProjectDetail";
-import SpeadsheetTable from "./components/templates/SpeadsheetTable";
+import SpeadsheetTable from "./components/molecules/steps/SpeadsheetTable";
 import PrivateRoute from "@/src/ProtectedRoute/PrivateRoute";
+import FinalScreen from "./components/molecules/steps/FinalScreen";
 
 const ProjectFlow = () => {
   return (
@@ -50,7 +51,10 @@ const routes = [
     path: "/project/:projectId/file/:fileId/details",
     element: <SpeadsheetTable />,
   },
+  // Add the route for FinalScreen
+  { path: "/project/:projectId/file/:fileId/details/finalscreen", element: <FinalScreen/> },
 ];
+
 
 export const App = () => {
   return (
