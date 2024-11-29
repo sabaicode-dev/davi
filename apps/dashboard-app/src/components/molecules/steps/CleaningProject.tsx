@@ -1,12 +1,12 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import icon from "@/public/images/icon-cleaning.png";
-import Button from "../../atoms/Button";
-import { DeleteIcon, DownloadIcon, V } from "../../atoms/icons/Icon";
-import Input from "../../atoms/Input";
+import Button from "@/src/components/atoms/Button";
+import { DeleteIcon, DownloadIcon, V } from "@/src/components/atoms/icons/Icon";
+import Input from "@/src/components/atoms/Input";
 import { CiFilter } from "react-icons/ci";
-import Table from "../tables/Table";
 import { useNavigate, useParams } from "react-router-dom";
-import Spinner from "../loading/Spinner";
+import Table from "@/src/components/molecules/tables/Table";
+import Spinner from "@/src/components/molecules/loading/Spinner";
 
 interface ApiResponse {
   count: number;
@@ -24,7 +24,6 @@ interface ApiResponse {
     file_size: number;
   };
 }
-
 interface TableProps {
   headers: string[];
   data: any[];
@@ -32,25 +31,18 @@ interface TableProps {
   total_column?: number;
   filename?: string;
 }
-
-const FinalScreen: React.FC = () => {
+const CleaningProject: React.FC = () => {
   const [fileDetails, setFileDetails] = useState({
     filename: "Employee Survey.CSV",
     totalRows: 0,
     totalColumns: 0,
   });
 
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // Initialize useNavigate hook
   const [tableData, setTableData] = useState<TableProps>({
     headers: [],
     data: [],
   });
-
-  const { projectId, fileId } = useParams();
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  // Move handleFileDetailsUpdate before it's used
   const handleFileDetailsUpdate = (details: {
     filename: string;
     totalRows: number;
@@ -58,6 +50,20 @@ const FinalScreen: React.FC = () => {
   }) => {
     setFileDetails(details);
   };
+
+
+  const handleNextClick = () => {
+    try {
+      console.log('Attempting to navigate');
+      navigate(`/project/${projectId}/file/${fileId}/finalscreen`);
+      console.log('Navigation successful');
+    } catch (error) {
+      console.error('Navigation error:', error);
+    }
+  };
+  const { projectId, fileId } = useParams();
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchData();
@@ -89,12 +95,13 @@ const FinalScreen: React.FC = () => {
         filename: jsonData.filename,
       });
 
-      // Ensure handleFileDetailsUpdate is called after it's defined
-      handleFileDetailsUpdate({
-        filename: jsonData.filename || "",
-        totalRows: jsonData.dataset_summary?.total_rows || 0,
-        totalColumns: jsonData.dataset_summary?.total_columns || 0,
-      });
+      if (handleFileDetailsUpdate) {
+        handleFileDetailsUpdate({
+          filename: jsonData.filename || "",
+          totalRows: jsonData.dataset_summary?.total_rows || 0,
+          totalColumns: jsonData.dataset_summary?.total_columns || 0,
+        });
+      }
     } catch (error) {
       setError(error instanceof Error ? error.message : "An error occurred");
       console.error("Error fetching data:", error);
@@ -147,20 +154,11 @@ const FinalScreen: React.FC = () => {
             isLoading={false}
             color="outline"
             startContent={<DownloadIcon />}
-            className="mr-2"
-          />
-          <Button
-            children={"Visualize"}
-            size="medium"
-            radius="2xl"
-            isLoading={false}
-            color="primary"
-            startContent={<V />}
-            className=" border-blue-500"
           />
         </div>
       </div>
-      <div className="flex flex-row  justify-between items-center border-t-2 border-[#443DFF] ">
+
+      <div className="flex flex-row justify-between items-center border-t-2 border-[#443DFF]">
         <div
           className="flex justify-between items-center gap-x-4 my-4"
           style={{ width: "60%" }}
@@ -201,9 +199,8 @@ const FinalScreen: React.FC = () => {
           />
         </div>
       </div>
-      <div className="">
-        {/* <TableProject onFileDetailsUpdate={handleFileDetailsUpdate} /> */}
-        <h1>Hllo</h1>
+
+      <div>
         <div className="responsive-table-height">
           <Table
             headers={tableData.headers}
@@ -213,9 +210,29 @@ const FinalScreen: React.FC = () => {
             isSelectColumn={true}
           />
         </div>
+        <div className="relative">
+          {/* Positioning the buttons */}
+          <Button
+            children={"Transform"}
+            size="medium"
+            radius="2xl"
+            isLoading={false}
+            color="outline"
+            className="absolute right-0 bottom-0 mr-[90px]"
+          />
+          <Button
+            children={"Next"}
+            size="medium"
+            radius="2xl"
+            isLoading={false}
+            color="primary"
+            className="absolute right-0 bottom-0 border-blue-500 w-20"
+            onClick={handleNextClick}
+          />
+        </div>
       </div>
     </div>
   );
 };
 
-export default FinalScreen;
+export default CleaningProject;
