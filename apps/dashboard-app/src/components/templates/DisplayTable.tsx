@@ -1,30 +1,36 @@
-import React from "react";
+import { useState } from "react";
 import BookIcon from "@/public/images/Book-icon.png";
-interface ListTable {
-  id: number;
-  table: string;
+import { DisplayTableMock } from "@/src/data/MockUp";
+
+interface DisplayTableProps {
+  onSelectTable: (tableName: string) => void;
 }
 
-interface Props {
-  listTable: ListTable[];
-  setSelectedTable: (item: ListTable) => void;
-}
+const DisplayTable = ({ onSelectTable }: DisplayTableProps) => {
+  const [selectedItemId, setSelectedItemId] = useState(null);
 
-const DisplayTable: React.FC<Props> = ({ listTable, setSelectedTable }) => {
+  const handleItemClick = (id: any, tableName: any) => {
+    setSelectedItemId(id);
+    onSelectTable(tableName);
+  };
+
   return (
-    <div className="container w-[15%] h-[730px] space-y-2 border border-[#C4C1D8] rounded-lg">
-      <header className="text-start py-5 font-medium text-[20px] flex justify-start ml-5">
-        Display Table
+    <div className=" h-[800px] space-y-3 border border-[#C4C1D8] rounded-lg py-3">
+      <header className="text-center font-medium text-[20px] w-[200px]">
+        <h1> Display Table</h1>
       </header>
-      <ul className="space-y-3 font-medium text-[14px] ml-5">
-        {listTable.map((item) => (
+      <ul className="space-y-3 font-medium text-[14px]">
+        {DisplayTableMock.map((item) => (
           <div
-            className="flex justify-start cursor-pointer"
             key={item.id}
-            onClick={() => setSelectedTable(item)}
+            className={`flex items-center text-center cursor-pointer space-x-1 px-10 ${
+              selectedItemId === item.id ? "bg-[#E6EDFF]" : ""
+            }`}
+            onClick={() => handleItemClick(item.id, item.table)}
           >
+            <input type="checkbox" className="size-4 border-[#afaac7]" />
             <img src={BookIcon} alt="" width={24} />
-            <p className="ml-2">{item.table}</p>
+            <p>{item.table}</p>
           </div>
         ))}
       </ul>

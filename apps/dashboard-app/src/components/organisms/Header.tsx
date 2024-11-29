@@ -6,6 +6,7 @@ import { AiOutlineLogout } from "react-icons/ai";
 import { FiUser } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/src/contexts/AuthContext";
+import { API_ENDPOINTS } from "@/src/utils/const/apiEndpoint";
 
 const Header: React.FC = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -33,7 +34,7 @@ const Header: React.FC = () => {
       }
 
       // Call the logout API with the refresh token
-      const response = await fetch("http://localhost:4001/v1/auth/logout", {
+      const response = await fetch(API_ENDPOINTS.SIGN_OUT, {
         method: "PUT",
         credentials: "include", // Include cookies if necessary
         headers: {

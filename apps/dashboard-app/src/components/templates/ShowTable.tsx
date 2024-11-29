@@ -1,5 +1,5 @@
 interface ShowTableProps {
-  selectedTable: { table: string } | null;
+  selectedTable: string | null;
 }
 
 const ShowTable = ({ selectedTable }: ShowTableProps) => {

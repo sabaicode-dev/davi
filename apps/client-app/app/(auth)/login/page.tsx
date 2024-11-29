@@ -13,7 +13,7 @@ export default function LoginPage() {
   const handleLogin = async (email: string, password: string) => {
     setError(null);
     try {
-      const response = await axiosInstance.post("/v1/auth/signin", {
+      const response = await axiosInstance.post("/signin", {
         email,
         password,
       });
@@ -38,7 +38,7 @@ export default function LoginPage() {
 
   const handleGoogleSignUp = async () => {
     try {
-      const response = await axiosInstance.get("/v1/auth/google");
+      const response = await axiosInstance.get("/google");
 
       // Check if the response contains the redirect URL
       if (response.data && response.data.url) {

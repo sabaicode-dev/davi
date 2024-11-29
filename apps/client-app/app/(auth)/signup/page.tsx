@@ -47,7 +47,7 @@ export default function SignUpPage() {
 
     try {
       // Call the signup API
-      const response = await axiosInstance.post("/v1/auth/signup", {
+      const response = await axiosInstance.post("/signup", {
         email,
         password,
         username,
@@ -101,7 +101,7 @@ export default function SignUpPage() {
 
   const handleGoogleSignUp = async () => {
     try {
-      const response = await axiosInstance.get("/v1/auth/google");
+      const response = await axiosInstance.get("/google");
 
       if (response.data && response.data.url) {
         window.location.href = response.data.url; // Redirect to the Google OAuth page
