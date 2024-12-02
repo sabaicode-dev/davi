@@ -1,5 +1,6 @@
 import React from 'react';
 import { X } from 'lucide-react';
+import { TranfromIcon } from '../../atoms/icons/Icon';
 
 interface ModalProps {
   isOpen: boolean;
@@ -17,19 +18,7 @@ export function Modal({ isOpen, onClose, children, title }: ModalProps) {
         <div className="flex items-center justify-between p-4 border-b">
           <div className="flex items-center gap-3">
             <div className="bg-green-100 p-2 rounded-lg">
-              <svg
-                className="w-5 h-5 text-green-600"
-                fill="none"
-                strokeWidth="2"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M20 7l-8 8-4-4"
-                />
-              </svg>
+             <TranfromIcon/>
             </div>
             <h2 className="text-lg font-semibold">{title}</h2>
           </div>
