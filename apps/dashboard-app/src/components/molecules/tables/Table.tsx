@@ -5,7 +5,6 @@ import Boolean from "../charts/BooleanChart";
 import UniqueValue from "../charts/UniqueValue";
 import Analysis from "../descraptive/Analysis";
 
-
 interface TableProps {
   headers: string[];
   data: Array<Record<string, any>>;
@@ -26,7 +25,7 @@ interface TableProps {
 interface ChartMetadata {
   key: string;
   table_column_info: {
-    type: 'STRING' | 'NUMERIC' | 'BOOLEAN';
+    type: "STRING" | "NUMERIC" | "BOOLEAN";
   };
   table_column_metrics: {
     string_metrics?: { counts: any[] };
@@ -79,16 +78,26 @@ const Table: React.FC<TableProps> = ({
     return word.charAt(0).toUpperCase() + word.slice(1);
   };
 
-
-//----1
-const [numberData, setNumberData] = useState<number[]>([]);
+  //----1
+  const [numberData, setNumberData] = useState<number[]>([]);
   const [numberLabels, setNumberLabels] = useState<string[]>([]);
-  const [categoryData, setCategoryData] = useState<{ category: string; percentage: number }[]>([]);
-  const [booleanData, setBooleanData] = useState<{ true: number; false: number }>({ true: 0, false: 0 });
+  const [categoryData, setCategoryData] = useState<
+    { category: string; percentage: number }[]
+  >([]);
+  const [booleanData, setBooleanData] = useState<{
+    true: number;
+    false: number;
+  }>({ true: 0, false: 0 });
   const [showSidebar, setShowSidebar] = useState(false);
-  const [selectedData, setSelectedData] = useState<{ category: string; percentage: number } | null>(null);
+  const [selectedData, setSelectedData] = useState<{
+    category: string;
+    percentage: number;
+  } | null>(null);
 
-  const handleBoxClick = (dataPoint: { category: string; percentage: number }) => {
+  const handleBoxClick = (dataPoint: {
+    category: string;
+    percentage: number;
+  }) => {
     setSelectedData(dataPoint);
     setShowSidebar(true);
   };
@@ -97,8 +106,7 @@ const [numberData, setNumberData] = useState<number[]>([]);
     setShowSidebar(false);
     setSelectedData(null);
   };
-//-----1
-
+  //-----1
 
   //hong
   const renderChart = (col: ChartMetadata) => {
@@ -108,7 +116,12 @@ const [numberData, setNumberData] = useState<number[]>([]);
         // For STRING columns, access string_metrics.counts
         return (
           <Category
-           onClick={(item) => handleBoxClick({ category: item.category, percentage: item.percentage })}
+            onClick={(item) =>
+              handleBoxClick({
+                category: item.category,
+                percentage: item.percentage,
+              })
+            }
             data={col.table_column_metrics.string_metrics?.counts || []} // Handle missing data with a fallback
           />
         );
@@ -131,8 +144,7 @@ const [numberData, setNumberData] = useState<number[]>([]);
         return <p>No chart available</p>;
     }
   };
-  
-  
+
   //hong
 
   const handleSelectRow = (id: string | number) => {
@@ -238,8 +250,8 @@ const [numberData, setNumberData] = useState<number[]>([]);
               </th>
             ))}
           </tr>
-            {/* Row for Charts */}
-            {showChart && (
+          {/* Row for Charts */}
+          {showChart && (
             <tr className="sticky bg-[#F7FAFF] z-10 top-[3rem]">
               {metadata.map((col) => (
                 <td
@@ -366,12 +378,11 @@ const [numberData, setNumberData] = useState<number[]>([]);
           })}
         </tbody>
       </table>
-       {/* Sidebar */}
-       {showSidebar && selectedData && (
+      {/* Sidebar */}
+      {showSidebar && selectedData && (
         <Analysis selectedData={selectedData} onClose={closeSidebar} />
       )}
     </div>
-    
   );
 };
 
