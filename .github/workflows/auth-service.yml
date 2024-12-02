@@ -18,7 +18,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 0 # Ensures all branches and tags are fetched
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -63,7 +63,7 @@ jobs:
           path: ./apps/backend/auth-service/build
 
       - name: Prepare Deployment Directories
-        uses: appleboy/ssh-action@v0.1.5
+        uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.EC2_IP }}
           username: ${{ secrets.EC2_USERNAME }}
@@ -74,7 +74,7 @@ jobs:
             mkdir -p /home/ubuntu/apps/auth-service/build/configs
 
       - name: Copy files to EC2
-        uses: appleboy/scp-action@v0.1.5
+        uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.EC2_IP }}
           username: ${{ secrets.EC2_USERNAME }}
@@ -85,7 +85,7 @@ jobs:
           strip_components: 4
 
       - name: Configure npm to use GitHub Packages on EC2
-        uses: appleboy/ssh-action@v0.1.5
+        uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.EC2_IP }}
           username: ${{ secrets.EC2_USERNAME }}
@@ -96,7 +96,7 @@ jobs:
             echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" >> /home/ubuntu/apps/auth-service/build/.npmrc
 
       - name: Create .env.production File with Secrets
-        uses: appleboy/ssh-action@v0.1.5
+        uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.EC2_IP }}
           username: ${{ secrets.EC2_USERNAME }}
@@ -120,14 +120,14 @@ jobs:
             echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> /home/ubuntu/apps/auth-service/build/configs/.env.production
 
       - name: Install Dependencies and Restart PM2 on EC2
-        uses: appleboy/ssh-action@v0.1.5
+        uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.EC2_IP }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
-            set -e
+            # Initialize NVM if it's installed, or install it if missing
             export NVM_DIR="$HOME/.nvm"
             if [ -s "$NVM_DIR/nvm.sh" ]; then
               . "$NVM_DIR/nvm.sh"
@@ -135,14 +135,22 @@ jobs:
               curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
               . "$NVM_DIR/nvm.sh"
             fi
+
+            # Install Node.js, Yarn, and PM2 if missing
             nvm install 20
             nvm use 20
             npm install -g yarn pm2
-            . ~/.bashrc
+            . ~/.bashrc  # Ensure the environment is updated for non-interactive shells
+
+            # Navigate to the application directory and install production dependencies
             cd /home/ubuntu/apps/auth-service/build
             yarn install --production
+
+            # Start or restart the app using PM2 with direct PM2 commands
             if pm2 show auth-service > /dev/null; then
+              echo "Application is running. Restarting..."
               pm2 restart auth-service --update-env
             else
+              echo "Application is not running. Starting..."
               pm2 start server.js --name auth-service --update-env
             fi
