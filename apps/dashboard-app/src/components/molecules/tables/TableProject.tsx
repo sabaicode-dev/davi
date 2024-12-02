@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Table from "./Table";
 import { useParams } from "react-router-dom";
-import Spinner from "../../loading/Spinner";
+import Spinner from "../loading/Spinner";
 
 interface ApiResponse {
   count: number;
@@ -125,3 +125,4 @@ const TableProject:React.FC <TableProjectProps> = ({ onFileDetailsUpdate }) => {
 };
 
 export default TableProject;
+
