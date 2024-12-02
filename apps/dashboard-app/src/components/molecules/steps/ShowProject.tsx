@@ -112,7 +112,7 @@ const ShowProject: React.FC<SelectProjectProps> = ({
 
   if (children) {
     return <>{children}</>;
-  }  
+  }
 
   const getFilteredProjects = (filter: "recent" | "alphabetical" | null) => {
     if (filter === "recent") {
@@ -135,8 +135,8 @@ const ShowProject: React.FC<SelectProjectProps> = ({
     navigate(`/project/${project._id}`, {
       state: {
         projectName: project.project_name,
-        projectDescription: project.project_description
-      }
+        projectDescription: project.project_description,
+      },
     });
   };
   const handleEditClick = (projectId: string) => {
@@ -163,8 +163,8 @@ const ShowProject: React.FC<SelectProjectProps> = ({
   };
 
   const newProject = () => {
-    navigate("/project/create", { 
-      state: { from: 'showProject' }
+    navigate("/project/create", {
+      state: { from: "showProject" },
     });
   };
   if (isLoading) {
