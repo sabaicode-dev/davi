@@ -3,8 +3,6 @@ import Table from "./Table";
 import { useParams } from "react-router-dom";
 import Spinner from "../../loading/Spinner";
 
-
-
 interface ApiResponse {
   count: number;
   next: boolean;
@@ -120,8 +118,7 @@ const TableProject:React.FC <TableProjectProps> = ({ onFileDetailsUpdate }) => {
         data={tableData.data}
         isCheckBox={true}
         isEditCell={true}
-        isSelectColumn={true}
-     
+        isSelectColumn={true}     
       />
     </div>
   );
