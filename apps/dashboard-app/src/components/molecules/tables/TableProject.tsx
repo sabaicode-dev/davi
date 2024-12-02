@@ -3,6 +3,8 @@ import Table from "./Table";
 import { useParams } from "react-router-dom";
 import Spinner from "../../loading/Spinner";
 
+
+
 interface ApiResponse {
   count: number;
   next: boolean;
@@ -44,6 +46,7 @@ const TableProject:React.FC <TableProjectProps> = ({ onFileDetailsUpdate }) => {
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
 
   useEffect(() => {
     fetchData();
@@ -93,6 +96,9 @@ const TableProject:React.FC <TableProjectProps> = ({ onFileDetailsUpdate }) => {
       setIsLoading(false);
     }
   };
+  
+
+
 
   if (isLoading)
     return (
@@ -102,6 +108,11 @@ const TableProject:React.FC <TableProjectProps> = ({ onFileDetailsUpdate }) => {
     );
   if (error) return <div className="p-4 text-red-500">Error: {error}</div>;
 
+
+// Correct
+
+
+
   return (
     <div className="responsive-table-height">
       <Table
@@ -110,6 +121,7 @@ const TableProject:React.FC <TableProjectProps> = ({ onFileDetailsUpdate }) => {
         isCheckBox={true}
         isEditCell={true}
         isSelectColumn={true}
+     
       />
     </div>
   );

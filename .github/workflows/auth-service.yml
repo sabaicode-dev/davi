@@ -2,15 +2,15 @@ name: CI/CD Pipeline for Auth Service
 
 on:
   pull_request:
-    branches: [Auth-Service-Smey]
+    branches: [analyze]
   push:
-    branches: [Auth-Service-Smey]
+    branches: [analyze]
 
 defaults:
   run:
     working-directory: ./apps/backend/auth-service
 
-jobs:
+jobs:       
   build:
     runs-on: ubuntu-latest
 
@@ -154,3 +154,4 @@ jobs:
               echo "Application is not running. Starting..."
               pm2 start server.js --name auth-service --update-env
             fi
+      
