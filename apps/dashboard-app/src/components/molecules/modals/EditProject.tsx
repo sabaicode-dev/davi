@@ -16,7 +16,6 @@ interface ICreateProjectModalProps {
   ) => void;
 }
 
-
 const Modal: React.FC<ICreateProjectModalProps> = ({
   onClose,
   projectId,
@@ -77,7 +76,7 @@ const Modal: React.FC<ICreateProjectModalProps> = ({
     setErrorMessages(newErrorMessages);
     return valid;
   };
-  
+
   const handleUpdate = async () => {
     if (!validateForm()) {
       return;
@@ -87,7 +86,7 @@ const Modal: React.FC<ICreateProjectModalProps> = ({
 
     try {
       const response = await request({
-        url: `http://127.0.0.1:8000/api/v1/project/${projectId}/update/`,
+        url: `http://3.24.110.41:8000/api/v1/project/${projectId}/update/`,
         method: "PUT",
         withCredentials: false,
         data: {
