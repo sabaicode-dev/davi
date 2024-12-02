@@ -28,7 +28,7 @@ jobs:
       - name: Configure npm to use GitHub Packages
         run: |
           echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
-          echo "@datacatalog2024:registry=https://npm.pkg.github.com" >> ~/.npmrc
+          echo "@sabaicode-dev:registry=https://npm.pkg.github.com" >> ~/.npmrc
 
       - name: Install dependencies
         run: yarn install
@@ -92,7 +92,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
-            echo "@datacatalog2024:registry=https://npm.pkg.github.com" > /home/ubuntu/apps/auth-service/build/.npmrc
+            echo "@sabaicode-dev:registry=https://npm.pkg.github.com" > /home/ubuntu/apps/auth-service/build/.npmrc
             echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" >> /home/ubuntu/apps/auth-service/build/.npmrc
 
       - name: Create .env.production File with Secrets
