@@ -142,6 +142,10 @@ jobs:
             npm install -g yarn pm2
             . ~/.bashrc  # Ensure the environment is updated for non-interactive shells
 
+            # Display .bashrc contents for debugging purposes
+            echo "Displaying contents of ~/.bashrc"
+            cat ~/.bashrc  # This will show the contents of ~/.bashrc in the logs
+
             # Navigate to the application directory and install production dependencies
             cd /home/ubuntu/apps/auth-service/build
             yarn install --production
