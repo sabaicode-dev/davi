@@ -3,7 +3,6 @@ import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 
 dotenv.config();
 
-console.log("Loaded Auth Endpoint:", process.env.NEXT_PUBLIC_AUTH_ENDPOINT);
 // Extend AxiosRequestConfig to include `_retry` flag
 interface CustomAxiosRequestConfig extends AxiosRequestConfig {
   _retry?: boolean;
