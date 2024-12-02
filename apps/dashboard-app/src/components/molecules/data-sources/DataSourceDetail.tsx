@@ -6,7 +6,7 @@ import formatFileSize from "@/src/utils/formatSizeFile";
 import ImageProject from "@/public/images/saveImage.png";
 import request from "@/src/utils/helper";
 import { useNavigate, useParams } from "react-router-dom";
-import Spinner from "../../loading/Spinner";
+import Spinner from "../loading/Spinner";
 
 interface ProjectFile {
   _id: string;
@@ -28,8 +28,9 @@ const DataSourceDetail: React.FC = () => {
   const navigate = useNavigate();
 
   const handleCardClick = (fileId: string) => {
-    navigate(`/project/${projectId}/file/${fileId}/details`);
+    navigate(`/project/${projectId}/file/${fileId}/cleaning`);
   };
+
   useEffect(() => {
     const fetchProjectFiles = async () => {
       if (!projectId) return;

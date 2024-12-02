@@ -1,5 +1,5 @@
 import React from "react";
-import Button from "../../atoms/Button";
+import Button from "@/src/components/atoms/Button";
 import { FaPlus } from "react-icons/fa6";
 import DataSourceDetail from "../data-sources/DataSourceDetail";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -32,7 +32,7 @@ const ProjectDetail: React.FC = () => {
             className="ml-auto py-3 !px-4 flex flex-row"
             onClick={goToPickDataSource}
             startContent={<FaPlus />}
-            children="Create New File v1"
+            children="Create New File"
             size="small"
             radius="2xl"
             color="secondary"

@@ -36,9 +36,10 @@ export const GetStart = function () {
           <div className="flex mt-10 mr-20">
             <Button
               className="ml-auto py-3 !px-4 flex flex-row"
-              onClick={goToCreateProject}
+              // onClick={goToCreateProject}
+              onClick={ goToCreateProject}
               startContent={<FaPlus />}
-              children="Start New Project v1"
+              children="Start New Project"
               size="small"
               radius="2xl"
               color="secondary"

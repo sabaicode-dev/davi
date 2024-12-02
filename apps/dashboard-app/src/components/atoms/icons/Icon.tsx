@@ -18,6 +18,25 @@ const FilterIcon = () => (
     />
   </svg>
 );
+const Xicon = () => {
+  return (
+    <svg
+      width="44"
+      height="44"
+      viewBox="0 0 44 44"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M28 16L16 28M16 16L28 28"
+        stroke="#667085"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+  );
+};
 const AIIcon = () => {
   return (
     <svg
@@ -238,6 +257,24 @@ const DatasetIcon = () => (
   </svg>
 );
 
+const XIcon = () => (
+  <svg
+    width="44"
+    height="44"
+    viewBox="0 0 44 44"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="M28 16L16 28M16 16L28 28"
+      stroke="#667085"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+  </svg>
+);
+
 const HelpIcon = () => (
   <svg
     width="31"
@@ -381,6 +418,14 @@ const CheckTick = () => {
   );
 };
 
+const V = () => {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M13.9994 9C13.7342 9 13.4799 8.89464 13.2923 8.70711C13.1048 8.51957 12.9994 8.26522 12.9994 8C12.9994 7.73478 13.1048 7.48043 13.2923 7.29289C13.4799 7.10536 13.7342 7 13.9994 7H18.9994C19.2646 7 19.519 7.10536 19.7065 7.29289C19.8941 7.48043 19.9994 7.73478 19.9994 8V13C19.9994 13.2652 19.8941 13.5196 19.7065 13.7071C19.519 13.8946 19.2646 14 18.9994 14C18.7342 14 18.4799 13.8946 18.2923 13.7071C18.1048 13.5196 17.9994 13.2652 17.9994 13V10.414L13.7064 14.707C13.5189 14.8945 13.2646 14.9998 12.9994 14.9998C12.7343 14.9998 12.48 14.8945 12.2924 14.707L9.99943 12.414L5.70643 16.707C5.51783 16.8892 5.26523 16.99 5.00303 16.9877C4.74083 16.9854 4.49002 16.8802 4.30461 16.6948C4.1192 16.5094 4.01403 16.2586 4.01176 15.9964C4.00948 15.7342 4.11027 15.4816 4.29243 15.293L9.29243 10.293C9.47996 10.1055 9.73427 10.0002 9.99943 10.0002C10.2646 10.0002 10.5189 10.1055 10.7064 10.293L12.9994 12.586L16.5854 9H13.9994Z" fill="white"/>
+</svg>
+
+  );
+};
 export const EditIcon: React.FC<IIcons> = ({ className }) => {
   return (
     <svg
@@ -429,7 +474,6 @@ export const CloseIcon: React.FC<IIcons> = ({ className }) => {
         stroke="currentColor"
         stroke-width="1.7"
         stroke-linecap="round"
-        
       ></path>
       <path
         d="M16.2426 7.75745L7.75732 16.2427"
@@ -456,4 +500,6 @@ export {
   UploadFile,
   FileIcon,
   CheckTick,
+  XIcon,
+  V,
 };

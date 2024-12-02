@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import Button from "@/src/components/atoms/Button";
 import { FaPlus } from "react-icons/fa6";
 import { DeleteIcon, EditIcon } from "@/src/components/atoms/icons/Icon";
-import SkeletonLoader from "@/src/components/loading/SelectProjectSkeleton";
+import SkeletonLoader from "@/src/components/molecules/loading/SelectProjectSkeleton";
 import EditProject from "@/src/components/molecules/modals/EditProject";
 import request from "@/src/utils/helper";
 
@@ -187,7 +187,7 @@ const ShowProject: React.FC<SelectProjectProps> = ({
           className="ml-auto !py-2 !px-4 border-2 border-blue-500"
           onClick={newProject}
           startContent={<FaPlus />}
-          children="New Project v1"
+          children="New Project"
           size="small"
           radius="2xl"
           color="secondary"

@@ -87,7 +87,7 @@ const LineChartTest: React.FC = () => {
 
   return (
     <div className="">
-      <LineChart data={sampleData} show_category={true} />
+      <LineChart data={sampleData} show_category={false} />
     </div>
   );
 };

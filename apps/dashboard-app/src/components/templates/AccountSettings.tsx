@@ -2,6 +2,7 @@ import React, { useState, ChangeEvent, useEffect } from "react";
 import axios from "axios";
 import { AiOutlineLogout } from "react-icons/ai";
 import { useAuth } from "@/src/contexts/AuthContext";
+import { API_ENDPOINTS } from "@/src/utils/const/apiEndpoint";
 
 const AccountSettings: React.FC = () => {
   const [user, setUser] = useState({
@@ -28,7 +29,7 @@ const AccountSettings: React.FC = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await axios.get("http://localhost:4001/v1/auth/me", {
+        const response = await axios.get(API_ENDPOINTS.USER_PROFILE, {
           withCredentials: true,
         });
 
@@ -82,7 +83,7 @@ const AccountSettings: React.FC = () => {
   const updateUser = async () => {
     try {
       const response = await axios.put(
-        "http://localhost:4001/v1/auth/updateUsername",
+        API_ENDPOINTS.UPDATE_USER_NAME,
         {
           email: user.email,
           newUsername: user.userName, // Add last name to the update request
@@ -115,24 +116,46 @@ const AccountSettings: React.FC = () => {
   // Logout function
   const handleLogout = async () => {
     try {
+      // Retrieve tokens from localStorage
+      const authToken = localStorage.getItem("authToken");
+      const refreshToken = localStorage.getItem("refreshToken"); // Replace "dummyRefreshToken" with the real token
+
+      // Check if tokens are available
+      if (!authToken || !refreshToken) {
+        console.warn("No tokens found. Redirecting to login...");
+        window.location.href = "http://localhost:3000/login";
+        return;
+      }
+
       // Call the logout API with the refresh token
-      const response = await axios.put(
-        "http://localhost:4001/v1/auth/logout",
-        { refreshToken: localStorage.getItem("refreshToken") }, // Retrieve actual refresh token
-        { withCredentials: true } // Ensure cookies are included in the request
-      );
-  
-      if (response.status === 200) {
+      const response = await fetch(API_ENDPOINTS.SIGN_OUT, {
+        method: "PUT",
+        credentials: "include", // Include cookies if necessary
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authToken}`, // Include authToken in the header
+        },
+        body: JSON.stringify({
+          refreshToken, // Send the refreshToken in the body
+        }),
+      });
+
+      if (response.ok) {
         console.log("User logged out successfully");
-  
-        // Clear authentication-related data from localStorage
+
+        // Clear tokens and user state from the frontend
         localStorage.removeItem("authToken");
         localStorage.removeItem("refreshToken");
-  
-        // Redirect to the login page
+
+        // Clear any additional user-related state (if necessary)
+        setUsername && setUsername(null);
+        setEmail && setEmail(null);
+
+        // Redirect to the login or signup page
         window.location.href = "http://localhost:3000/login";
       } else {
-        console.error("Failed to log out:", response.data);
+        const errorData = await response.json();
+        console.error("Failed to log out:", errorData);
       }
     } catch (error) {
       console.error("Error during logout:", error);

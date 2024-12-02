@@ -1,70 +1,67 @@
 import React from "react";
+import Chart from "react-apexcharts";
+import { ApexOptions } from "apexcharts";
 
-type BooleanData = {
-  user_name: string;
-  Boolean: boolean;
+type BooleanProps = {
+  data: { true: number; false: number };
+  title: string;
+  onClick: () => void; // Callback for click
 };
 
-type BooleanChartProps = {
-  data: BooleanData[];
-};
+const Boolean: React.FC<BooleanProps> = ({ data, title = "Boolean", onClick }) => {
+  const chartOptions: ApexOptions = {
+    chart: {
+      type: "pie",
+      toolbar: { show: false },
+    },
+    labels: ["True", "False"],
+    legend: {
+      position: "bottom",
+      markers: {
+        size: 4,
+        shape: "circle",
+      },
+    },
+    colors: ["#3b82f6", "#a5b4fc"],
+    tooltip: {
+      enabled: false,
+      y: {
+        formatter: (value: number) => `${value}%`,
+      },
+    },
+  };
 
-export const BooleanChart: React.FC<BooleanChartProps> = ({ data }) => {
-  // Calculate totals
-  const totalUsers = data.length;
-  const yesCount = data.filter((item) => item.Boolean).length;
-  const noCount = totalUsers - yesCount;
-
-  // Calculate percentages with fallback for empty data
-  const yesPercentage = totalUsers > 0 ? (yesCount / totalUsers) * 100 : 0;
-  const noPercentage = totalUsers > 0 ? (noCount / totalUsers) * 100 : 0;
+  const chartSeries = [
+    ((data.true / (data.true + data.false)) * 100).toFixed(1),
+    ((data.false / (data.true + data.false)) * 100).toFixed(1),
+  ].map((value) => parseFloat(value));
 
   return (
-    <div className="w-full bg-slate-100 px-[15px] py-[20px] space-y-1">
-      <div className="w-full flex items-center justify-start">
-        <div className="text-white text-[12px] bg-green-500 rounded-md p-1 mb-2">
-          <h1>Boolean</h1>
-        </div>
-      </div>
-
-      {/* Check for empty data */}
-      {totalUsers === 0 ? (
-        <p className="text-center text-gray-500">No data available</p>
-      ) : (
-        <div className="space-y-3">
-          {/* Yes Chart */}
-          <div className="flex flex-col justify-start text-xs space-y-1">
-            <div>
-              <div className="w-full flex flex-row justify-between">
-                <p>Yes: {yesCount}</p>
-                <p>{yesPercentage.toFixed(2)}%</p>
-              </div>
-              <div className="w-full h-2 bg-slate-300 rounded-full">
-                <div
-                  className="h-2 bg-blue-500 rounded-full"
-                  style={{ width: `${yesPercentage}%` }}
-                ></div>
-              </div>
-            </div>
-          </div>
-
-          {/* No Chart */}
-          <div className="flex flex-col justify-start text-xs space-y-1">
-            <div>
-              <div className="w-full flex flex-row justify-between">
-                <p>No: {noCount}</p>
-                <p>{noPercentage.toFixed(2)}%</p>
-              </div>
-              <div className="w-full h-2 bg-slate-300 rounded-full">
-                <div
-                  className="h-2 bg-blue-500 rounded-full"
-                  style={{ width: `${noPercentage}%` }}
-                ></div>
-              </div>
-            </div>
+    <div
+      className="relative w-[209px] h-[149px] bg-gray-100 rounded-sm shadow-md p-2 pt-4 flex items-center justify-center cursor-pointer"
+      onClick={onClick} // Use onClick prop
+    >
+      {/* Title */}
+      {title && (
+        <div className="absolute top-2 left-2">
+          <div className="text-blue-800 text-xs bg-blue-100 px-2 py-1 rounded">
+            {title}
           </div>
         </div>
       )}
+
+      {/* Chart */}
+      <div className="w-full h-full flex items-center justify-center">
+        <Chart
+          options={chartOptions}
+          series={chartSeries}
+          type="pie"
+          width="100%"
+          height="100%"
+        />
+      </div>
     </div>
   );
 };
+
+export default Boolean;

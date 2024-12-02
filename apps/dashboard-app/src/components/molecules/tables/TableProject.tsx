@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Table from "./Table";
 import { useParams } from "react-router-dom";
-import Spinner from "../../loading/Spinner";
+import Spinner from "../loading/Spinner";
 
 interface ApiResponse {
   count: number;
@@ -44,6 +44,7 @@ const TableProject:React.FC <TableProjectProps> = ({ onFileDetailsUpdate }) => {
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
 
   useEffect(() => {
     fetchData();
@@ -93,6 +94,9 @@ const TableProject:React.FC <TableProjectProps> = ({ onFileDetailsUpdate }) => {
       setIsLoading(false);
     }
   };
+  
+
+
 
   if (isLoading)
     return (
@@ -102,6 +106,11 @@ const TableProject:React.FC <TableProjectProps> = ({ onFileDetailsUpdate }) => {
     );
   if (error) return <div className="p-4 text-red-500">Error: {error}</div>;
 
+
+// Correct
+
+
+
   return (
     <div className="responsive-table-height">
       <Table
@@ -109,10 +118,11 @@ const TableProject:React.FC <TableProjectProps> = ({ onFileDetailsUpdate }) => {
         data={tableData.data}
         isCheckBox={true}
         isEditCell={true}
-        isSelectColumn={true}
+        isSelectColumn={true}     
       />
     </div>
   );
 };
 
 export default TableProject;
+
