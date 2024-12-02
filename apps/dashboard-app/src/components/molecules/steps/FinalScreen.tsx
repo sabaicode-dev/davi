@@ -203,7 +203,6 @@ const FinalScreen: React.FC = () => {
       </div>
       <div className="">
         {/* <TableProject onFileDetailsUpdate={handleFileDetailsUpdate} /> */}
-        <h1>Hllo</h1>
         <div className="responsive-table-height">
           <Table
             headers={tableData.headers}
