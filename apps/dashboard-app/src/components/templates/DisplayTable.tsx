@@ -28,7 +28,12 @@ const DisplayTable = ({ onSelectTable }: DisplayTableProps) => {
             }`}
             onClick={() => handleItemClick(item.id, item.table)}
           >
-            <input type="checkbox" className="size-4 border-[#afaac7]" />
+            <input
+              type="checkbox"
+              className="size-4 border-[#afaac7]"
+              checked={selectedItemId === item.id}
+              onChange={() => handleItemClick(item.id, item.table)}
+            />
             <img src={BookIcon} alt="" width={24} />
             <p>{item.table}</p>
           </div>
