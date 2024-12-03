@@ -7,7 +7,6 @@ import { CiFilter } from "react-icons/ci";
 import { useNavigate, useParams } from "react-router-dom";
 import Table from "@/src/components/molecules/tables/Table";
 import Spinner from "@/src/components/molecules/loading/Spinner";
-import { DataTransformationCard } from "../modals/DataTransformationCard";
 
 interface ApiResponse {
   count: number;
@@ -94,6 +93,11 @@ const CleaningProject: React.FC = () => {
         total_column: jsonData.dataset_summary?.total_columns,
         filename: jsonData.filename,
       });
+
+      // Just debug data
+      console.log(tableData.filename);
+      console.log(tableData.total_column);
+      console.log(tableData.total_rows);
 
       if (handleFileDetailsUpdate) {
         handleFileDetailsUpdate({
@@ -231,6 +235,7 @@ const CleaningProject: React.FC = () => {
             onClick={handleNextClick}
           />
         </div>
+        {/* Pass modal here */}
       </div>
     </div>
   );
