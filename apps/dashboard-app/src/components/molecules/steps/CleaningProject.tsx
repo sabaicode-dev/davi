@@ -7,6 +7,7 @@ import { CiFilter } from "react-icons/ci";
 import { useNavigate, useParams } from "react-router-dom";
 import Table from "@/src/components/molecules/tables/Table";
 import Spinner from "@/src/components/molecules/loading/Spinner";
+import { DataTransformationCard } from "../modals/DataTransformationCard";
 
 interface ApiResponse {
   count: number;
@@ -51,14 +52,13 @@ const CleaningProject: React.FC = () => {
     setFileDetails(details);
   };
 
-
   const handleNextClick = () => {
     try {
-      console.log('Attempting to navigate');
+      console.log("Attempting to navigate");
       navigate(`/project/${projectId}/file/${fileId}/finalscreen`);
-      console.log('Navigation successful');
+      console.log("Navigation successful");
     } catch (error) {
-      console.error('Navigation error:', error);
+      console.error("Navigation error:", error);
     }
   };
   const { projectId, fileId } = useParams();
@@ -79,7 +79,7 @@ const CleaningProject: React.FC = () => {
     try {
       setIsLoading(true);
       const response = await fetch(
-        `http://127.0.0.1:8000/api/v1/project/${projectId}/file/${fileId}/details/`
+        `http://3.24.110.41:8000/api/v1/project/${projectId}/file/${fileId}/details/`
       );
 
       if (!response.ok) {
@@ -213,12 +213,13 @@ const CleaningProject: React.FC = () => {
         <div className="relative">
           {/* Positioning the buttons */}
           <Button
-            children={"Transform"}
+            children={"Transform v1"}
             size="medium"
             radius="2xl"
             isLoading={false}
             color="outline"
             className="absolute right-0 bottom-0 mr-[90px]"
+            onClick={() => alert("Hello")}
           />
           <Button
             children={"Next"}

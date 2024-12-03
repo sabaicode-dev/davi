@@ -61,7 +61,7 @@ const AccountSettings: React.FC = () => {
     };
     setErrors(newErrors);
 
-    // Enable button only if the current values differ from the initial ones
+    // Enable button only if the current values differ from the initial one..
     const hasChanges = user.userName !== initialUser.userName;
     setIsButtonEnabled(hasChanges && newErrors.userName === "");
   };
