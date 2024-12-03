@@ -1,4 +1,3 @@
-
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const Dotenv = require("dotenv-webpack");
@@ -6,7 +5,7 @@ const Dotenv = require("dotenv-webpack");
 module.exports = {
   // Entry point for your application
   entry: path.resolve(__dirname, "..", "./src/index.tsx"),
-  
+
   // Resolve extensions and aliases
   resolve: {
     extensions: [".tsx", ".ts", ".js"],
