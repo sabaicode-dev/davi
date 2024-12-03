@@ -49,7 +49,7 @@ const ShowProject: React.FC<SelectProjectProps> = ({
       setIsLoading(true);
       try {
         const response = await request({
-          url: `http://127.0.0.1:8000/api/v1/projects/`,
+          url: `http://3.24.110.41:8000/api/v1/projects/`,
           method: "GET",
         });
 
@@ -85,7 +85,7 @@ const ShowProject: React.FC<SelectProjectProps> = ({
 
     try {
       const response = await request({
-        url: `http://127.0.0.1:8000/api/v1/project/${projectId}/delete/`,
+        url: `http://3.24.110.41:8000/api/v1/project/${projectId}/delete/`,
         method: "DELETE",
         withCredentials: false,
       });

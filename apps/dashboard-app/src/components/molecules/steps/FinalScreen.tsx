@@ -73,7 +73,7 @@ const FinalScreen: React.FC = () => {
     try {
       setIsLoading(true);
       const response = await fetch(
-        `http://127.0.0.1:8000/api/v1/project/${projectId}/file/${fileId}/details/`
+        `http://3.24.110.41:8000/api/v1/v1/project/${projectId}/file/${fileId}/details/`
       );
 
       if (!response.ok) {
@@ -203,7 +203,6 @@ const FinalScreen: React.FC = () => {
       </div>
       <div className="">
         {/* <TableProject onFileDetailsUpdate={handleFileDetailsUpdate} /> */}
-        <h1>Hllo</h1>
         <div className="responsive-table-height">
           <Table
             headers={tableData.headers}

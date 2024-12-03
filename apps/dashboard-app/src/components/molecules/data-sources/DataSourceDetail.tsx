@@ -37,7 +37,7 @@ const DataSourceDetail: React.FC = () => {
 
       try {
         const response = await request({
-          url: `http://127.0.0.1:8000/api/v1/projects/${projectId}/files/`,
+          url: `http://3.24.110.41:8000/api/v1/projects/${projectId}/files/`,
           method: "GET",
         });
 
@@ -66,7 +66,7 @@ const DataSourceDetail: React.FC = () => {
     return false
     try {
       const response = await request({
-        url: `http://127.0.0.1:8000/api/v1/projects/${projectId}/files/${fileId}`,
+        url: `http://3.24.110.41:8000/api/v1/projects/${projectId}/files/${fileId}`,
         method: "DELETE",
       });
 
