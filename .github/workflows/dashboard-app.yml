@@ -38,17 +38,12 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
-      # Step 5: Build the React app using Webpack
+      # Step 5: Build React app using Webpack
       - name: Build React App
         id: build
         run: |
           npm run build  # This uses the build script in your package.json which runs Webpack
         continue-on-error: false
-
-      # Debug: Check if the build directory exists
-      - name: Check build directory
-        run: |
-          ls -R ./apps/dashboard-app/*
 
   deploy:
     runs-on: ubuntu-latest
@@ -66,14 +61,9 @@ jobs:
         with:
           node-version: "20" # Ensure consistency in Node.js version across jobs
 
-      # Step 3: Cache node modules (deploy job)
-      - name: Cache node modules (deploy job)
-        uses: actions/cache@v3
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-modules-
+      # Step 3: Install dependencies (in case it's needed in deploy job)
+      - name: Install Dependencies
+        run: npm install
 
       # Step 4: Deploy to S3
       - name: Deploy to S3
@@ -85,8 +75,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
-          SOURCE_DIR: "apps/dashboard-app/build" # Ensure this path is correct
-
+          SOURCE_DIR: "./apps/dashboard-app/build" # Verify this path exists
 
       # Optional: Invalidate CloudFront cache (if using CloudFront)
       # - name: Invalidate CloudFront Cache
