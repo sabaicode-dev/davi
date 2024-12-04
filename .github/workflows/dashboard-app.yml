@@ -48,7 +48,7 @@ jobs:
       # Debug: Check if the build directory exists
       - name: Check build directory
         run: |
-          ls -R ./apps/dashboard-app
+          ls -R ./apps/dashboard-app/*
 
   deploy:
     runs-on: ubuntu-latest
