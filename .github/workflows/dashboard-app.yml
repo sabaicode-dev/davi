@@ -63,7 +63,7 @@ jobs:
         run: npm install
 
       - name: List build directory
-        run: ls -R ./build # This confirms the build output
+        run: ls -R ./apps/dashboard-app/build # Confirm the build output directory exists
 
       - name: Deploy to S3
         uses: jakejarvis/s3-sync-action@v0.5.1
@@ -74,7 +74,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
-          SOURCE_DIR: "build" # Make sure this path is correct based on the previous step's output
+          SOURCE_DIR: "apps/dashboard-app/build" # Ensure this path points to the correct build directory
 
 
       # Optional: Invalidate CloudFront cache (if using CloudFront)
