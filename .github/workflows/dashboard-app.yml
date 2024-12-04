@@ -25,11 +25,20 @@ jobs:
         with:
           node-version: "20" # Use the correct Node.js version
 
-      # Step 3: Install dependencies
+      # Step 3: Cache npm dependencies to speed up the build
+      - name: Cache node modules
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-modules-
+
+      # Step 4: Install dependencies
       - name: Install Dependencies
         run: npm install
 
-      # Step 4: Build the React app using Webpack
+      # Step 5: Build the React app using Webpack
       - name: Build React App
         id: build
         run: |
