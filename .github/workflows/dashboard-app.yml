@@ -68,13 +68,13 @@ jobs:
       - name: Deploy to S3
         uses: jakejarvis/s3-sync-action@v0.5.1
         with:
-          args: --acl public-read --delete # Optional: Deletes old files from the S3 bucket
+          args: --acl public-read --delete
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
-          SOURCE_DIR: "./apps/dashboard-app/dist" # Ensure this matches the build directory path
+          SOURCE_DIR: "./apps/dashboard-app/build" # Update this path to match your build output
 
 
       # # Optional: Invalidate CloudFront cache (if using CloudFront)
