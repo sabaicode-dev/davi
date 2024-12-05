@@ -107,13 +107,19 @@ const Table: React.FC<TableProps> = ({
     setSelectedData(null);
   };
   //-----1
-
-  //hong
-  const renderChart = (col: ChartMetadata) => {
-    // Check the column type and render corresponding chart component
-    switch (col.table_column_info.type) {
-      case "STRING":
-        // For STRING columns, access string_metrics.counts
+  const renderChart = (col: any) => {
+    switch (col.type) {
+      case "Number":
+        return (
+          <Number
+            data={col.data}
+            labels={col.labels}
+            onClick={() =>
+              handleBoxClick({ category: "Number Data", percentage: 50 })
+            }
+          />
+        );
+      case "Category":
         return (
           <Category
             onClick={(item) =>
@@ -122,28 +128,70 @@ const Table: React.FC<TableProps> = ({
                 percentage: item.percentage,
               })
             }
-            data={col.table_column_metrics.string_metrics?.counts || []} // Handle missing data with a fallback
+            data={col.data}
           />
         );
-      // case "NUMERIC":
-      //   // For NUMERIC columns, access numeric_metrics.histogram.buckets
-      //   return (
-      //     <Number
-      //       data={col.table_column_metrics.numeric_metrics?.histogram?.buckets || []} // Ensure safe access
-      //     />
-      //   );
-      // case "BOOLEAN":
-      //   // For BOOLEAN columns, access boolean_metrics
-      //   return (
-      //     <Boolean
-      //       data={col.table_column_metrics.boolean_metrics || {}} // Fallback to empty object if missing
-      //     />
-      //   );
+      case "Boolean":
+        return (
+          <Boolean
+            data={col.data}
+            title="Boolean"
+            onClick={() =>
+              handleBoxClick({ category: "Boolean Data", percentage: 60 })
+            }
+          />
+        );
+      case "UniqueValue":
+        return (
+          <UniqueValue
+            value={51} // Example unique value count
+            total={500} // Example total count
+            onClick={() =>
+              handleBoxClick({ category: "Unique Value Data", percentage: 51 })
+            }
+          />
+        );
       default:
-        // Handle unknown column types
-        return <p>No chart available</p>;
+        return null;
     }
   };
+
+  //hong
+  // const renderChart = (col: ChartMetadata) => {
+  //   // Check the column type and render corresponding chart component
+  //   switch (col.table_column_info.type) {
+  //     case "STRING":
+  //       // For STRING columns, access string_metrics.counts
+  //       return (
+  //         <Category
+  //           onClick={(item) =>
+  //             handleBoxClick({
+  //               category: item.category,
+  //               percentage: item.percentage,
+  //             })
+  //           }
+  //           data={col.table_column_metrics.string_metrics?.counts || []} // Handle missing data with a fallback
+  //         />
+  //       );
+  //     case "NUMERIC":
+  //       // For NUMERIC columns, access numeric_metrics.histogram.buckets
+  //       return (
+  //         <Number
+  //           data={col.table_column_metrics.numeric_metrics?.histogram?.buckets || []} // Ensure safe access
+  //         />
+  //       );
+  //     case "BOOLEAN":
+  //       // For BOOLEAN columns, access boolean_metrics
+  //       return (
+  //         <Boolean
+  //           data={col.table_column_metrics.boolean_metrics || {}} // Fallback to empty object if missing
+  //         />
+  //       );
+  //     default:
+  //       // Handle unknown column types
+  //       return <p>No chart available</p>;
+  //   }
+  // };
 
   //hong
 
@@ -225,19 +273,19 @@ const Table: React.FC<TableProps> = ({
 
   return (
     <div
-      className="overflow-auto w-full border-[1px] border-gray-400"
+      className="overflow-auto w-full border-[1px] border-gray-400 "
       style={{ height: isFullHeight ? "100%" : "95%" }}
     >
       <table
         className="  border-collapse table-fixed"
         style={{ tableLayout: "fixed", width: "100%" }}
       >
-        <thead className="h-12 ">
-          <tr className="px-4 text-center font-medium text-black  tracking-wider sticky top-0 bg-[#E6EDFF] z-10 ">
+        <thead className="h-12 sticky top-0 z-10 bg-[#E6EDFF] border-[1px] border-t-0 border-gray-500 ">
+          <tr className="text-center font-medium text-black  tracking-wider  ">
             {headers.map((header) => (
               <th
                 key={header}
-                className={`border-[1px] border-t-0 border-gray-500  px-2 w-[210px]  cursor-pointer relative group
+                className={`border-[1px] border-t-0 border-collapse border-gray-500  py-2 w-[210px]  cursor-pointer relative group
                   ${selectedColumns.has(header) ? "bg-blue-200" : ""}`}
                 onClick={() => handleSelectColumn(header)}
               >
@@ -251,7 +299,22 @@ const Table: React.FC<TableProps> = ({
             ))}
           </tr>
           {/* Row for Charts */}
+          {/* Row for Charts */}
           {showChart && (
+            <tr className="bg-[#F7FAFF] w-full ">
+              {metadata.map((col) => (
+                <td
+                  key={col.key}
+                  className="border-[1px] border-gray-500 k w-[210px] overflow-hidden whitespace-nowrap"
+                >
+                  {renderChart(col)}{" "}
+                  {/* Render the chart based on the column data */}
+                </td>
+              ))}
+            </tr>
+          )}
+
+          {/* {showChart && (
             <tr className="sticky bg-[#F7FAFF] z-10 top-[3rem]">
               {metadata.map((col) => (
                 <td
@@ -262,7 +325,7 @@ const Table: React.FC<TableProps> = ({
                 </td>
               ))}
             </tr>
-          )}
+          )} */}
         </thead>
         <tbody className="bg-white">
           {tableData.map((row, index) => {

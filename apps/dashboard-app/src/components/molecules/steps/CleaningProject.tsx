@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import icon from "@/public/images/icon-cleaning.png";
 import Button from "@/src/components/atoms/Button";
-import { DeleteIcon, DownloadIcon, V } from "@/src/components/atoms/icons/Icon";
+import { DeleteIcon, DownloadIcon } from "@/src/components/atoms/icons/Icon";
 import { useNavigate, useParams } from "react-router-dom";
 import Table from "@/src/components/molecules/tables/Table";
 import Spinner from "@/src/components/molecules/loading/Spinner";
@@ -22,6 +22,7 @@ interface ApiResponse {
     file_size: number;
   };
 }
+
 interface TableProps {
   headers: string[];
   data: any[];
@@ -29,6 +30,7 @@ interface TableProps {
   total_column?: number;
   filename?: string;
 }
+
 const CleaningProject: React.FC = () => {
   const [fileDetails, setFileDetails] = useState({
     filename: "Employee Survey.CSV",
@@ -36,11 +38,16 @@ const CleaningProject: React.FC = () => {
     totalColumns: 0,
   });
 
-  const navigate = useNavigate(); // Initialize useNavigate hook
+  const navigate = useNavigate();
   const [tableData, setTableData] = useState<TableProps>({
     headers: [],
     data: [],
   });
+  const { projectId, fileId } = useParams();
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Handle file details update
   const handleFileDetailsUpdate = (details: {
     filename: string;
     totalRows: number;
@@ -49,6 +56,7 @@ const CleaningProject: React.FC = () => {
     setFileDetails(details);
   };
 
+  // Navigate to the next page
   const handleNextClick = () => {
     try {
       console.log("Attempting to navigate");
@@ -58,31 +66,32 @@ const CleaningProject: React.FC = () => {
       console.error("Navigation error:", error);
     }
   };
-  const { projectId, fileId } = useParams();
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
+  // Fetch data when component mounts or when params change
   useEffect(() => {
-    fetchData();
+    if (projectId && fileId) {
+      fetchData();
+    } else {
+      setError("Project ID or File ID is missing");
+      setIsLoading(false);
+    }
   }, [projectId, fileId]);
 
   const fetchData = async () => {
-    if (!projectId || !fileId) {
-      setError("Project ID or File ID is missing");
-      setIsLoading(false);
-      return;
-    }
-
     try {
       setIsLoading(true);
       const response = await fetch(
         `http://3.24.110.41:8000/api/v1/project/${projectId}/file/${fileId}/details/`
       );
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const jsonData: ApiResponse = await response.json();
+      console.log("Fetched data:", jsonData);
+
+      // Update state with fetched data
       setTableData({
         headers: jsonData.headers,
         data: jsonData.results,
@@ -91,11 +100,12 @@ const CleaningProject: React.FC = () => {
         filename: jsonData.filename,
       });
 
-      if (handleFileDetailsUpdate) {
+      // Update file details
+      if (jsonData.dataset_summary) {
         handleFileDetailsUpdate({
           filename: jsonData.filename || "",
-          totalRows: jsonData.dataset_summary?.total_rows || 0,
-          totalColumns: jsonData.dataset_summary?.total_columns || 0,
+          totalRows: jsonData.dataset_summary.total_rows || 0,
+          totalColumns: jsonData.dataset_summary.total_columns || 0,
         });
       }
     } catch (error) {
@@ -106,6 +116,7 @@ const CleaningProject: React.FC = () => {
     }
   };
 
+  // Show loading spinner while data is being fetched
   if (isLoading)
     return (
       <div className="flex w-full justify-center items-center h-full">
@@ -113,6 +124,7 @@ const CleaningProject: React.FC = () => {
       </div>
     );
 
+  // Show error message if there's an error
   if (error) return <div className="p-4 text-red-500">Error: {error}</div>;
 
   return (
@@ -142,29 +154,28 @@ const CleaningProject: React.FC = () => {
           </div>
         </div>
         {/* Content Right */}
-        <div>
-          <Button
-            children={"Download"}
-            size="medium"
-            radius="2xl"
-            isLoading={false}
-            color="outline"
-            startContent={<DownloadIcon />}
-          />
-        </div>
-      </div>
-
-      <div className="flex flex-row justify-end items-center py-2 border-t-2 border-[#443DFF]">
+        <div className="flex items-center">
           <Button
             children={"Delete"}
             size="medium"
             radius="2xl"
             isLoading={false}
             color="danger"
-            startContent={<DeleteIcon />
-            }
+            startContent={<DeleteIcon />}
+            className="mr-2"
           />
+           <Button
+            children={"Download"}
+            size="medium"
+            radius="2xl"
+            isLoading={false}
+            color="outline"
+            startContent={<DownloadIcon />}
+            
+          />
+        </div>
       </div>
+      <div className="flex flex-row justify-end items-center py-2 border-t-2 border-[#443DFF]"></div>
 
       <div>
         <div className="responsive-table-height">

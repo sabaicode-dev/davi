@@ -62,7 +62,7 @@ const Category: React.FC<CategoryProps> = ({
 
   return (
     <div
-      className="relative w-[209px] h-[149px] bg-gray-100 rounded-sm shadow-md p-2 flex flex-col justify-center cursor-pointer"
+      className="relative w-[210px] h-[149px] bg-white rounded-sm shadow-md p-2 flex flex-col justify-center cursor-pointer"
       onClick={() => onClick(topItem)} // Trigger onClick with the top item
     >
       {/* Title */}

@@ -67,6 +67,7 @@ const UploadCsv: React.FC<IUploadCSV> = ({ defaultProjectId }) => {
       formData.append("size", file.size.toString());
       formData.append("type", "csv");
       formData.append("project_id", projectId); // Use the projectId from URL params
+      formData.append("project_id", "your_project_id_here");
 
       const response = await request({
         url: `http://3.24.110.41:8000/api/v1/project/${projectId}/file/upload/`,
