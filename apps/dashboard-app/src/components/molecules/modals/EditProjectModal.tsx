@@ -16,7 +16,6 @@ interface ICreateProjectModalProps {
   ) => void;
 }
 
-
 const Modal: React.FC<ICreateProjectModalProps> = ({
   onClose,
   projectId,
@@ -47,21 +46,70 @@ const Modal: React.FC<ICreateProjectModalProps> = ({
   };
 
   const modalVariants = {
-    hidden: { opacity: 0, y: -50 },
+    hidden: {
+      opacity: 0,
+      y: -50,
+      scale: 0.9,
+      transition: {
+        duration: 0.1,
+        ease: "easeOut",
+      },
+    },
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.2, ease: "easeOut" },
+      scale: 1, 
+      transition: {
+        type: "spring",
+        damping: 12,
+        stiffness: 100, 
+        duration: 0.3,
+        delayChildren: 0.1,
+        staggerChildren: 0.1,
+      },
     },
-    exit: { opacity: 0, y: 50, transition: { duration: 0.3, ease: "easeIn" } },
+    exit: {
+      opacity: 0,
+      y: 50,
+      scale: 0.9,
+      transition: {
+        duration: 0.1,
+        ease: "easeIn",
+      },
+    },
   };
 
   const buttonVariants = {
-    hidden: { opacity: 0, y: 10 },
+    hidden: {
+      opacity: 0,
+      y: 10,
+      scale: 0.95,
+    },
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.5, ease: "easeOut" },
+      scale: 1,
+      transition: {
+        type: "spring",
+        damping: 10,
+        stiffness: 120,
+      },
+    },
+    hover: {
+      // Add hover state
+      scale: 1.05,
+      transition: {
+        type: "spring",
+        stiffness: 300,
+      },
+    },
+    tap: {
+      // Add tap/click state
+      scale: 0.95,
+      transition: {
+        type: "spring",
+        stiffness: 300,
+      },
     },
   };
 
@@ -77,7 +125,7 @@ const Modal: React.FC<ICreateProjectModalProps> = ({
     setErrorMessages(newErrorMessages);
     return valid;
   };
-  
+
   const handleUpdate = async () => {
     if (!validateForm()) {
       return;
@@ -87,7 +135,7 @@ const Modal: React.FC<ICreateProjectModalProps> = ({
 
     try {
       const response = await request({
-        url: `http://127.0.0.1:8000/api/v1/project/${projectId}/update/`,
+        url: `http://3.24.110.41:8000/api/v1/project/${projectId}/update/`,
         method: "PUT",
         withCredentials: false,
         data: {
@@ -126,7 +174,7 @@ const Modal: React.FC<ICreateProjectModalProps> = ({
       <dialog
         ref={dialogRef}
         id="modal_project"
-        className="modal fixed top-1/4 left-1/2 transform -translate-x-1/2 -translate-y-1/4 flex flex-col justify-center items-center w-1/2 xl:w-1/2 2xl:w-1/3 p-5 rounded-xl shadow-xl border-[1px] z-50"
+        className="modal bg-red-200 fixed top-1/4 left-1/2 transform -translate-x-1/2 -translate-y-1/4 flex flex-col justify-center items-center w-1/2 xl:w-1/2 2xl:w-1/3 p-5 rounded-xl shadow-xl border-[1px] z-50"
       >
         <motion.div
           initial="hidden"

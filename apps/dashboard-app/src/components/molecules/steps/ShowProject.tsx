@@ -5,8 +5,8 @@ import { useNavigate } from "react-router-dom";
 import Button from "@/src/components/atoms/Button";
 import { FaPlus } from "react-icons/fa6";
 import { DeleteIcon, EditIcon } from "@/src/components/atoms/icons/Icon";
-import SkeletonLoader from "@/src/components/loading/SelectProjectSkeleton";
-import EditProject from "@/src/components/molecules/modals/EditProject";
+import SkeletonLoader from "@/src/components/molecules/loading/SelectProjectSkeleton";
+import EditProject from "@/src/components/molecules/modals/EditProjectModal";
 import request from "@/src/utils/helper";
 
 
@@ -50,7 +50,7 @@ const ShowProject: React.FC<SelectProjectProps> = ({
       setIsLoading(true);
       try {
         const response = await request({
-          url: `http://127.0.0.1:8000/api/v1/projects/`,
+          url: `http://3.24.110.41:8000/api/v1/projects/`,
           method: "GET",
         });
 
@@ -86,7 +86,7 @@ const ShowProject: React.FC<SelectProjectProps> = ({
 
     try {
       const response = await request({
-        url: `http://127.0.0.1:8000/api/v1/project/${projectId}/delete/`,
+        url: `http://3.24.110.41:8000/api/v1/project/${projectId}/delete/`,
         method: "DELETE",
         withCredentials: false,
       });
@@ -189,7 +189,7 @@ const ShowProject: React.FC<SelectProjectProps> = ({
           className="ml-auto !py-2 !px-4 border-2 border-blue-500"
           onClick={newProject}
           startContent={<FaPlus />}
-          children="New Project v1"
+          children="New Project"
           size="small"
           radius="2xl"
           color="secondary"

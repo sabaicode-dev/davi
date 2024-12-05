@@ -12,10 +12,9 @@ import Project from "@/src/components/pages/Project";
 import { AuthProvider } from "@/src/contexts/AuthContext";
 import ShowProject from "@/src/components/molecules/steps/ShowProject";
 import ProjectDetail from "@/src/components/molecules/project/ProjectDetail";
-import SpeadsheetTable from "./components/molecules/steps/SpeadsheetTable";
+import FinalScreen from "@/src/components/molecules/steps/FinalScreen";
+import CleaningProject from "@/src/components/molecules/steps/CleaningProject";
 import PrivateRoute from "@/src/ProtectedRoute/PrivateRoute";
-import FinalScreen from "./components/molecules/steps/FinalScreen";
-// import { VisulizeCard } from "./components/molecules/models/Save_Vi/VisulizeCard";
 
 const ProjectFlow = () => {
   return (
@@ -47,14 +46,12 @@ const routes = [
   { path: "/helps", element: <Helps /> },
   { path: "/accountsetting", element: <AccountSettings /> },
   { path: "/cleaning", element: <AccountSettings /> },
-  { path: "/template-table", element: <SpeadsheetTable /> },
+  { path: "/template-table", element: <CleaningProject /> },
   {
-    path: "/project/:projectId/file/:fileId/details",
-    element: <SpeadsheetTable />,
+    path: "/project/:projectId/file/:fileId/cleaning",
+    element: <CleaningProject />,
   },
-  // Add the route for FinalScreen
-  { path: "/project/:projectId/file/:fileId/details/finalscreen", element: <FinalScreen/> },
-  // {path: "card", element: <VisulizeCard />}
+  { path: "/project/:projectId/file/:fileId/finalscreen", element: <FinalScreen/> },
 ];
 
 
@@ -63,17 +60,17 @@ export const App = () => {
     <AuthProvider>
       <BrowserRouter>
         <PrivateRoute>
-        <Layout>
-          <Routes>
-            {routes.map((route) => (
-              <Route
-                key={route.path}
-                path={route.path}
-                element={route.element}
-              />
-            ))}
-          </Routes>
-        </Layout>
+          <Layout>
+            <Routes>
+              {routes.map((route) => (
+                <Route
+                  key={route.path}
+                  path={route.path}
+                  element={route.element}
+                />
+              ))}
+            </Routes>
+          </Layout>
         </PrivateRoute>
       </BrowserRouter>
     </AuthProvider>

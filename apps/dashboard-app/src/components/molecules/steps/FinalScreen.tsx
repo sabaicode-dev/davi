@@ -4,7 +4,34 @@ import Button from "../../atoms/Button";
 import { DeleteIcon, DownloadIcon, V } from "../../atoms/icons/Icon";
 import Input from "../../atoms/Input";
 import { CiFilter } from "react-icons/ci";
-import TableProject from "../tables/TableProject";
+import Table from "../tables/Table";
+import { useNavigate, useParams } from "react-router-dom";
+import Spinner from "../loading/Spinner";
+
+interface ApiResponse {
+  count: number;
+  next: boolean;
+  previous: boolean;
+  pages: number[];
+  results: any[];
+  headers: string[];
+  file: string;
+  filename: string;
+  dataset_summary?: {
+    total_rows: number;
+    total_columns: number;
+    file_type: string;
+    file_size: number;
+  };
+}
+
+interface TableProps {
+  headers: string[];
+  data: any[];
+  total_rows?: number;
+  total_column?: number;
+  filename?: string;
+}
 
 const FinalScreen: React.FC = () => {
   const [fileDetails, setFileDetails] = useState({
@@ -13,6 +40,17 @@ const FinalScreen: React.FC = () => {
     totalColumns: 0,
   });
 
+  const navigate = useNavigate();
+  const [tableData, setTableData] = useState<TableProps>({
+    headers: [],
+    data: [],
+  });
+
+  const { projectId, fileId } = useParams();
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Move handleFileDetailsUpdate before it's used
   const handleFileDetailsUpdate = (details: {
     filename: string;
     totalRows: number;
@@ -20,6 +58,60 @@ const FinalScreen: React.FC = () => {
   }) => {
     setFileDetails(details);
   };
+
+  useEffect(() => {
+    fetchData();
+  }, [projectId, fileId]);
+
+  const fetchData = async () => {
+    if (!projectId || !fileId) {
+      setError("Project ID or File ID is missing");
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      const response = await fetch(
+        `http://3.24.110.41:8000/api/v1/project/${projectId}/file/${fileId}/details/`
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const jsonData: ApiResponse = await response.json();
+      setTableData({
+        headers: jsonData.headers,
+        data: jsonData.results,
+        total_rows: jsonData.dataset_summary?.total_rows,
+        total_column: jsonData.dataset_summary?.total_columns,
+        filename: jsonData.filename,
+      });
+
+      // Ensure handleFileDetailsUpdate is called after it's defined
+      handleFileDetailsUpdate({
+        filename: jsonData.filename || "",
+        totalRows: jsonData.dataset_summary?.total_rows || 0,
+        totalColumns: jsonData.dataset_summary?.total_columns || 0,
+      });
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "An error occurred");
+      console.error("Error fetching data:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (isLoading)
+    return (
+      <div className="flex w-full justify-center items-center h-full">
+        <Spinner />
+      </div>
+    );
+
+  if (error) return <div className="p-4 text-red-500">Error: {error}</div>;
+
   return (
     <div
       className="flex flex-col overflow-hidden mt-8 h-[200px]"
@@ -110,8 +202,17 @@ const FinalScreen: React.FC = () => {
         </div>
       </div>
       <div className="">
-        <TableProject  onFileDetailsUpdate={handleFileDetailsUpdate} />
+        {/* <TableProject onFileDetailsUpdate={handleFileDetailsUpdate} /> */}
+        <div className="responsive-table-height">
+          <Table
+            headers={tableData.headers}
+            data={tableData.data}
+            isCheckBox={true}
+            isEditCell={false}
+            isSelectColumn={true}
+          />
         </div>
+      </div>
     </div>
   );
 };

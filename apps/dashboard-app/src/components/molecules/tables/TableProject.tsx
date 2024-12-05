@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Table from "./Table";
 import { useParams } from "react-router-dom";
-import Spinner from "../../loading/Spinner";
-
-
+import Spinner from "../loading/Spinner";
 
 interface ApiResponse {
   count: number;
@@ -120,11 +118,11 @@ const TableProject:React.FC <TableProjectProps> = ({ onFileDetailsUpdate }) => {
         data={tableData.data}
         isCheckBox={true}
         isEditCell={true}
-        isSelectColumn={true}
-     
+        isSelectColumn={true}     
       />
     </div>
   );
 };
 
 export default TableProject;
+

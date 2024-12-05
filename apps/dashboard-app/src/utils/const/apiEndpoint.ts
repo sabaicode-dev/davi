@@ -9,5 +9,4 @@ export const API_ENDPOINTS = {
   UPDATE_USER_NAME: `${process.env.REACT_APP_API_URL_AUTH_ENDPOINT}/updateUsername`,
 };
 
-// Log the API_ENDPOINTS object to check the final values
 console.log(API_ENDPOINTS);

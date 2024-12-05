@@ -1,5 +1,5 @@
 import { GetStart } from "@/src/components/molecules/steps/GetStart";
-import Spinner from "@/src/components/loading/Spinner";
+import Spinner from "@/src/components/molecules/loading/Spinner";
 import SelectProject from "@/src/components/molecules/steps/ShowProject";
 import { useState } from "react";
 
@@ -7,7 +7,6 @@ export default function Project() {
   const [responseData, setResponseData] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
 
   return (
     <div className="flex w-full justify-center items-center">

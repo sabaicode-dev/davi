@@ -130,13 +130,13 @@ const Table: React.FC<TableProps> = ({
 
   // Guard clause for empty data
   if (!Array.isArray(headers) || !Array.isArray(data) || headers.length === 0) {
-    return <div>No data to display</div>;
+    return <div className="font-bold text-lg text-red-500">No data to display</div>;
   }
 
   return (
     <div
       className="overflow-auto w-full border-[1px] border-gray-400"
-      style={{ height: "92%" }} 
+      style={{ height: "100%" }} 
     >
       <table
         className="  border-collapse table-fixed"
