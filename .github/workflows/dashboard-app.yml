@@ -8,7 +8,7 @@ on:
 
 defaults:
   run:
-    working-directory: ./apps/dashboard-app # Ensure that this points to the correct directory
+    working-directory: ./apps/dashboard-app
 
 jobs:
   build:
@@ -51,25 +51,28 @@ jobs:
           npm run build  # This uses the build script in your package.json which runs Webpack
         continue-on-error: false
 
-      # Step 6: List contents of build directory
+      # Step 6: Debugging: List files in the directory to check for the build folder
+      - name: List files after build
+        run: |
+          echo "Listing files in the directory after build"
+          ls -R ./  # List files in the current directory to see if build folder exists
+        continue-on-error: false
+
+      # Step 7: List contents of build directory if it exists
       - name: List contents of build directory
         run: |
           echo "Listing contents of the build directory"
           ls -R ./build  # List contents recursively, making sure to specify the correct relative path
         continue-on-error: false
 
-      # Step 7: Deploy to S3
-      - name: Deploy to S3
-        uses: jakejarvis/s3-sync-action@v0.5.1
-        with:
-          args: --acl public-read --delete
+      # Step 8: Deploy to S3 using AWS CLI
+      - name: Deploy to S3 using AWS CLI
+        run: |
+          aws s3 sync ./build s3://${{ secrets.AWS_S3_BUCKET }} --delete --acl public-read
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
-          AWS_REGION: ${{ secrets.AWS_REGION }}
-          SOURCE_DIR: "./build" # Ensure the correct build directory path relative to working-directory
-
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_REGION }}
 
   # deploy:
   #   runs-on: ubuntu-latest
