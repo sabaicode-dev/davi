@@ -15,6 +15,7 @@ import ProjectDetail from "@/src/components/molecules/project/ProjectDetail";
 import SpeadsheetTable from "./components/molecules/steps/SpeadsheetTable";
 import PrivateRoute from "@/src/ProtectedRoute/PrivateRoute";
 import FinalScreen from "./components/molecules/steps/FinalScreen";
+// import { VisulizeCard } from "./components/molecules/models/Save_Vi/VisulizeCard";
 
 const ProjectFlow = () => {
   return (
@@ -53,6 +54,7 @@ const routes = [
   },
   // Add the route for FinalScreen
   { path: "/project/:projectId/file/:fileId/details/finalscreen", element: <FinalScreen/> },
+  // {path: "card", element: <VisulizeCard />}
 ];
 
 
