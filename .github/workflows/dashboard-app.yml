@@ -51,27 +51,32 @@ jobs:
     if: github.ref == 'refs/heads/deploy_dashboard_app'
 
     steps:
+      # Checkout the code to the same directory as in the build step
       - name: Checkout Code
         uses: actions/checkout@v3
 
+      # Set the working directory explicitly
+      - name: Set working directory for deploy
+        run: |
+          cd ./apps/dashboard-app
+
+      # Step 1: Set up Node.js
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: "20"
 
+      # Step 2: Install Dependencies
       - name: Install Dependencies
         run: npm install
 
-      # Debug: List files in build directory
+      # Debug: List files in the correct directory
       - name: List files in the build directory
         run: |
-          echo "Listing files in the apps/dashboard-app directory"
-          ls -R ./apps/dashboard-app
+          echo "Listing files in the ./apps/dashboard-app/build directory"
+          ls -R ./apps/dashboard-app/build  # Check if the build directory exists
 
-      # Ensure correct path to the build directory
-      - name: List build directory
-        run: ls -R ./apps/dashboard-app/build # Confirm the build output directory exists
-
+      # Deploy to S3
       - name: Deploy to S3
         uses: jakejarvis/s3-sync-action@v0.5.1
         with:
@@ -81,7 +86,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
-          SOURCE_DIR: "apps/dashboard-app/build" # Ensure this path points to the correct build directory
+          SOURCE_DIR: "./apps/dashboard-app/build" # Correct build directory path
 
 
       # Optional: Invalidate CloudFront cache (if using CloudFront)
