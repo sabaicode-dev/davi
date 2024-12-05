@@ -51,6 +51,13 @@ jobs:
           npm run build  # This uses the build script in your package.json which runs Webpack
         continue-on-error: false
 
+      # Step 6: List contents of build directory
+      - name: List contents of build directory
+        run: |
+          echo "Listing contents of the build directory"
+          ls -R build  # List contents recursively
+        continue-on-error: false
+
   deploy:
     runs-on: ubuntu-latest
     needs: build
@@ -85,7 +92,7 @@ jobs:
       - name: List files in the build directory
         run: |
           echo "Listing files in the ./build directory"
-          ls -R ./build  # Check if the build directory exists
+          tree -L 2  # Check if the build directory exists
 
       # Deploy to S3
       - name: Deploy to S3
