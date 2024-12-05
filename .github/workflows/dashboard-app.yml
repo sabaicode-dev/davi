@@ -104,7 +104,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
-          SOURCE_DIR: "./apps/dashboard-app/build" # Correct build directory path
+          SOURCE_DIR: "build" # Correct build directory path
 
 
       # Optional: Invalidate CloudFront cache (if using CloudFront)
