@@ -73,7 +73,7 @@ const FinalScreen: React.FC = () => {
     try {
       setIsLoading(true);
       const response = await fetch(
-        `http://3.24.110.41:8000/api/v1/v1/project/${projectId}/file/${fileId}/details/`
+        `http://3.24.110.41:8000/api/v1/project/${projectId}/file/${fileId}/details/`
       );
 
       if (!response.ok) {

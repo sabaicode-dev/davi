@@ -6,7 +6,7 @@ import Button from "@/src/components/atoms/Button";
 import { FaPlus } from "react-icons/fa6";
 import { DeleteIcon, EditIcon } from "@/src/components/atoms/icons/Icon";
 import SkeletonLoader from "@/src/components/molecules/loading/SelectProjectSkeleton";
-import EditProject from "@/src/components/molecules/modals/EditProject";
+import EditProject from "@/src/components/molecules/modals/EditProjectModal";
 import request from "@/src/utils/helper";
 
 interface Project {
