@@ -46,7 +46,7 @@ jobs:
       - name: Install Dependencies
         run: |
           npm install
-          npm install webpack-merge --save-dev
+          
 
       # Set environment variables
       - name: Set environment variables from GitHub Secrets
