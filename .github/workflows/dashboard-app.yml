@@ -21,10 +21,11 @@ jobs:
         uses: actions/checkout@v3
 
       # Debug: List files in the root of the repository to confirm structure
+      # List the entire directory structure of the repository to verify if apps/dashboard-app exists
       - name: List files in the root directory
         run: |
           echo "Listing files in the root of the repository"
-          tree -L 3 # List the entire directory structure of the repository to verify if apps/dashboard-app exists
+          tree -L 3
 
       # Step 2: Set up Node.js environment
       - name: Set up Node.js
@@ -43,7 +44,9 @@ jobs:
 
       # Install dependencies
       - name: Install Dependencies
-        run: npm install
+        run: |
+          npm install
+          npm install webpack-merge --save-dev
 
       # Set environment variables
       - name: Set environment variables from GitHub Secrets
@@ -53,20 +56,13 @@ jobs:
       # Build React app using Webpack
       - name: Build React App
         run: |
-          npm run build  # This uses the build script in your package.json which runs Webpack
+          npm run build
 
       # List files after build to check the build folder
       - name: List files after build
         run: |
           echo "Listing files in the directory after build"
-          tree -L 2 ./  # List files in the current directory to see if build folder exists
-
-      # List contents of the build directory if it exists
-      # - name: List contents of build directory
-      #   run: |
-      #     echo "Listing contents of the build directory"
-      #     ls -R ./build  # List contents recursively to make sure ./build is created
-      #   continue-on-error: false
+          tree -L 2 ./
 
   # Step 2: Deploy to AWS S3
   deploy:
@@ -88,13 +84,13 @@ jobs:
       # step 3: Build app for Deploy to S3
       - name: Build React App
         run: |
-          npm run build  # This uses the build script in your package.json which runs Webpack
+          npm run build
 
       # step 4: in build folder
       - name: List files in build folder
         run: |
           echo "Listing files in the directory after build"
-          tree -L 2 ./build  # List files in the current directory to see if build folder exists
+          tree -L 2 ./build
 
       # step 5: Deploy to S3 using AWS CLI
       - name: Deploy to S3 using AWS CLI
