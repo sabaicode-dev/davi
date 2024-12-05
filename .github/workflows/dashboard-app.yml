@@ -45,6 +45,12 @@ jobs:
           npm run build  # This uses the build script in your package.json which runs Webpack
         continue-on-error: false
 
+      # Debugging: List files to see if the build directory exists
+      - name: List files in the working directory
+        run: |
+          echo "Listing files in the ./apps/dashboard-app directory"
+          ls -R ./apps/dashboard-app  # Check if the build directory exists
+
   deploy:
     runs-on: ubuntu-latest
     needs: build
