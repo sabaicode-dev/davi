@@ -69,7 +69,7 @@ jobs:
       - name: List files in the root directory again
         run: |
           echo "Listing files in the root of the repository"
-          ls -R  # Confirm directory structure
+          tree -L 2  # Confirm directory structure
 
       # Set up Node.js
       - name: Set up Node.js
@@ -84,8 +84,8 @@ jobs:
       # Debug: List files in the build directory
       - name: List files in the build directory
         run: |
-          echo "Listing files in the ./apps/dashboard-app/build directory"
-          ls -R ./apps/dashboard-app/build  # Check if the build directory exists
+          echo "Listing files in the ./build directory"
+          ls -R ./build  # Check if the build directory exists
 
       # Deploy to S3
       - name: Deploy to S3
