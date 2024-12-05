@@ -81,6 +81,11 @@ const CleaningProject: React.FC = () => {
     headers: [],
     data: [],
   });
+  const { projectId, fileId } = useParams();
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Handle file details update
   const handleFileDetailsUpdate = (details: {
     filename: string;
     totalRows: number;
@@ -92,9 +97,12 @@ const CleaningProject: React.FC = () => {
   const handleNextClick = () => {
     try {
       console.log("Attempting to navigate");
+      console.log("Attempting to navigate");
       navigate(`/project/${projectId}/file/${fileId}/finalscreen`);
       console.log("Navigation successful");
+      console.log("Navigation successful");
     } catch (error) {
+      console.error("Navigation error:", error);
       console.error("Navigation error:", error);
     }
   };
@@ -115,9 +123,10 @@ const CleaningProject: React.FC = () => {
     if (!projectId || !fileId) {
       setError("Project ID or File ID is missing");
       setIsLoading(false);
-      return;
     }
+  }, [projectId, fileId]);
 
+  const fetchData = async () => {
     try {
       setIsLoading(true);
       const response = await request({
@@ -297,6 +306,8 @@ const CleaningProject: React.FC = () => {
             isCheckBox={true}
             isEditCell={false}
             isSelectColumn={true}
+            isFullHeight={false}
+            showChart={false}
           />
         </div>
         <div className="relative mt-14">

@@ -50,7 +50,7 @@ const Analysis: React.FC<AnalysisProps> = ({ selectedData, onClose }) => {
   return (
     <div
       ref={sidebarRef}
-      className="fixed right-5 top-20 bottom-0 w-[428px] h-[855px] bg-white p-5 shadow-2xl overflow-y-auto"
+      className="fixed right-5 top-16 bottom-0 w-[428px] h-[855px] bg-white p-5 shadow-2xl overflow-y-auto z-20"
     >
       {/* Close Button */}
       <button
