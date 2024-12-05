@@ -8,7 +8,7 @@ on:
 
 defaults:
   run:
-    working-directory: ./apps/dashboard-app
+    working-directory: ./apps/dashboard-app # Ensure that this points to the correct directory
 
 jobs:
   build:
@@ -55,46 +55,10 @@ jobs:
       - name: List contents of build directory
         run: |
           echo "Listing contents of the build directory"
-          ls -R build  # List contents recursively
+          ls -R ./build  # List contents recursively, making sure to specify the correct relative path
         continue-on-error: false
 
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build
-    if: github.ref == 'refs/heads/deploy_dashboard_app'
-
-    defaults:
-      run:
-        working-directory: ./apps/dashboard-app # Set working directory here for deploy job
-
-    steps:
-      # Checkout the code to the root of the repository
-      - name: Checkout Code
-        uses: actions/checkout@v3
-
-      # Debug: List files in the root directory again
-      - name: List files in the root directory again
-        run: |
-          echo "Listing files in the root of the repository"
-          tree -L 2  # Confirm directory structure
-
-      # Set up Node.js
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: "20"
-
-      # Step 1: Install Dependencies
-      - name: Install Dependencies
-        run: npm install
-
-      # Debug: List files in the build directory
-      - name: List files in the build directory
-        run: |
-          echo "Listing files in the build directory"
-          tree -L 2  # Check if the build directory exists
-
-      # Deploy to S3
+      # Step 7: Deploy to S3
       - name: Deploy to S3
         uses: jakejarvis/s3-sync-action@v0.5.1
         with:
@@ -104,17 +68,65 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
-          SOURCE_DIR: "./build" # Correct build directory path
+          SOURCE_DIR: "./build" # Ensure the correct build directory path relative to working-directory
 
 
-      # Optional: Invalidate CloudFront cache (if using CloudFront)
-      # - name: Invalidate CloudFront Cache
-      #   if: success()
-      #   run: |
-      #     aws cloudfront create-invalidation \
-      #       --distribution-id ${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION_ID }} \
-      #       --paths "/*"
-      #   env:
-      #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      #     AWS_REGION: ${{ secrets.AWS_REGION }}
+  # deploy:
+  #   runs-on: ubuntu-latest
+  #   needs: build
+  #   if: github.ref == 'refs/heads/deploy_dashboard_app'
+
+  #   defaults:
+  #     run:
+  #       working-directory: ./apps/dashboard-app # Set working directory here for deploy job
+
+  #   steps:
+  #     # Checkout the code to the root of the repository
+  #     - name: Checkout Code
+  #       uses: actions/checkout@v3
+
+  #     # Debug: List files in the root directory again
+  #     - name: List files in the root directory again
+  #       run: |
+  #         echo "Listing files in the root of the repository"
+  #         tree -L 2  # Confirm directory structure
+
+  #     # Set up Node.js
+  #     - name: Set up Node.js
+  #       uses: actions/setup-node@v3
+  #       with:
+  #         node-version: "20"
+
+  #     # Step 1: Install Dependencies
+  #     - name: Install Dependencies
+  #       run: npm install
+
+  #     # Debug: List files in the build directory
+  #     - name: List files in the build directory
+  #       run: |
+  #         echo "Listing files in the build directory"
+  #         tree -L 2  # Check if the build directory exists
+
+  #     # Deploy to S3
+  #     - name: Deploy to S3
+  #       uses: jakejarvis/s3-sync-action@v0.5.1
+  #       with:
+  #         args: --acl public-read --delete
+  #       env:
+  #         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  #         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  #         AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+  #         AWS_REGION: ${{ secrets.AWS_REGION }}
+  #         SOURCE_DIR: "./build" # Correct build directory path
+
+  # Optional: Invalidate CloudFront cache (if using CloudFront)
+  # - name: Invalidate CloudFront Cache
+  #   if: success()
+  #   run: |
+  #     aws cloudfront create-invalidation \
+  #       --distribution-id ${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION_ID }} \
+  #       --paths "/*"
+  #   env:
+  #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  #     AWS_REGION: ${{ secrets.AWS_REGION }}
