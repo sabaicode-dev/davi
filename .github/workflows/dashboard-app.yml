@@ -50,15 +50,14 @@ jobs:
     needs: build
     if: github.ref == 'refs/heads/deploy_dashboard_app'
 
+    defaults:
+      run:
+        working-directory: ./apps/dashboard-app # Set working directory here for deploy job
+
     steps:
-      # Checkout the code to the same directory as in the build step
+      # Checkout the code to the root of the repository
       - name: Checkout Code
         uses: actions/checkout@v3
-
-      # Set the working directory explicitly
-      - name: Set working directory for deploy
-        run: |
-          cd ./apps/dashboard-app
 
       # Step 1: Set up Node.js
       - name: Set up Node.js
@@ -70,7 +69,7 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
-      # Debug: List files in the correct directory
+      # Debug: List files in the build directory
       - name: List files in the build directory
         run: |
           echo "Listing files in the ./apps/dashboard-app/build directory"
