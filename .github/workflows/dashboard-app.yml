@@ -23,7 +23,7 @@ jobs:
       - name: List files in the root directory
         run: |
           echo "Listing files in the root of the repository"
-          ls -R # List the entire directory structure of the repository to verify if apps/dashboard-app exists
+          tree -L 2 # List the entire directory structure of the repository to verify if apps/dashboard-app exists
 
       # Step 2: Set up Node.js environment
       - name: Set up Node.js
