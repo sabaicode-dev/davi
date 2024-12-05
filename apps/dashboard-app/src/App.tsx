@@ -57,8 +57,6 @@ const routes = [
   },
 ];
 
-// fix add
-
 export const App = () => {
   return (
     <AuthProvider>
