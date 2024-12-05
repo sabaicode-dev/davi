@@ -6,7 +6,7 @@ import {
   FileIcon,
   UploadFile,
 } from "@/src/components/atoms/icons/Icon";
-import request from "@/src/utils/helper";
+import axios, { AxiosRequestConfig } from "axios";
 
 interface IUploadCSV {
   defaultProjectId?: string;
@@ -21,7 +21,7 @@ const UploadCsv: React.FC<IUploadCSV> = ({ defaultProjectId }) => {
   const [fileSize, setFileSize] = useState<number>(0);
   const [progress, setProgress] = useState<number>(0);
   const [uploadSuccess, setUploadSuccess] = useState<boolean>(false);
-  const [fileId, setFileId] = useState<string | null>(null); // Store the fileId after upload
+  const [fileId, setFileId] = useState<string | null>(null);
   const [error, setError] = useState<string>("");
 
   const MAX_FILENAME_LENGTH = 30;
@@ -47,7 +47,6 @@ const UploadCsv: React.FC<IUploadCSV> = ({ defaultProjectId }) => {
     if (file.type === "text/csv" || file.name.endsWith(".csv")) {
       setFileName(file.name);
       setFileSize(file.size / 1024);
-      simulateUpload();
       await uploadFileToDB(file);
     } else {
       setError("Please upload a valid CSV file.");
@@ -61,6 +60,7 @@ const UploadCsv: React.FC<IUploadCSV> = ({ defaultProjectId }) => {
     }
 
     setError("");
+    setProgress(0);
 
     try {
       const formData = new FormData();
@@ -70,24 +70,30 @@ const UploadCsv: React.FC<IUploadCSV> = ({ defaultProjectId }) => {
       formData.append("type", "csv");
       formData.append("project_id", projectId);
 
-      const response = await request({
-        url: `http://3.24.110.41:8000/api/v1/project/${projectId}/file/upload/`,
-        method: "POST",
-        data: formData,
+      const config: AxiosRequestConfig = {
         headers: {
           "Content-Type": "multipart/form-data",
         },
-      });
+        onUploadProgress: (progressEvent) => {
+          const total = progressEvent.total ?? 1;
+          const percentCompleted = Math.round(
+            (progressEvent.loaded * 100) / total
+          );
+          setProgress(percentCompleted);
+        },
+      };
 
-      console.log("Upload Response:", response);
+      const response = await axios.post(
+        `http://3.24.110.41:8000/api/v1/project/${projectId}/file/upload/`,
+        formData,
+        config
+      );
 
-      if (response.success || response.status === 201) {
-        // Ensure the response structure matches the expected format
+      if (response.status === 201 || response.status === 200) {
         const uploadedFileId = response.data?._id; // Adjust based on your response structure
         if (uploadedFileId) {
-          console.log("File uploaded with fileId:", uploadedFileId);
           setUploadSuccess(true);
-          setFileId(uploadedFileId); // Store the fileId after successful upload
+          setFileId(uploadedFileId);
         } else {
           setError("File ID not returned in response.");
         }
@@ -95,20 +101,8 @@ const UploadCsv: React.FC<IUploadCSV> = ({ defaultProjectId }) => {
         setError("Failed to upload file. Please try again.");
       }
     } catch (error) {
-      console.error("Failed to upload file:", error);
       setError("Failed to upload file. Please try again.");
     }
-  };
-
-  const simulateUpload = () => {
-    setProgress(0);
-    const interval = setInterval(() => {
-      setProgress((prev) => {
-        if (prev < 100) return prev + 1;
-        clearInterval(interval);
-        return 100;
-      });
-    }, 20);
   };
 
   const truncateFileName = (name: string) => {
@@ -125,17 +119,8 @@ const UploadCsv: React.FC<IUploadCSV> = ({ defaultProjectId }) => {
   };
 
   const handleNext = () => {
-    console.log("uploadSuccess:", uploadSuccess);
-    console.log("fileId:", fileId);
-
-    // Ensure both uploadSuccess and fileId are set
     if (uploadSuccess && fileId) {
-      console.log("Navigating to file cleaning page...");
       window.location.href = `/project/${projectId}/file/${fileId}/cleaning`;
-    } else {
-      console.log(
-        "Cannot navigate: Either upload not successful or fileId is missing."
-      );
     }
   };
 
@@ -204,7 +189,7 @@ const UploadCsv: React.FC<IUploadCSV> = ({ defaultProjectId }) => {
                   <div className="flex flex-row justify-center items-center mt-1 space-x-4 w-full">
                     <div className="h-2 w-full bg-blue-300 rounded-full">
                       <div
-                        className="h-2 bg-[#443DFF] rounded-full w-[300px]"
+                        className="h-2 bg-[#443DFF] rounded-full"
                         style={{ width: `${progress}%` }}
                       ></div>
                     </div>
