@@ -46,7 +46,6 @@ jobs:
       - name: Install Dependencies
         run: |
           npm install
-          
 
       # Set environment variables
       - name: Set environment variables from GitHub Secrets
@@ -81,18 +80,23 @@ jobs:
           echo "Listing files in the root of the repository"
           tree -L 2  # Confirm directory structure
 
-      # step 3: Build app for Deploy to S3
+      # step 3: Install dependencies
+      - name: Install Dependencies
+        run: |
+          npm install
+
+      # step 4: Build app for Deploy to S3
       - name: Build React App
         run: |
           npm run build
 
-      # step 4: in build folder
+      # step 5: in build folder
       - name: List files in build folder
         run: |
           echo "Listing files in the directory after build"
           tree -L 2 ./build
 
-      # step 5: Deploy to S3 using AWS CLI
+      # step 6: Deploy to S3 using AWS CLI
       - name: Deploy to S3 using AWS CLI
         run: |
           aws s3 sync ./build s3://${{ secrets.AWS_S3_BUCKET }} --delete --acl public-read
