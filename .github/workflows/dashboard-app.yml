@@ -11,11 +11,12 @@ defaults:
     working-directory: ./apps/dashboard-app
 
 jobs:
+  # Step 1: Build the React App
   build:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout the repository code
+      # Checkout the repository code
       - name: Checkout Code
         uses: actions/checkout@v3
 
@@ -31,7 +32,7 @@ jobs:
         with:
           node-version: "20" # Use the correct Node.js version
 
-      # Step 3: Cache npm dependencies to speed up the build
+      # Cache npm dependencies to speed up the build
       - name: Cache node modules
         uses: actions/cache@v3
         with:
@@ -40,39 +41,65 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-modules-
 
-      # Step 4: Install dependencies
+      # Install dependencies
       - name: Install Dependencies
         run: npm install
 
-      # Step 5: Build React app using Webpack
+      # Build React app using Webpack
       - name: Build React App
-        id: build
         run: |
           npm run build  # This uses the build script in your package.json which runs Webpack
-        continue-on-error: false
 
-      # Step 6: Debugging: List files in the directory to check for the build folder
+      # List files after build to check the build folder
       - name: List files after build
         run: |
           echo "Listing files in the directory after build"
           ls -R ./  # List files in the current directory to see if build folder exists
-        continue-on-error: false
 
-      # Step 7: List contents of build directory if it exists
+      # List contents of the build directory if it exists
       - name: List contents of build directory
         run: |
           echo "Listing contents of the build directory"
-          ls -R ./build  # List contents recursively, making sure to specify the correct relative path
+          ls -R ./build  # List contents recursively to make sure ./build is created
         continue-on-error: false
 
-      # Step 8: Deploy to S3 using AWS CLI
+  # Step 2: Deploy to AWS S3
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build # Make sure the build job is successful before deploying
+    if: success() # Only deploy if the build was successful
+
+    steps:
+      # Checkout the repository code
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      # Debug: List files in the root directory again
+      - name: List files in the root directory again
+        run: |
+          echo "Listing files in the root of the repository"
+          tree -L 2  # Confirm directory structure
+
+      # Deploy to S3 using AWS CLI
       - name: Deploy to S3 using AWS CLI
         run: |
-          aws s3 sync ./build s3://deploydashboardapp --delete --acl public-read
+          aws s3 sync ./build s3://${{ secrets.AWS_S3_BUCKET }} --delete --acl public-read
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_REGION }}
+
+      # Optional: Invalidate CloudFront cache (if using CloudFront)
+      # - name: Invalidate CloudFront Cache
+      #   if: success()
+      #   run: |
+      #     aws cloudfront create-invalidation \
+      #       --distribution-id ${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION_ID }} \
+      #       --paths "/*"
+      #   env:
+      #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     AWS_REGION: ${{ secrets.AWS_REGION }}
 
   # deploy:
   #   runs-on: ubuntu-latest
