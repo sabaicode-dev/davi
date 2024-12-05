@@ -11,7 +11,7 @@ const UniqueValue: React.FC<UniqueValueProps> = ({ value, total, onClick }) => {
 
   return (
     <div
-      className="relative w-[209px] h-[149px] bg-white rounded-sm shadow-md p-4 flex flex-col justify-center items-center cursor-pointer"
+      className="relative w-[210px] h-[149px] bg-white rounded-sm shadow-md p-4 flex flex-col justify-center items-center cursor-pointer "
       onClick={onClick}
     >
       {/* Top-right icon */}

@@ -36,7 +36,7 @@ interface TableProjectProps {
   }) => void;
 }
 
-const TableProject:React.FC <TableProjectProps> = ({ onFileDetailsUpdate }) => {
+const TableProject: React.FC<TableProjectProps> = ({ onFileDetailsUpdate }) => {
   const { projectId, fileId } = useParams();
   const [tableData, setTableData] = useState<TableProps>({
     headers: [],
@@ -44,7 +44,6 @@ const TableProject:React.FC <TableProjectProps> = ({ onFileDetailsUpdate }) => {
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
 
   useEffect(() => {
     fetchData();
@@ -60,7 +59,8 @@ const TableProject:React.FC <TableProjectProps> = ({ onFileDetailsUpdate }) => {
     try {
       setIsLoading(true);
       const response = await fetch(
-        `http://127.0.0.1:8000/api/v1/project/${projectId}/file/${fileId}/details/`
+        // `http://3.24.110.41:8000/api/v1/project/${projectId}/file/${fileId}/details/`,
+        `http://3.24.110.41:8000/api/v1/project/${projectId}/file/${fileId}/details/`
       );
 
       if (!response.ok) {
@@ -82,9 +82,9 @@ const TableProject:React.FC <TableProjectProps> = ({ onFileDetailsUpdate }) => {
 
       if (onFileDetailsUpdate) {
         onFileDetailsUpdate({
-          filename: jsonData.filename || '',
+          filename: jsonData.filename || "",
           totalRows: jsonData.dataset_summary?.total_rows || 0,
-          totalColumns: jsonData.dataset_summary?.total_columns || 0
+          totalColumns: jsonData.dataset_summary?.total_columns || 0,
         });
       }
     } catch (error) {
@@ -94,9 +94,6 @@ const TableProject:React.FC <TableProjectProps> = ({ onFileDetailsUpdate }) => {
       setIsLoading(false);
     }
   };
-  
-
-
 
   if (isLoading)
     return (
@@ -106,10 +103,7 @@ const TableProject:React.FC <TableProjectProps> = ({ onFileDetailsUpdate }) => {
     );
   if (error) return <div className="p-4 text-red-500">Error: {error}</div>;
 
-
-// Correct
-
-
+  // Correct
 
   return (
     <div className="responsive-table-height">
@@ -118,11 +112,10 @@ const TableProject:React.FC <TableProjectProps> = ({ onFileDetailsUpdate }) => {
         data={tableData.data}
         isCheckBox={true}
         isEditCell={true}
-        isSelectColumn={true}     
+        isSelectColumn={true}
       />
     </div>
   );
 };
 
 export default TableProject;
-

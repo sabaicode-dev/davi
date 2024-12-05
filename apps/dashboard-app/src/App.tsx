@@ -51,9 +51,11 @@ const routes = [
     path: "/project/:projectId/file/:fileId/cleaning",
     element: <CleaningProject />,
   },
-  { path: "/project/:projectId/file/:fileId/finalscreen", element: <FinalScreen/> },
+  {
+    path: "/project/:projectId/file/:fileId/finalscreen",
+    element: <FinalScreen />,
+  },
 ];
-
 
 export const App = () => {
   return (
