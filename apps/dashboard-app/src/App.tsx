@@ -55,12 +55,17 @@ const routes = [
     path: "/project/:projectId/file/:fileId/finalscreen",
     element: <FinalScreen />,
   },
+  {
+    path: "/project/:projectId/file/:fileId/finalscreen",
+    element: <FinalScreen />,
+  },
 ];
 
 export const App = () => {
   return (
     <AuthProvider>
       <BrowserRouter>
+        <PrivateRoute>
         <PrivateRoute>
           <Layout>
             <Routes>
@@ -73,6 +78,7 @@ export const App = () => {
               ))}
             </Routes>
           </Layout>
+        </PrivateRoute>
         </PrivateRoute>
       </BrowserRouter>
     </AuthProvider>

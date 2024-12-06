@@ -1,3 +1,5 @@
+// update AWS_REDIRECT_URI
+
 import express from "express";
 import swaggerUi from "swagger-ui-express";
 import { RegisterRoutes } from "./routes/v1/routes";
