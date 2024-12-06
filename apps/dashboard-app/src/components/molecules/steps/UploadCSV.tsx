@@ -6,7 +6,7 @@ import {
   FileIcon,
   UploadFile,
 } from "@/src/components/atoms/icons/Icon";
-import request from "@/src/utils/helper";
+import axios, { AxiosRequestConfig } from "axios";
 
 interface IUploadCSV {
   defaultProjectId?: string;
@@ -20,10 +20,11 @@ const UploadCsv: React.FC<IUploadCSV> = ({ defaultProjectId }) => {
   const [fileName, setFileName] = useState<string>("");
   const [fileSize, setFileSize] = useState<number>(0);
   const [progress, setProgress] = useState<number>(0);
+  const [uploadSuccess, setUploadSuccess] = useState<boolean>(false);
+  const [fileId, setFileId] = useState<string | null>(null);
   const [error, setError] = useState<string>("");
 
   const MAX_FILENAME_LENGTH = 30;
-  console.log("Project ID from URL:", projectId);
 
   const handleFileUpload = () => {
     fileInputRef.current?.click();
@@ -46,12 +47,12 @@ const UploadCsv: React.FC<IUploadCSV> = ({ defaultProjectId }) => {
     if (file.type === "text/csv" || file.name.endsWith(".csv")) {
       setFileName(file.name);
       setFileSize(file.size / 1024);
-      simulateUpload();
       await uploadFileToDB(file);
     } else {
       setError("Please upload a valid CSV file.");
     }
   };
+
   const uploadFileToDB = async (file: File) => {
     if (!projectId) {
       setError("Project ID is missing.");
@@ -59,6 +60,7 @@ const UploadCsv: React.FC<IUploadCSV> = ({ defaultProjectId }) => {
     }
 
     setError("");
+    setProgress(0);
 
     try {
       const formData = new FormData();
@@ -66,39 +68,41 @@ const UploadCsv: React.FC<IUploadCSV> = ({ defaultProjectId }) => {
       formData.append("filename", file.name);
       formData.append("size", file.size.toString());
       formData.append("type", "csv");
-      formData.append("project_id", projectId); // Use the projectId from URL params
+      formData.append("project_id", projectId);
 
-      const response = await request({
-        url: `http://3.24.110.41:8000/api/v1/project/${projectId}/file/upload/`,
-        method: "POST",
-        data: formData,
+      const config: AxiosRequestConfig = {
         headers: {
           "Content-Type": "multipart/form-data",
         },
-      });
+        onUploadProgress: (progressEvent) => {
+          const total = progressEvent.total ?? 1;
+          const percentCompleted = Math.round(
+            (progressEvent.loaded * 100) / total
+          );
+          setProgress(percentCompleted);
+        },
+      };
 
-      console.log("Upload response:", response);
+      const response = await axios.post(
+        `http://3.24.110.41:8000/api/v1/project/${projectId}/file/upload/`,
+        formData,
+        config
+      );
 
-      if (response.success || response.status === 201) {
-        navigate("/visualize");
+      if (response.status === 201 || response.status === 200) {
+        const uploadedFileId = response.data?._id; // Adjust based on your response structure
+        if (uploadedFileId) {
+          setUploadSuccess(true);
+          setFileId(uploadedFileId);
+        } else {
+          setError("File ID not returned in response.");
+        }
       } else {
         setError("Failed to upload file. Please try again.");
       }
     } catch (error) {
-      console.error("Failed to upload file:", error);
       setError("Failed to upload file. Please try again.");
     }
-  };
-
-  const simulateUpload = () => {
-    setProgress(0);
-    const interval = setInterval(() => {
-      setProgress((prev) => {
-        if (prev < 100) return prev + 1;
-        clearInterval(interval);
-        return 100;
-      });
-    }, 50);
   };
 
   const truncateFileName = (name: string) => {
@@ -112,6 +116,12 @@ const UploadCsv: React.FC<IUploadCSV> = ({ defaultProjectId }) => {
 
   const handleBack = () => {
     navigate(`/project/create/pick-datasource?projectId=${projectId}`);
+  };
+
+  const handleNext = () => {
+    if (uploadSuccess && fileId) {
+      window.location.href = `/project/${projectId}/file/${fileId}/cleaning`;
+    }
   };
 
   return (
@@ -166,7 +176,7 @@ const UploadCsv: React.FC<IUploadCSV> = ({ defaultProjectId }) => {
                 </div>
                 <div className="flex flex-col w-full">
                   <div className="flex flex-col justify-start">
-                    <div className="flex flex-row items-center space-x-4">
+                    <div className="flex flex-row justify-between items-center space-x-4">
                       <p className="text-sm font-medium text-gray-700 truncate max-w-xs">
                         {truncateFileName(fileName)}{" "}
                       </p>
@@ -179,7 +189,7 @@ const UploadCsv: React.FC<IUploadCSV> = ({ defaultProjectId }) => {
                   <div className="flex flex-row justify-center items-center mt-1 space-x-4 w-full">
                     <div className="h-2 w-full bg-blue-300 rounded-full">
                       <div
-                        className="h-2 bg-[#443DFF] rounded-full w-[300px]"
+                        className="h-2 bg-[#443DFF] rounded-full"
                         style={{ width: `${progress}%` }}
                       ></div>
                     </div>
@@ -201,25 +211,17 @@ const UploadCsv: React.FC<IUploadCSV> = ({ defaultProjectId }) => {
                 Back
               </button>
               <button
-                onClick={() =>
-                  fileName && console.log("Proceeding to next step...")
-                }
+                onClick={handleNext}
                 className={`px-4 py-2 bg-blue-600 text-white rounded-md font-semibold hover:bg-blue-700 ${
-                  !fileName ? "opacity-50 cursor-not-allowed" : ""
+                  !uploadSuccess ? "cursor-not-allowed opacity-50" : ""
                 }`}
-                disabled={!fileName}
+                disabled={!uploadSuccess}
               >
                 Next
               </button>
             </div>
           </div>
         </div>
-      </div>
-
-      <div className="flex justify-center">
-        <div className="h-1 w-8 bg-blue-600 rounded-full mx-1"></div>
-        <div className="h-1 w-8 bg-blue-600 rounded-full mx-1"></div>
-        <div className="h-1 w-8 bg-blue-600 rounded-full mx-1"></div>
       </div>
     </div>
   );

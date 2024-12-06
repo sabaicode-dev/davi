@@ -62,8 +62,8 @@ const DataSourceDetail: React.FC = () => {
   }, []);
 
   const handleDeleteFile = async (fileId: string) => {
-    alert("Error url delete file,")
-    return false
+    alert("Error url delete file,");
+    return false;
     try {
       const response = await request({
         url: `http://3.24.110.41:8000/api/v1/projects/${projectId}/files/${fileId}`,
@@ -109,7 +109,9 @@ const DataSourceDetail: React.FC = () => {
           projectFiles.map((file, index) => (
             <div
               key={file._id}
-              onClick={() => {handleCardClick(file._id)}}
+              onClick={() => {
+                handleCardClick(file._id);
+              }}
               className="flex justify-between items-center p-2  bg-[#f2f5fd] shadow-lg rounded-md cursor-pointer ring-1 hover:ring-blue-500 transition-all"
             >
               <div className="flex flex-row space-x-16 xl:space-x-6 2xl:space-x-12">

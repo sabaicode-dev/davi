@@ -2,13 +2,15 @@ import React, { useEffect, useState } from "react";
 import icon from "@/public/images/icon-cleaning.png";
 import Button from "@/src/components/atoms/Button";
 import { DeleteIcon, DownloadIcon, V } from "@/src/components/atoms/icons/Icon";
-import Input from "@/src/components/atoms/Input";
-import { CiFilter } from "react-icons/ci";
 import { useNavigate, useParams } from "react-router-dom";
 import Table from "@/src/components/molecules/tables/Table";
 import Spinner from "@/src/components/molecules/loading/Spinner";
-import { DataTransformationCard } from "../modals/DataTransformationCard";
+import { ShowCleaningModal } from "../modals/ShowCleaningModal";
+import request from "@/src/utils/helper";
+import { PreviewCleaningModal } from "../modals/PreviewCleaningModal";
+import { AutoCleaningModal } from "../modals/AutoCleaningModal";
 
+// Prop descripe the data response from api
 interface ApiResponse {
   count: number;
   next: boolean;
@@ -25,6 +27,8 @@ interface ApiResponse {
     file_size: number;
   };
 }
+
+// Prop descript the behavior of table
 interface TableProps {
   headers: string[];
   data: any[];
@@ -32,6 +36,8 @@ interface TableProps {
   total_column?: number;
   filename?: string;
 }
+
+// Define Cleaning project page
 const CleaningProject: React.FC = () => {
   const [fileDetails, setFileDetails] = useState({
     filename: "Employee Survey.CSV",
@@ -39,7 +45,38 @@ const CleaningProject: React.FC = () => {
     totalColumns: 0,
   });
 
-  const navigate = useNavigate(); // Initialize useNavigate hook
+  const navigate = useNavigate();
+
+  const [isShowCleaningModalOpen, setIsShowCleaningModalOpen] = useState(false);
+  const [isPreviewCleaningModalOpen, setIsPreviewCleaningModalOpen] =
+    useState(false);
+  const [isAutoCleaningModalOpen, setIsAutoCleaningModalOpen] = useState(false);
+
+  const handleOpenShowCleaningModal = () => {
+    setIsShowCleaningModalOpen(true);
+  };
+
+  const handleCloseShowCleaningModal = () => {
+    setIsShowCleaningModalOpen(false);
+  };
+
+  const handleOpenPreviewCleaningModal = () => {
+    setIsShowCleaningModalOpen(false);
+    setIsPreviewCleaningModalOpen(true);
+  };
+
+  const handleClosePreviewCleaningModal = () => {
+    setIsPreviewCleaningModalOpen(false);
+    // Optionally reopen ShowCleaningModal
+    setIsShowCleaningModalOpen(false);
+  };
+  const handleOpenAutoCleaningModal = () => {
+    setIsShowCleaningModalOpen(false);
+    setIsAutoCleaningModalOpen(true);
+  };
+  const handleCloseAutoCleaningModal = () => {
+    setIsAutoCleaningModalOpen(false);
+  };
   const [tableData, setTableData] = useState<TableProps>({
     headers: [],
     data: [],
@@ -64,11 +101,16 @@ const CleaningProject: React.FC = () => {
   const { projectId, fileId } = useParams();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [dataIssuesDetails, setDataIssuesDetails] = useState({
+    missingRows: [],
+    duplicateRows: [],
+    outliers: {},
+  });
 
+  // Handle useEffect to fetch data to table before take it to cleaning.
   useEffect(() => {
     fetchData();
   }, [projectId, fileId]);
-
   const fetchData = async () => {
     if (!projectId || !fileId) {
       setError("Project ID or File ID is missing");
@@ -78,29 +120,36 @@ const CleaningProject: React.FC = () => {
 
     try {
       setIsLoading(true);
-      const response = await fetch(
-        `http://3.24.110.41:8000/api/v1/project/${projectId}/file/${fileId}/details/`
-      );
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const jsonData: ApiResponse = await response.json();
-      setTableData({
-        headers: jsonData.headers,
-        data: jsonData.results,
-        total_rows: jsonData.dataset_summary?.total_rows,
-        total_column: jsonData.dataset_summary?.total_columns,
-        filename: jsonData.filename,
+      const response = await request({
+        url: `http://3.24.110.41:8000/api/v1/project/${projectId}/file/${fileId}/details/`,
+        method: "GET",
       });
 
-      if (handleFileDetailsUpdate) {
-        handleFileDetailsUpdate({
-          filename: jsonData.filename || "",
-          totalRows: jsonData.dataset_summary?.total_rows || 0,
-          totalColumns: jsonData.dataset_summary?.total_columns || 0,
+      // Check if the request was successful
+      if (response.success) {
+        const jsonData: ApiResponse = response.data;
+        setTableData({
+          headers: jsonData.headers,
+          data: jsonData.results,
+          total_rows: jsonData.dataset_summary?.total_rows,
+          total_column: jsonData.dataset_summary?.total_columns,
+          filename: jsonData.filename,
         });
+
+        // Debug data
+        console.log(response.data.headers);
+        console.log(response.data.filename);
+
+        if (handleFileDetailsUpdate) {
+          handleFileDetailsUpdate({
+            filename: jsonData.filename || "",
+            totalRows: jsonData.dataset_summary?.total_rows || 0,
+            totalColumns: jsonData.dataset_summary?.total_columns || 0,
+          });
+        }
+      } else {
+        // Handle unsuccessful request
+        setError(response.message || "Failed to fetch data");
       }
     } catch (error) {
       setError(error instanceof Error ? error.message : "An error occurred");
@@ -110,6 +159,78 @@ const CleaningProject: React.FC = () => {
     }
   };
 
+  const [dataIssues, setDataIssues] = useState({
+    outlierValues: 0,
+    missingRows: 0,
+    duplicateRows: 0,
+  });
+  const [isDataIssuesLoading, setIsDataIssuesLoading] = useState(false);
+  const [dataIssuesError, setDataIssuesError] = useState<string | null>(null);
+  const [missingRowsData, setMissingRowsData] = useState<
+    {
+      name: string;
+      main_category: string;
+      ratings: string;
+      actual_price: string;
+    }[]
+  >([]);
+
+  const fetchDataIssues = async () => {
+    if (!projectId || !fileId) {
+      setDataIssuesError("Project ID or File ID is missing");
+      return;
+    }
+
+    try {
+      setIsDataIssuesLoading(true);
+      setDataIssuesError(null);
+
+      const response = await request({
+        url: `http://3.24.110.41:8000/api/v1/project/${projectId}/file/${fileId}/find-anaccurate-file/`,
+        method: "POST",
+      });
+
+      if (response.success) {
+        setDataIssues({
+          outlierValues: response.data.outliers_count || 0,
+          missingRows: response.data.missing_rows_count || 0,
+          duplicateRows: response.data.duplicate_rows_count || 0,
+        });
+        setDataIssuesDetails({
+          missingRows: response.data.missing_rows || [],
+          duplicateRows: response.data.duplicate_rows || [],
+          outliers: response.data.outliers || {},
+        });
+        // Optional: Log data issues for debugging
+        console.log("Data Issues:", {
+          missingRows: response.data.missing_rows_count,
+          outlierValues: response.data.outliers_count,
+          duplicateRows: response.data.duplicate_rows_count,
+        });
+        setMissingRowsData(response.data.missing_rows);
+        console.log("Missing value: ", response.data.missing_rows);
+      } else {
+        setDataIssuesError(response.message || "Failed to fetch data issues");
+      }
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : "An unexpected error occurred while fetching data issues";
+      setDataIssuesError(errorMessage);
+      console.error("Data Issues Fetch Error:", err);
+    } finally {
+      setIsDataIssuesLoading(false);
+    }
+  };
+
+  // You can call this method when needed, for example:
+  useEffect(() => {
+    fetchData();
+    fetchDataIssues();
+  }, [projectId, fileId]);
+
+  // Handle loading with spiner
   if (isLoading)
     return (
       <div className="flex w-full justify-center items-center h-full">
@@ -117,6 +238,7 @@ const CleaningProject: React.FC = () => {
       </div>
     );
 
+  // Handle if it error/issue
   if (error) return <div className="p-4 text-red-500">Error: {error}</div>;
 
   return (
@@ -146,7 +268,16 @@ const CleaningProject: React.FC = () => {
           </div>
         </div>
         {/* Content Right */}
-        <div>
+        <div className="flex items-center">
+          <Button
+            children={"Delete"}
+            size="medium"
+            radius="2xl"
+            isLoading={false}
+            color="danger"
+            startContent={<DeleteIcon />}
+            className="mr-2"
+          />
           <Button
             children={"Download"}
             size="medium"
@@ -157,50 +288,8 @@ const CleaningProject: React.FC = () => {
           />
         </div>
       </div>
-
-      <div className="flex flex-row justify-between items-center border-t-2 border-[#443DFF]">
-        <div
-          className="flex justify-between items-center gap-x-4 my-4"
-          style={{ width: "60%" }}
-        >
-          <Input
-            type="text"
-            label=""
-            placeholder="What do you want to do with your data"
-            defaultValue=""
-            size="md"
-            color="secondary"
-            variant="bordered"
-            radius="2xl"
-            labelPlacement="outside"
-            isDisabled={false}
-            isReadOnly={false}
-            isRequired={false}
-            className="max-w-input w-full"
-          />
-          <Button
-            size="medium"
-            radius="2xl"
-            isLoading={false}
-            color="none"
-            isIconOnly={true}
-            startContent={<CiFilter className="w-6 h-6" />}
-            className="border-2 border-[#E6EDFF]"
-          />
-        </div>
-        <div>
-          <Button
-            children={"Delete"}
-            size="medium"
-            radius="2xl"
-            isLoading={false}
-            color="danger"
-            startContent={<DeleteIcon />}
-          />
-        </div>
-      </div>
-
-      <div>
+      <div className="flex flex-row justify-between items-center border-t-2 border-[#443DFF]"></div>
+      <div className="mt-4">
         <div className="responsive-table-height">
           <Table
             headers={tableData.headers}
@@ -210,16 +299,16 @@ const CleaningProject: React.FC = () => {
             isSelectColumn={true}
           />
         </div>
-        <div className="relative">
+        <div className="relative mt-14">
           {/* Positioning the buttons */}
           <Button
-            children={"Transform v1"}
+            children={"Transform"}
             size="medium"
             radius="2xl"
             isLoading={false}
             color="outline"
             className="absolute right-0 bottom-0 mr-[90px]"
-            onClick={() => alert("Hello")}
+            onClick={handleOpenShowCleaningModal}
           />
           <Button
             children={"Next"}
@@ -231,6 +320,34 @@ const CleaningProject: React.FC = () => {
             onClick={handleNextClick}
           />
         </div>
+        {/* Modal - Show Cleaning */}
+        <ShowCleaningModal
+          isOpen={isShowCleaningModalOpen}
+          onClose={handleCloseShowCleaningModal}
+          title="Data Transformation"
+          onPreview={handleOpenPreviewCleaningModal}
+          dataIssues={dataIssues}
+          isDataIssuesLoading={isDataIssuesLoading}
+          dataIssuesError={dataIssuesError}
+          onAutoClean={handleOpenAutoCleaningModal}
+        />
+        {/* Modal - Show Preview data */}
+
+        <PreviewCleaningModal
+          isOpen={isPreviewCleaningModalOpen}
+          onClose={handleClosePreviewCleaningModal}
+          title="Preview Cleaning"
+          projectId={projectId!}
+          fileId={fileId!}
+          missingRowsData={missingRowsData}
+          dataIssuesDetails={dataIssuesDetails}
+        />
+        <AutoCleaningModal
+          isOpen={isAutoCleaningModalOpen}
+          onClose={handleCloseAutoCleaningModal}
+          title="Auto Cleaning"
+          filename={fileDetails.filename}
+        />
       </div>
     </div>
   );

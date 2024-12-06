@@ -60,7 +60,7 @@ const Number: React.FC<NumberProps> = ({
 
   return (
     <div
-      className="relative w-[209px] h-[149px] bg-gray-100 rounded-sm shadow-md pt-2 flex items-center justify-center cursor-pointer"
+      className="relative w-[210px] h-[149px] bg-white rounded-sm shadow-md pt-2 flex items-center justify-center cursor-pointer"
       onClick={onClick} // Trigger callback when the container is clicked
     >
       {/* Title */}

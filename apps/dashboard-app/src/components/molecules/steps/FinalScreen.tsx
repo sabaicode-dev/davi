@@ -7,6 +7,10 @@ import { CiFilter } from "react-icons/ci";
 import Table from "../tables/Table";
 import { useNavigate, useParams } from "react-router-dom";
 import Spinner from "../loading/Spinner";
+import Number from "../charts/Number";
+import Category from "../charts/Catagory";
+import Boolean from "../charts/BooleanChart";
+import UniqueValue from "../charts/UniqueValue";
 
 interface ApiResponse {
   count: number;
@@ -45,12 +49,11 @@ const FinalScreen: React.FC = () => {
     headers: [],
     data: [],
   });
-
+  const [metadata, setMetadata] = useState<any[]>([]);
   const { projectId, fileId } = useParams();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Move handleFileDetailsUpdate before it's used
   const handleFileDetailsUpdate = (details: {
     filename: string;
     totalRows: number;
@@ -59,21 +62,77 @@ const FinalScreen: React.FC = () => {
     setFileDetails(details);
   };
 
+  // Simulated Chart Data (Mock Data)
+  const generateMockChartData = () => {
+    return [
+      {
+        type: "Number",
+        key: "number_column",
+        data: [10, 20, 30, 40, 10, 20, 30, 40],
+        labels: ["A", "B", "C", "D"],
+      },
+      {
+        type: "Category",
+        key: "category_column",
+        data: [
+          { category: "Electronics", percentage: 50 },
+          { category: "Furniture", percentage: 30 },
+          { category: "Clothing", percentage: 20 },
+        ],
+      },
+      {
+        type: "Boolean",
+        key: "boolean_column",
+        data: { true: 60, false: 40 },
+      },
+      {
+        type: "UniqueValue",
+        key: "unique_column",
+        data: { value: 51, total: 500 },
+      },
+      {
+        type: "Number",
+        key: "number_column",
+        data: [10, 20, 30, 40 ,30, 40, 10, 20],
+        labels: ["A", "B", "C", "D"],
+      },
+      {
+        type: "Category",
+        key: "category_column",
+        data: [
+          { category: "Electronics", percentage: 50 },
+          { category: "Furniture", percentage: 30 },
+          { category: "Clothing", percentage: 20 },
+        ],
+      },
+      {
+        type: "Boolean",
+        key: "boolean_column",
+        data: { true: 60, false: 40 },
+      },
+      {
+        type: "UniqueValue",
+        key: "unique_column",
+        data: { value: 51, total: 500 },
+      },
+    ];
+  };
+
+  // Fetch data when component mounts or when params change
   useEffect(() => {
-    fetchData();
+    if (projectId && fileId) {
+      fetchData();
+    } else {
+      setError("Project ID or File ID is missing");
+      setIsLoading(false);
+    }
   }, [projectId, fileId]);
 
   const fetchData = async () => {
-    if (!projectId || !fileId) {
-      setError("Project ID or File ID is missing");
-      setIsLoading(false);
-      return;
-    }
-
     try {
       setIsLoading(true);
       const response = await fetch(
-        `http://3.24.110.41:8000/api/v1/v1/project/${projectId}/file/${fileId}/details/`
+        `http://3.24.110.41:8000/api/v1/project/${projectId}/file/${fileId}/details/`
       );
 
       if (!response.ok) {
@@ -81,6 +140,9 @@ const FinalScreen: React.FC = () => {
       }
 
       const jsonData: ApiResponse = await response.json();
+      console.log("Fetched data:", jsonData);
+
+      // Update state with fetched data
       setTableData({
         headers: jsonData.headers,
         data: jsonData.results,
@@ -89,12 +151,17 @@ const FinalScreen: React.FC = () => {
         filename: jsonData.filename,
       });
 
-      // Ensure handleFileDetailsUpdate is called after it's defined
-      handleFileDetailsUpdate({
-        filename: jsonData.filename || "",
-        totalRows: jsonData.dataset_summary?.total_rows || 0,
-        totalColumns: jsonData.dataset_summary?.total_columns || 0,
-      });
+      // Update file details
+      if (jsonData.dataset_summary) {
+        handleFileDetailsUpdate({
+          filename: jsonData.filename || "",
+          totalRows: jsonData.dataset_summary.total_rows || 0,
+          totalColumns: jsonData.dataset_summary.total_columns || 0,
+        });
+      }
+
+      // Set mock chart data to metadata
+      setMetadata(generateMockChartData());
     } catch (error) {
       setError(error instanceof Error ? error.message : "An error occurred");
       console.error("Error fetching data:", error);
@@ -113,12 +180,8 @@ const FinalScreen: React.FC = () => {
   if (error) return <div className="p-4 text-red-500">Error: {error}</div>;
 
   return (
-    <div
-      className="flex flex-col overflow-hidden mt-8 h-[200px]"
-      style={{ width: "100%", height: "30%" }}
-    >
+    <div className="flex flex-col overflow-hidden mt-8 h-[200px]" style={{ width: "100%", height: "30%" }}>
       <div className="flex flex-row justify-between items-center mb-3">
-        {/* Content Left */}
         <div className="flex flex-row gap-x-3 justify-center items-center">
           <div className="flex rounded-full bg-[#F4EBFF] w-12 h-12 justify-center items-center">
             <img src={icon} alt="" className="w-5 h-6" />
@@ -138,7 +201,6 @@ const FinalScreen: React.FC = () => {
             </div>
           </div>
         </div>
-        {/* Content Right */}
         <div>
           <Button
             children={"Download"}
@@ -160,11 +222,8 @@ const FinalScreen: React.FC = () => {
           />
         </div>
       </div>
-      <div className="flex flex-row  justify-between items-center border-t-2 border-[#443DFF] ">
-        <div
-          className="flex justify-between items-center gap-x-4 my-4"
-          style={{ width: "60%" }}
-        >
+      <div className="flex flex-row justify-between items-center border-t-2 border-[#443DFF]">
+        <div className="flex justify-between items-center gap-x-4 my-4" style={{ width: "60%" }}>
           <Input
             type="text"
             label=""
@@ -201,15 +260,18 @@ const FinalScreen: React.FC = () => {
           />
         </div>
       </div>
+
       <div className="">
-        {/* <TableProject onFileDetailsUpdate={handleFileDetailsUpdate} /> */}
         <div className="responsive-table-height">
           <Table
             headers={tableData.headers}
             data={tableData.data}
             isCheckBox={true}
+            metadata={metadata}  // Pass the mock chart data here
             isEditCell={false}
             isSelectColumn={true}
+            isFullHeight={true}
+            showChart={true}
           />
         </div>
       </div>

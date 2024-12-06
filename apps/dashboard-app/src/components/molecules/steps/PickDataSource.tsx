@@ -4,7 +4,7 @@ import SourceCSV from "@/src/components/molecules/data-sources/SourceCSV";
 import SourceWeb from "@/src/components/molecules/data-sources/SourceWeb";
 import SourceMySQL from "@/src/components/molecules/data-sources/SourceMySQL";
 import SourceMongoDB from "@/src/components/molecules/data-sources/SourceMongoDB";
-import { useLocation, useSearchParams } from "react-router-dom";
+import { useLocation, useSearchParams, useNavigate } from "react-router-dom";
 
 interface IPickDataSource {
   onNext?: () => void;
@@ -16,10 +16,17 @@ const PickDataSource: React.FC<IPickDataSource> = ({
   onBack,
 }) => {
   const location = useLocation();
+  const navigate = useNavigate(); // Initialize the navigate function
   const [searchParams] = useSearchParams();
   const projectId = location.state?.projectId || searchParams.get("projectId");
   console.log('ProjectId in PickDataSource:', projectId);
   console.log('Search params:', Object.fromEntries(searchParams.entries()));
+
+  const handleBack = () => {
+    // Navigate to the desired URL
+    navigate("/project/create"); 
+  };
+
   return (
     <div className="py-6 flex flex-col justify-center items-center">
       <div className="flex flex-col justify-center items-center p-8">
@@ -27,7 +34,7 @@ const PickDataSource: React.FC<IPickDataSource> = ({
           Pick a data source to start
         </h2>
         <div className="flex flex-row  w-full space-x-5">
-          <SourceCSV projectId={projectId}/>
+          <SourceCSV projectId={projectId} />
           <SourceWeb projectId={projectId} />
           <SourceMySQL />
           <SourceMongoDB />
@@ -39,7 +46,7 @@ const PickDataSource: React.FC<IPickDataSource> = ({
         </div>
         <div className="flex justify-end items-end w-full">
           <Button
-            onClick={onBack}
+            onClick={handleBack}  // Use handleBack for navigation
             children="Back"
             size="medium"
             radius="2xl"

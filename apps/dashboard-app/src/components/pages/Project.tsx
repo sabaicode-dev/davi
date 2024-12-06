@@ -8,7 +8,6 @@ export default function Project() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-
   return (
     <div className="flex w-full justify-center items-center">
       <SelectProject
