@@ -14,7 +14,7 @@ import ShowProject from "@/src/components/molecules/steps/ShowProject";
 import ProjectDetail from "@/src/components/molecules/project/ProjectDetail";
 import FinalScreen from "./components/molecules/steps/FinalScreen";
 import CleaningProject from "./components/molecules/steps/CleaningProject";
-
+import ProjectImport from "./components/molecules/steps/selectTable";
 const ProjectFlow = () => {
   return (
     <Routes>
@@ -28,7 +28,8 @@ const ProjectFlow = () => {
     </Routes>
   );
 };
-
+// project/projectId/pick-datasource/import/
+// http://localhost:8080/project/pick-datasource/import/6752655b6b20191452f44cb4
 const routes = [
   {
     path: "/",
@@ -37,6 +38,7 @@ const routes = [
   { path: "/project", element: <Project /> },
   { path: "/project/create", element: <CreateProject /> },
   { path: "/project/:projectId", element: <ProjectDetail /> },
+  { path: "/project/:projectId/pick-datasource/import/selectTable", element: <ProjectImport /> },
   { path: "/select-project", element: <ShowProject /> },
   { path: "/project/*", element: <ProjectFlow /> },
   { path: "/project/create/pick-datasource", element: <PickDataSource /> },
@@ -50,26 +52,28 @@ const routes = [
     path: "/project/:projectId/file/:fileId/cleaning",
     element: <CleaningProject />,
   },
-  { path: "/project/:projectId/file/:fileId/finalscreen", element: <FinalScreen/> },
+  {
+    path: "/project/:projectId/file/:fileId/finalscreen",
+    element: <FinalScreen />,
+  },
 ];
-
 
 export const App = () => {
   return (
     <AuthProvider>
       <BrowserRouter>
         {/* <PrivateRoute> */}
-          <Layout>
-            <Routes>
-              {routes.map((route) => (
-                <Route
-                  key={route.path}
-                  path={route.path}
-                  element={route.element}
-                />
-              ))}
-            </Routes>
-          </Layout>
+        <Layout>
+          <Routes>
+            {routes.map((route) => (
+              <Route
+                key={route.path}
+                path={route.path}
+                element={route.element}
+              />
+            ))}
+          </Routes>
+        </Layout>
         {/* </PrivateRoute> */}
       </BrowserRouter>
     </AuthProvider>

@@ -1,19 +1,33 @@
-import DisplayTable from "../templates/DisplayTable";
-import ShowTable from "../templates/ShowTable";
-import { useState } from "react";
-export default function SelectedTable() {
-  const [selectedTable, setSelectedTable] = useState(null);
+import { useState, useCallback } from "react";
+import DisplayTable from "./DisplayTable";
+import ShowTable from "./ShowTable";
 
-  const handleTableSelection = (tableName: any) => {
-    setSelectedTable(tableName);
+const ParentComponent = () => {
+  const [selectedItemId, setSelectedItemId] = useState<number | null>(null);
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  // Use useCallback to memorize the callback and prevent unnecessary re-renders
+  const handleItemClick = useCallback((index: number) => {
+    setSelectedItemId(index); // Update the selected item ID
+  }, []);
+  const handleChangeIndex = (value: number) => {
+    setSelectedIndex(value);
   };
   return (
-    <div className="flex w-auto h-full pt-2">
-      {/* DisplayTable component handles table selection */}
-      <DisplayTable onSelectTable={handleTableSelection} />
+    <div className="flex space-x-5">
+      {/* Pass handleItemClick to DisplayTable */}
+      <DisplayTable
+        handleItemClicked={handleItemClick}
+        selectedItemId={selectedItemId}
+        handleChangeIndex={handleChangeIndex}
+      />
 
-      {/* ShowTable component displays selected table */}
-      <ShowTable selectedTable={selectedTable} />
+      {/* Pass selectedItemId to ShowTable */}
+      <ShowTable
+        selectedItemId={selectedItemId}
+        selectedIndex={selectedIndex}
+      />
     </div>
   );
-}
+};
+
+export default ParentComponent;
