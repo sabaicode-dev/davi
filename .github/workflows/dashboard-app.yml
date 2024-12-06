@@ -108,14 +108,14 @@ jobs:
         run: |
           aws s3 sync ./build s3://${{ secrets.AWS_S3_BUCKET }}
 
-      # Optional: Invalidate CloudFront cache (if using CloudFront)
-      # - name: Invalidate CloudFront Cache
-      #   if: success()
-      #   run: |
-      #     aws cloudfront create-invalidation \
-      #       --distribution-id ${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION_ID }} \
-      #       --paths "/*"
-      #   env:
-      #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      #     AWS_REGION: ${{ secrets.AWS_REGION }}
+      Optional: Invalidate CloudFront cache (if using CloudFront)
+      - name: Invalidate CloudFront Cache
+        if: success()
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION_ID }} \
+            --paths "/*"
+        env:
+          AWS_ACCESS_KEY_ID_ADMIN: ${{ secrets.AWS_ACCESS_KEY_ID_ADMIN }}
+          AWS_SECRET_ACCESS_KEY_ADMIN: ${{ secrets.AWS_SECRET_ACCESS_KEY_ADMIN }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
