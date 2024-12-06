@@ -10,7 +10,12 @@ import { PieChartTest } from "@/src/components/molecules/charts/PieChart";
 
 // Define the props interface for RightSide
 interface RightSideProps {
+  selectedData: {
+    category: string;
+    percentage: number;
+  };
   onClose: () => void;
+
 }
 
 const RightSide: React.FC<RightSideProps> = ({ onClose }) => {
