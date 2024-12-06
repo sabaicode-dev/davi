@@ -108,7 +108,7 @@ jobs:
         run: |
           aws s3 sync ./build s3://${{ secrets.AWS_S3_BUCKET }}
 
-      Optional: Invalidate CloudFront cache (if using CloudFront)
+      # Optional: Invalidate CloudFront cache (if using CloudFront)
       - name: Invalidate CloudFront Cache
         if: success()
         run: |
