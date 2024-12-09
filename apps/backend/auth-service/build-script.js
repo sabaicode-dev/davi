@@ -56,7 +56,7 @@ esbuild
     );
     console.log("Package.json copied successfully!");
 
-    // Copy .env.development if it exists
+    // Copy .env.development if it exists and replace NODE_ENV=development with NODE_ENV=production
     const envSource = path.resolve(__dirname, "src/configs/.env.development");
     const envDestination = path.resolve(
       __dirname,
@@ -68,8 +68,18 @@ esbuild
 
     // Check if the .env.development file exists before copying
     if (fs.existsSync(envSource)) {
-      fs.copySync(envSource, envDestination);
-      console.log(".env.development copied successfully!");
+      // Read the content of the .env.development file
+      let envContent = fs.readFileSync(envSource, "utf-8");
+
+      // Replace NODE_ENV=development with NODE_ENV=production
+      envContent = envContent.replace(
+        /NODE_ENV\s*=\s*development/,
+        "NODE_ENV=production"
+      );
+
+      // Write the updated content to .env.production
+      fs.writeFileSync(envDestination, envContent);
+      console.log(".env.development copied and NODE_ENV set to production!");
     } else {
       console.warn(".env.development not found, skipping copy.");
     }

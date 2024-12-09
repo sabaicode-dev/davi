@@ -14,7 +14,7 @@
     "start:local": "pm2 start ecosystem.local.config.js",
     "restart:local": "pm2 restart ecosystem.local.config.js",
     "stop:local": "pm2 stop ecosystem.local.config.js",
-    "start:prod": "NODE_ENV=production node ./server.js"
+    "start:prod": "node ./server.js"
   },
   "dependencies": {
     "@aws-sdk/client-cognito-identity-provider": "^3.682.0",

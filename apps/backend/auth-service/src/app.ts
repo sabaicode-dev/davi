@@ -1,5 +1,10 @@
 // update AWS_REDIRECT_URI
+console.log(`-------------------------`);
+
 console.log("app.ts is running...!");
+console.log("update on 09/Dec/2024, 04:02 PM");
+
+console.log(`------ At : @SabaiCode ------`);
 
 import express from "express";
 import swaggerUi from "swagger-ui-express";
