@@ -16,6 +16,7 @@ import FinalScreen from "./components/molecules/steps/FinalScreen";
 import CleaningProject from "./components/molecules/steps/CleaningProject";
 import ProjectImport from "./components/molecules/steps/selectTable";
 import PrivateRoute from "./ProtectedRoute/PrivateRoute";
+import PrivateRoute from "./ProtectedRoute/PrivateRoute";
 const ProjectFlow = () => {
   return (
     <Routes>
