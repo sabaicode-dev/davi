@@ -59,6 +59,8 @@ const Table: React.FC<TableProps> = ({
     new Set()
   );
 
+  const [showRightSide, setShowRightSide] = useState<boolean>(false);
+
   // State for sidebar display based on column selection
   const [selectedColumnData, setSelectedColumnData] = useState<any | null>(
     null
@@ -70,12 +72,12 @@ const Table: React.FC<TableProps> = ({
       const newSelectedColumns = new Set(selectedColumns);
       if (newSelectedColumns.has(header)) {
         newSelectedColumns.delete(header);
-        setSelectedColumnData(null); // Deselect and close sidebar
+        setSelectedColumnData(null); // Close the sidebar
       } else {
         newSelectedColumns.add(header);
-        // Assuming you have a way to fetch or generate chart data for the column
-        const columnChartData = generateChartDataForColumn(header); // Implement this function
-        setSelectedColumnData(columnChartData); // Set the data for sidebar
+        const columnChartData = generateChartDataForColumn(header);
+        setSelectedColumnData(columnChartData); // Set the selected data for the sidebar
+        setShowRightSide(true); // Open the sidebar
       }
       setSelectedColumns(newSelectedColumns);
     }
@@ -91,6 +93,10 @@ const Table: React.FC<TableProps> = ({
       };
     }
     return null;
+  };
+
+  const handleCloseSidebar = () => {
+    setShowRightSide(false); // Close the RightSide sidebar
   };
 
   // Update tableData when data prop changes
