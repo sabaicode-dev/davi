@@ -73,6 +73,15 @@ esbuild
     } else {
       console.warn(".env.development not found, skipping copy.");
     }
+
+    // Copy ecosystem.config.js to the build folder
+    const ecosystemSource = path.resolve(__dirname, "ecosystem.config.js");
+    const ecosystemDestination = path.resolve(
+      __dirname,
+      "build/ecosystem.config.js"
+    );
+    fs.copySync(ecosystemSource, ecosystemDestination);
+    console.log("ecosystem.config.js copied successfully!");
   })
   .catch((error) => {
     console.error("Build failed:", error);
