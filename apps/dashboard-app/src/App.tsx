@@ -15,6 +15,7 @@ import ProjectDetail from "@/src/components/molecules/project/ProjectDetail";
 import FinalScreen from "./components/molecules/steps/FinalScreen";
 import CleaningProject from "./components/molecules/steps/CleaningProject";
 import ProjectImport from "./components/molecules/steps/selectTable";
+import PrivateRoute from "./ProtectedRoute/PrivateRoute";
 const ProjectFlow = () => {
   return (
     <Routes>
@@ -38,7 +39,10 @@ const routes = [
   { path: "/project", element: <Project /> },
   { path: "/project/create", element: <CreateProject /> },
   { path: "/project/:projectId", element: <ProjectDetail /> },
-  { path: "/project/:projectId/pick-datasource/import/selectTable", element: <ProjectImport /> },
+  {
+    path: "/project/:projectId/pick-datasource/import/selectTable",
+    element: <ProjectImport />,
+  },
   { path: "/select-project", element: <ShowProject /> },
   { path: "/project/*", element: <ProjectFlow /> },
   { path: "/project/create/pick-datasource", element: <PickDataSource /> },
@@ -66,19 +70,19 @@ export const App = () => {
   return (
     <AuthProvider>
       <BrowserRouter>
-        {/* <PrivateRoute> */}
-        <Layout>
-          <Routes>
-            {routes.map((route) => (
-              <Route
-                key={route.path}
-                path={route.path}
-                element={route.element}
-              />
-            ))}
-          </Routes>
-        </Layout>
-        {/* </PrivateRoute> */}
+        <PrivateRoute>
+          <Layout>
+            <Routes>
+              {routes.map((route) => (
+                <Route
+                  key={route.path}
+                  path={route.path}
+                  element={route.element}
+                />
+              ))}
+            </Routes>
+          </Layout>
+        </PrivateRoute>
       </BrowserRouter>
     </AuthProvider>
   );

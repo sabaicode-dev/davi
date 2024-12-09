@@ -1,6 +1,7 @@
 import dotenv from "dotenv";
 import path from "path";
 import Joi from "joi";
+import chalk from "chalk";
 
 // Define a TypeScript type for the configuration
 type Config = {
@@ -77,11 +78,12 @@ function loadConfig(): Config {
       ? envVars.AWS_REDIRECT_URI
       : "http://localhost:4001/v1/auth/google/callback/";
 
-  console.log("=======================================");
-
+  console.log(chalk.blue("==== ENV & clientUrl & awsRedirectUri ====="));
+  console.log("Environment:", process.env.NODE_ENV);
   console.log(`clientUrl : ${clientUrl}`);
   console.log(`awsRedirectUri : ${awsRedirectUri}`);
   console.log("=======================================");
+
   return {
     env: envVars.NODE_ENV,
     port: envVars.PORT,
