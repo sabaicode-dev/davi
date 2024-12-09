@@ -53,7 +53,7 @@ const ImportUrl: React.FC<IImportURL> = ({ defaultProjectId }) => {
 
     try {
       const response = await request({
-        url: `http://3.24.110.41:8000/api/v1/scrape/url/`,
+        url: `http://3.24.110.41:8000/api/v1/project/${projectId}/scrape/url/`,
         method: "POST",
         data: {
           url,
@@ -65,7 +65,13 @@ const ImportUrl: React.FC<IImportURL> = ({ defaultProjectId }) => {
       if (response.success || response.status === 201) {
         setScrapedData(response.data);
         console.log("Scraped Data:", response.data);
-        navigate("/visualize");
+        // Pass scrapedData via navigate to DisplayTable
+        navigate(`/project/${projectId}/pick-datasource/import/selectTable`, {
+          state: { scrapedData: response.data },
+        });
+        // navigate(`/project/import?projectId=${projectId}`, {
+        //   state: { scrapedData: response.data },
+        // });
       } else {
         setError(response.message || "Failed to scrape the URL.");
       }
