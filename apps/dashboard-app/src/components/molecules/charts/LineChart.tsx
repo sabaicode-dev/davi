@@ -68,7 +68,7 @@ const LineChart: React.FC<LineChartProps> = ({
         options={chartOptions}
         series={chartSeries}
         type="line"
-        height={350}
+        height={270}
       />
     </div>
   );
@@ -86,9 +86,8 @@ const LineChartTest: React.FC = () => {
   ];
 
   return (
-    <div className="w-full h-full mt-24">
-      <h1>Monthly Performance</h1>
-      <LineChart data={sampleData} show_category={true} />
+    <div className="">
+      <LineChart data={sampleData} show_category={false} />
     </div>
   );
 };

@@ -7,7 +7,13 @@ type ProcessedDataItem = {
   percentage: number;
 };
 
-// Process data to find top 2 categories and group the rest as "Others"
+type CategoryProps = {
+  data: DataItem[]; // Raw data for processing
+  title?: string; // Optional title for the component
+  onClick: (item: { category: string; percentage: number }) => void; // Callback for clicks
+};
+
+// Process data to find top 2 categories and group the rest as "Other"
 const processData = (data: DataItem[]): ProcessedDataItem[] => {
   const categoryCount = data.reduce<Record<string, number>>(
     (acc, { category }) => ({ ...acc, [category]: (acc[category] || 0) + 1 }),
@@ -31,7 +37,7 @@ const processData = (data: DataItem[]): ProcessedDataItem[] => {
     .reduce((sum, [, count]) => sum + count, 0);
   if (othersCount)
     topCategories.push({
-      category: "Others",
+      category: "Other+",
       count: othersCount,
       percentage: 0,
     });
@@ -44,47 +50,47 @@ const processData = (data: DataItem[]): ProcessedDataItem[] => {
   return topCategories;
 };
 
-const CategoryItem: React.FC<{ category: string; percentage: number }> = ({
-  category,
-  percentage,
-}) => (
-  <div className="w-full flex flex-col space-y-1">
-    <div className="w-full flex justify-between">
-      <p>{category}</p>
-      <p>{percentage}%</p>
-    </div>
-    <div className="w-full h-2 bg-slate-300 rounded-full">
-      <div
-        className="h-2 bg-blue-500 rounded-full"
-        style={{ width: `${percentage}%` }}
-      ></div>
-    </div>
-  </div>
-);
-
-type CategoryProps = {
-  data: DataItem[];
-};
-
-export const Category: React.FC<CategoryProps> = ({ data }) => {
+const Category: React.FC<CategoryProps> = ({
+  data,
+  title = "Category",
+  onClick,
+}) => {
   const processedData = processData(data);
 
+  // Calculate the top item to trigger `onClick` for the entire component
+  const topItem = processedData[0] || { category: "", percentage: 0 };
+
   return (
-    <div className="w-full space-y-1">
-      <div className="w-full flex items-center justify-start">
-        <div className="text-blue-800 text-xs bg-blue-300 rounded-md p-1 mb-2">
-          <h1>Category</h1>
+    <div
+      className="relative w-[210px] h-[149px] bg-white rounded-sm shadow-md p-2 flex flex-col justify-center cursor-pointer"
+      onClick={() => onClick(topItem)} // Trigger onClick with the top item
+    >
+      {/* Title */}
+      <div className="absolute top-2 left-2">
+        <div className="text-green-800 text-xs bg-green-100 px-2 py-1 rounded">
+          {title}
         </div>
       </div>
-      <div className="flex flex-col justify-start h-24 text-xs space-y-2">
+
+      {/* Categories */}
+      <div className="w-full h-full flex flex-col justify-evenly pt-6 px-2">
         {processedData.map((item, index) => (
-          <CategoryItem
-            key={index}
-            category={item.category}
-            percentage={item.percentage}
-          />
+          <div key={index} className="flex flex-col space-y-1">
+            <div className="flex justify-between text-xs">
+              <span>{item.category}</span>
+              <span>{item.percentage.toFixed(2)}%</span>
+            </div>
+            <div className="w-full h-2 bg-slate-200 rounded-full">
+              <div
+                className="h-2 bg-blue-500 rounded-full"
+                style={{ width: `${item.percentage}%` }}
+              ></div>
+            </div>
+          </div>
         ))}
       </div>
     </div>
   );
 };
+
+export default Category;

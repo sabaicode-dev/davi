@@ -4,11 +4,11 @@ import Sidebar from "@/src/components/organisms/Sidebar";
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
-    <div className="flex h-screen">
+    <div className="flex h-screen overflow-hidden lg:overflow-auto">
       <Sidebar />
-      <div className="flex-1">
+      <div className="w-full">
         <Header />
-        <main className="p-6 mt-10 ml-28">{children}</main>
+        <main className="px-6 mt-[70px] ml-28">{children}</main>
       </div>
     </div>
   );

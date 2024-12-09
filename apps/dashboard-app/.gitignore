@@ -1,6 +1,8 @@
+.env.sample
+.env.local
 node_modules/
 _README.md
-build/
+build
 .DS_Store
 *storybook.log
 /test-results/
@@ -9,3 +11,6 @@ build/
 /playwright/.cache/
 tests-examples
 tests
+.env.sample
+
+build/

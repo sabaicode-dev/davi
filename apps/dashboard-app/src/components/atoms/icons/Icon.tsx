@@ -1,3 +1,6 @@
+interface IIcons {
+  className?: string;
+}
 const FilterIcon = () => (
   <svg
     width="20"
@@ -15,6 +18,25 @@ const FilterIcon = () => (
     />
   </svg>
 );
+const Xicon = () => {
+  return (
+    <svg
+      width="44"
+      height="44"
+      viewBox="0 0 44 44"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M28 16L16 28M16 16L28 28"
+        stroke="#667085"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+  );
+};
 const AIIcon = () => {
   return (
     <svg
@@ -123,7 +145,7 @@ const VisualizeIcon = () => {
   );
 };
 
-const DeleteIcon = () => {
+export const DeleteIcon: React.FC<IIcons> = ({ className }) => {
   return (
     <svg
       width="20"
@@ -131,10 +153,11 @@ const DeleteIcon = () => {
       viewBox="0 0 20 20"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
+      className={className}
     >
       <path
         d="M13.3333 5.0013V4.33464C13.3333 3.40121 13.3333 2.9345 13.1517 2.57798C12.9919 2.26438 12.7369 2.00941 12.4233 1.84962C12.0668 1.66797 11.6001 1.66797 10.6667 1.66797H9.33333C8.39991 1.66797 7.9332 1.66797 7.57668 1.84962C7.26308 2.00941 7.00811 2.26438 6.84832 2.57798C6.66667 2.9345 6.66667 3.40121 6.66667 4.33464V5.0013M8.33333 9.58464V13.7513M11.6667 9.58464V13.7513M2.5 5.0013H17.5M15.8333 5.0013V14.3346C15.8333 15.7348 15.8333 16.4348 15.5608 16.9696C15.3212 17.44 14.9387 17.8225 14.4683 18.0622C13.9335 18.3346 13.2335 18.3346 11.8333 18.3346H8.16667C6.76654 18.3346 6.06647 18.3346 5.53169 18.0622C5.06129 17.8225 4.67883 17.44 4.43915 16.9696C4.16667 16.4348 4.16667 15.7348 4.16667 14.3346V5.0013"
-        stroke="white"
+        stroke="currentColor"
         stroke-width="1.66667"
         stroke-linecap="round"
         stroke-linejoin="round"
@@ -234,6 +257,24 @@ const DatasetIcon = () => (
   </svg>
 );
 
+const XIcon = () => (
+  <svg
+    width="44"
+    height="44"
+    viewBox="0 0 44 44"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="M28 16L16 28M16 16L28 28"
+      stroke="#667085"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+  </svg>
+);
+
 const HelpIcon = () => (
   <svg
     width="31"
@@ -314,17 +355,234 @@ const DeleteIconCardVisualize = () => {
     </svg>
   );
 };
+
+const UploadFile = () => {
+  return (
+    <svg
+      width="20"
+      height="18"
+      viewBox="0 0 20 18"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M6.66797 12.3333L10.0013 9M10.0013 9L13.3346 12.3333M10.0013 9V16.5M16.668 12.9524C17.6859 12.1117 18.3346 10.8399 18.3346 9.41667C18.3346 6.88536 16.2826 4.83333 13.7513 4.83333C13.5692 4.83333 13.3989 4.73833 13.3064 4.58145C12.2197 2.73736 10.2133 1.5 7.91797 1.5C4.46619 1.5 1.66797 4.29822 1.66797 7.75C1.66797 9.47175 2.36417 11.0309 3.49043 12.1613"
+        stroke="#475467"
+        stroke-width="1.66667"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+  );
+};
+
+const FileIcon = () => {
+  return (
+    <svg
+      width="16"
+      height="17"
+      viewBox="0 0 16 17"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M9.33268 2.01167V4.76537C9.33268 5.13873 9.33268 5.32542 9.40534 5.46802C9.46926 5.59347 9.57125 5.69545 9.69669 5.75937C9.8393 5.83203 10.026 5.83203 10.3993 5.83203H13.153M13.3327 7.15751V11.9654C13.3327 13.0855 13.3327 13.6455 13.1147 14.0733C12.9229 14.4497 12.617 14.7556 12.2407 14.9474C11.8128 15.1654 11.2528 15.1654 10.1327 15.1654H5.86602C4.74591 15.1654 4.18586 15.1654 3.75803 14.9474C3.38171 14.7556 3.07575 14.4497 2.884 14.0733C2.66602 13.6455 2.66602 13.0855 2.66602 11.9654V5.03203C2.66602 3.91193 2.66602 3.35187 2.884 2.92405C3.07575 2.54773 3.38171 2.24176 3.75803 2.05002C4.18586 1.83203 4.74591 1.83203 5.86602 1.83203H8.0072C8.49638 1.83203 8.74097 1.83203 8.97115 1.88729C9.17522 1.93628 9.37031 2.01709 9.54925 2.12675C9.75108 2.25043 9.92404 2.42339 10.2699 2.76929L12.3954 4.89477C12.7413 5.24068 12.9143 5.41363 13.038 5.61546C13.1476 5.79441 13.2284 5.9895 13.2774 6.19357C13.3327 6.42374 13.3327 6.66833 13.3327 7.15751Z"
+        stroke="#443DFF"
+        stroke-width="1.33333"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+  );
+};
+
+const CheckTick = () => {
+  return (
+    <svg
+      width="16"
+      height="17"
+      viewBox="0 0 16 17"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <rect x="0.5" y="1" width="15" height="15" rx="7.5" fill="#443DFF" />
+      <rect x="0.5" y="1" width="15" height="15" rx="7.5" stroke="#7F56D9" />
+      <path
+        d="M11.3327 6L6.74935 10.5833L4.66602 8.5"
+        stroke="white"
+        stroke-width="1.66667"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+  );
+};
+
+const V = () => {
+  return (
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        fill-rule="evenodd"
+        clip-rule="evenodd"
+        d="M13.9994 9C13.7342 9 13.4799 8.89464 13.2923 8.70711C13.1048 8.51957 12.9994 8.26522 12.9994 8C12.9994 7.73478 13.1048 7.48043 13.2923 7.29289C13.4799 7.10536 13.7342 7 13.9994 7H18.9994C19.2646 7 19.519 7.10536 19.7065 7.29289C19.8941 7.48043 19.9994 7.73478 19.9994 8V13C19.9994 13.2652 19.8941 13.5196 19.7065 13.7071C19.519 13.8946 19.2646 14 18.9994 14C18.7342 14 18.4799 13.8946 18.2923 13.7071C18.1048 13.5196 17.9994 13.2652 17.9994 13V10.414L13.7064 14.707C13.5189 14.8945 13.2646 14.9998 12.9994 14.9998C12.7343 14.9998 12.48 14.8945 12.2924 14.707L9.99943 12.414L5.70643 16.707C5.51783 16.8892 5.26523 16.99 5.00303 16.9877C4.74083 16.9854 4.49002 16.8802 4.30461 16.6948C4.1192 16.5094 4.01403 16.2586 4.01176 15.9964C4.00948 15.7342 4.11027 15.4816 4.29243 15.293L9.29243 10.293C9.47996 10.1055 9.73427 10.0002 9.99943 10.0002C10.2646 10.0002 10.5189 10.1055 10.7064 10.293L12.9994 12.586L16.5854 9H13.9994Z"
+        fill="white"
+      />
+    </svg>
+  );
+};
+export const EditIcon: React.FC<IIcons> = ({ className }) => {
+  return (
+    <svg
+      width="20px"
+      height="20px"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+    >
+      <path
+        d="M16.6711 4.48785L11.4428 9.78833C11.2429 9.99099 11.143 10.0923 11.0761 10.2152L11.0727 10.2215C11.0067 10.3448 10.9772 10.4832 10.9184 10.7599C10.6297 12.1177 10.4853 12.7966 10.8705 13.1765C10.8766 13.1825 10.8827 13.1885 10.889 13.1943C11.2839 13.5644 11.9721 13.4037 13.3486 13.0822C13.6235 13.0181 13.7609 12.986 13.8822 12.9197L13.8839 12.9187C14.0051 12.8521 14.1048 12.7545 14.3042 12.5592L19.6099 7.36337C20.2676 6.71937 20.5964 6.39736 20.6034 5.99372C20.6103 5.59008 20.2928 5.25743 19.6579 4.59212L19.5804 4.51093C18.9033 3.80151 18.5647 3.4468 18.1347 3.44338C17.7047 3.43997 17.3602 3.78926 16.6711 4.48785Z"
+        stroke="currentColor"
+        stroke-width="1.7"
+        className="my-path"
+      ></path>
+      <path
+        d="M19.0007 8.00004L16 5"
+        stroke="currentColor"
+        stroke-width="1.7"
+        className="my-path"
+      ></path>
+      <path
+        d="M13.5882 3H11C7.22876 3 5.34315 3 4.17157 4.17157C3 5.34315 3 7.22876 3 11V13C3 16.7712 3 18.6569 4.17157 19.8284C5.34315 21 7.22876 21 11 21H13C16.7712 21 18.6569 21 19.8284 19.8284C21 18.6569 21 16.7712 21 13V11.4706"
+        stroke="currentColor"
+        stroke-width="1.7"
+        stroke-linecap="round"
+        className="my-path"
+      ></path>
+    </svg>
+  );
+};
+
+export const CloseIcon: React.FC<IIcons> = ({ className }) => {
+  return (
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+    >
+      <path
+        d="M7.75732 7.75745L16.2426 16.2427"
+        stroke="currentColor"
+        stroke-width="1.7"
+        stroke-linecap="round"
+      ></path>
+      <path
+        d="M16.2426 7.75745L7.75732 16.2427"
+        stroke="currentColor"
+        stroke-width="1.7"
+        stroke-linecap="round"
+        className={className}
+      ></path>
+    </svg>
+  );
+};
+
+const TranfromIcon = () => {
+  return (
+    <svg
+      width="56"
+      height="56"
+      viewBox="0 0 56 56"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <rect x="4" y="4" width="48" height="48" rx="24" fill="#D1FADF" />
+      <rect
+        x="4"
+        y="4"
+        width="48"
+        height="48"
+        rx="24"
+        stroke="#ECFDF3"
+        stroke-width="8"
+      />
+      <path
+        d="M38 33.5H31"
+        stroke="#171717"
+        stroke-width="1.5"
+        stroke-miterlimit="10"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M21 33.5H18"
+        stroke="#171717"
+        stroke-width="1.5"
+        stroke-miterlimit="10"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M38 22.5H35"
+        stroke="#171717"
+        stroke-width="1.5"
+        stroke-miterlimit="10"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M25 22.5H18"
+        stroke="#171717"
+        stroke-width="1.5"
+        stroke-miterlimit="10"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M23 30.5H29C30.1 30.5 31 31 31 32.5V34.5C31 36 30.1 36.5 29 36.5H23C21.9 36.5 21 36 21 34.5V32.5C21 31 21.9 30.5 23 30.5Z"
+        stroke="#171717"
+        stroke-width="1.5"
+        stroke-miterlimit="10"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M27 19.5H33C34.1 19.5 35 20 35 21.5V23.5C35 25 34.1 25.5 33 25.5H27C25.9 25.5 25 25 25 23.5V21.5C25 20 25.9 19.5 27 19.5Z"
+        stroke="#171717"
+        stroke-width="1.5"
+        stroke-miterlimit="10"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+  );
+};
+
 export {
   FilterIcon,
   AIIcon,
   DownloadIcon,
   VisualizeIcon,
-  DeleteIcon,
   ProjectIcon,
   GraphIcon,
   DatasetIcon,
   HelpIcon,
   CloseModalIcon,
   SortIcon,
-  DeleteIconCardVisualize
+  DeleteIconCardVisualize,
+  UploadFile,
+  FileIcon,
+  CheckTick,
+  XIcon,
+  V,
+  TranfromIcon
 };

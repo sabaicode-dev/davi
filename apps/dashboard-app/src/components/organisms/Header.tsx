@@ -1,14 +1,18 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Logo from "@/public/images/header/logo.png";
 import ProfileUser from "@/public/images/header/roem-reaksmey.jpeg";
 import FileImg from "@/public/images/header/status-up.png";
 import { AiOutlineLogout } from "react-icons/ai";
 import { FiUser } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/src/contexts/AuthContext";
+import { API_ENDPOINTS } from "@/src/utils/const/apiEndpoint";
 
 const Header: React.FC = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+  const { setUsername, username, setEmail, email } = useAuth();
+
   const navigate = useNavigate();
 
   const handleProfileClick = () => {
@@ -16,8 +20,55 @@ const Header: React.FC = () => {
     closeDropdown();
   };
 
+  const handleLogout = async () => {
+    try {
+      // Retrieve tokens from localStorage
+      const authToken = localStorage.getItem("authToken");
+      const refreshToken = localStorage.getItem("refreshToken"); // Replace "dummyRefreshToken" with the real token
+
+      // Check if tokens are available
+      if (!authToken || !refreshToken) {
+        console.warn("No tokens found. Redirecting to login...");
+        window.location.href = "http://localhost:3000/login";
+        return;
+      }
+
+      // Call the logout API with the refresh token
+      const response = await fetch(API_ENDPOINTS.SIGN_OUT, {
+        method: "PUT",
+        credentials: "include", // Include cookies if necessary
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authToken}`, // Include authToken in the header
+        },
+        body: JSON.stringify({
+          refreshToken, // Send the refreshToken in the body
+        }),
+      });
+
+      if (response.ok) {
+        console.log("User logged out successfully");
+
+        // Clear tokens and user state from the frontend
+        localStorage.removeItem("authToken");
+        localStorage.removeItem("refreshToken");
+
+        // Clear any additional user-related state (if necessary)
+        setUsername && setUsername(null);
+        setEmail && setEmail(null);
+
+        // Redirect to the login or signup page
+        window.location.href = "http://localhost:3000/login";
+      } else {
+        const errorData = await response.json();
+        console.error("Failed to log out:", errorData);
+      }
+    } catch (error) {
+      console.error("Error during logout:", error);
+    }
+  };
+
   const toggleDropdown = () => {
-    // Open the notification dropdown and close the profile dropdown if it's open
     setIsDropdownOpen(!isDropdownOpen);
     if (isProfileDropdownOpen) {
       setIsProfileDropdownOpen(false);
@@ -25,7 +76,6 @@ const Header: React.FC = () => {
   };
 
   const toggleProfileDropdown = () => {
-    // Open the profile dropdown and close the notification dropdown if it's open
     setIsProfileDropdownOpen(!isProfileDropdownOpen);
     if (isDropdownOpen) {
       setIsDropdownOpen(false);
@@ -33,10 +83,10 @@ const Header: React.FC = () => {
   };
 
   const closeDropdown = () => {
-    // Close both dropdowns
     setIsDropdownOpen(false);
     setIsProfileDropdownOpen(false);
   };
+
   return (
     <header className="bg-white shadow-md flex items-center justify-between py-3 px-8 fixed top-0 left-0 w-full z-50">
       <div className="flex items-center cursor-pointer">
@@ -62,7 +112,7 @@ const Header: React.FC = () => {
             />
           </svg>
           {/* Notification badge */}
-          <span className="absolute -top-0 -right-[1px] inline-flex items-center justify-center w-[6px] h-[6px] text-xs font-bold leading-none text-white bg-red-600 rounded-full"></span>
+          <span className="absolute -top-0 -right-[1px] inline-flex items-center justify-center w-[6px] h-[6px] text-xs font-bold leading-none text-white rounded-full"></span>
         </button>
 
         {/* Notification Dropdown */}
@@ -122,7 +172,9 @@ const Header: React.FC = () => {
             alt="Profile"
             className="size-8 rounded-full"
           />
-          <span className="mr-1 font-medium">ReakSmey</span>
+          <span className="mr-1 text-lg font-medium">
+            {username || "UserName"}
+          </span>
           <svg
             width="14"
             height="8"
@@ -150,8 +202,8 @@ const Header: React.FC = () => {
                   className="w-14 h-14 rounded-full"
                 />
                 <div className="ml-3">
-                  <p className="font-medium">ReakSmey</p>
-                  <p className="text-sm text-gray-500">reaksmey007@gmail.com</p>
+                  <p className="font-normal">{username}</p>
+                  <p className="text-sm text-gray-500">{email}</p>
                 </div>
               </div>
               <button onClick={closeDropdown} className="text-gray-500">
@@ -166,7 +218,10 @@ const Header: React.FC = () => {
                 <FiUser size={22} />
                 <span>My Profile</span>
               </button>
-              <button className="w-full flex items-center p-3 text-red-500 hover:bg-gray-100 rounded-sm mt-2 space-x-3">
+              <button
+                onClick={handleLogout}
+                className="w-full flex items-center p-3 text-red-500 hover:bg-gray-100 rounded-sm mt-2 space-x-3"
+              >
                 <AiOutlineLogout size={22} />
                 <span>Log Out</span>
               </button>

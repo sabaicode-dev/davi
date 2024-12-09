@@ -1,75 +1,89 @@
 import React from "react";
 import Chart from "react-apexcharts";
-import { ApexOptions } from "apexcharts"; // Import ApexOptions type
+import { ApexOptions } from "apexcharts";
 
-// Define props interface for the Number component
 interface NumberProps {
-  data: number[]; // Explicitly typing data as an array of numbers
+  data: number[]; // Array of bar heights
+  labels: string[]; // Array of x-axis labels
+  title?: string; // Optional title
+  onClick?: () => void; // Callback when the container is clicked
 }
 
-export const Number: React.FC<NumberProps> = ({ data }) => {
+const Number: React.FC<NumberProps> = ({
+  data,
+  labels,
+  title = "Number",
+  onClick,
+}) => {
   const chartOptions: ApexOptions = {
     chart: {
-      type: "bar", // Set the type directly as "bar"
-      toolbar: {
-        show: false,
-      },
+      type: "bar",
+      toolbar: { show: false },
+      animations: { enabled: false },
     },
     plotOptions: {
       bar: {
         borderRadius: 2,
         horizontal: false,
-        columnWidth: "70%",
+        columnWidth: "80%",
       },
     },
     dataLabels: {
       enabled: false,
     },
     xaxis: {
-      categories: ["1", "2", "3", "4", "5", "6", "7", "8"], // Labels for the bars
-      labels: {
-        show: false, // Disable the x-axis labels to remove the bottom numbers
-      },
-    },
-    colors: ["#3b82f6"], // Bar color
-    fill: {
-      opacity: 1,
-    },
-    grid: {
-      show: false, // Disable grid lines and borders
+      categories: labels,
+      labels: { show: false },
+      axisBorder: { show: false },
+      axisTicks: { show: false },
     },
     yaxis: {
-      show: false, // Disable y-axis labels and lines
-      max: 100, // Set max limit for y-axis to 100
+      show: false,
+    },
+    grid: {
+      show: false,
+  
+      
+    },
+    colors: ["#3b82f6"],
+    tooltip: {
+      enabled: false,
     },
   };
 
   const chartSeries = [
     {
-      name: "Height",
-      data: data, // Use the passed-in data prop here
+      name: "Count",
+      data: data,
     },
   ];
 
   return (
-    <div className="relative w-full max-w-md mx-auto h-44 px-[15px] pt-[20px] bg-slate-100">
-      {/* Button on Top */}
-      <div className="absolute top-[20px] left-[15px] flex items-center">
-        <div className="text-green-800 text-[12px] bg-green-300 rounded-md px-2 py-1">
-          <h1>Number</h1>
+    <div
+      className="relative w-[210px] h-[149px] bg-white rounded-sm shadow-md pt-2 flex items-center justify-center cursor-pointer"
+      onClick={onClick} // Trigger callback when the container is clicked
+    >
+      {/* Title */}
+      {title && (
+        <div className="absolute top-2 left-2">
+          <div className="text-blue-800 text-xs bg-blue-100 px-2 py-1 rounded">
+            {title}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Chart */}
-      <div className="h-full">
+      <div className="w-full h-full">
         <Chart
-          options={chartOptions} // Pass the correctly typed options
-          series={chartSeries} // Pass the series data
-          type="bar" // Explicitly set type here for clarity
-          width="70%"
+          options={chartOptions}
+          series={chartSeries}
+          type="bar"
+          width="100%"
           height="100%"
         />
       </div>
     </div>
   );
 };
+
+export default Number;

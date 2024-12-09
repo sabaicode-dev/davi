@@ -25,7 +25,7 @@ const CardContainer: React.FC<CardContainerProps> = ({ numCards }) => {
   };
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 w-full">
       {cards.map((card, index) => (
         <Card key={card.id} index={index} onDelete={() => deleteCard(index)} />
       ))}
