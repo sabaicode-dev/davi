@@ -1,3 +1,5 @@
+console.log("config.ts is running...!");
+
 import dotenv from "dotenv";
 import path from "path";
 import Joi from "joi";
@@ -82,7 +84,6 @@ function loadConfig(): Config {
   console.log("Environment:", process.env.NODE_ENV);
   console.log(`clientUrl : ${clientUrl}`);
   console.log(`awsRedirectUri : ${awsRedirectUri}`);
-  console.log("=======================================");
 
   return {
     env: envVars.NODE_ENV,

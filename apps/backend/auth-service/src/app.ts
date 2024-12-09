@@ -1,4 +1,5 @@
 // update AWS_REDIRECT_URI
+console.log("app.ts is running...!");
 
 import express from "express";
 import swaggerUi from "swagger-ui-express";
@@ -8,6 +9,7 @@ import path from "path";
 import { allowedOrigins, corsOptions } from "@/src/middleware/allowsReq";
 import { errorHandler } from "@/src/middleware/errorHandler";
 import cookieParser from "cookie-parser";
+import chalk from "chalk";
 
 // Dynamically load swagger.json
 const swaggerDocument = JSON.parse(
@@ -34,6 +36,8 @@ app.use(cookieParser());
 app.use(corsOptions);
 
 //log show allowedOrigins
+console.log(chalk.blue("==== allowedOrigins ====="));
+
 console.log(`allowedOrigins : ${allowedOrigins}`);
 
 // ========================
