@@ -23,6 +23,7 @@ const UploadCsv: React.FC<IUploadCSV> = ({ defaultProjectId }) => {
   const [uploadSuccess, setUploadSuccess] = useState<boolean>(false);
   const [fileId, setFileId] = useState<string | null>(null);
   const [error, setError] = useState<string>("");
+  const [isDragOver, setIsDragOver] = useState<boolean>(false);
 
   const MAX_FILENAME_LENGTH = 30;
 
@@ -51,6 +52,39 @@ const UploadCsv: React.FC<IUploadCSV> = ({ defaultProjectId }) => {
     } else {
       setError("Please upload a valid CSV file.");
     }
+  };
+
+  const handleDrop = async (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    setIsDragOver(false); // Reset drag-over state
+
+    const file = event.dataTransfer.files[0];
+    if (!file) {
+      setError("No file selected.");
+      return;
+    }
+
+    if (!projectId) {
+      setError("No project ID available. Please try again.");
+      return;
+    }
+
+    if (file.type === "text/csv" || file.name.endsWith(".csv")) {
+      setFileName(file.name);
+      setFileSize(file.size / 1024);
+      await uploadFileToDB(file);
+    } else {
+      setError("Please upload a valid CSV file.");
+    }
+  };
+
+  const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    setIsDragOver(true); // Set drag-over state to true to highlight the drop area
+  };
+
+  const handleDragLeave = () => {
+    setIsDragOver(false); // Reset drag-over state when dragging leaves the area
   };
 
   const uploadFileToDB = async (file: File) => {
@@ -139,8 +173,13 @@ const UploadCsv: React.FC<IUploadCSV> = ({ defaultProjectId }) => {
               Upload and attach files to this project.
             </p>
             <div
-              className="border-2 border-dashed border-[#E4E7EC] bg-[#FFFFFF] p-3 rounded-lg text-center cursor-pointer shadow-sm"
+              className={`border-2 border-dashed ${
+                isDragOver ? "border-blue-500" : "border-[#E4E7EC]"
+              } bg-[#FFFFFF] p-3 rounded-lg text-center cursor-pointer shadow-sm`}
               onClick={handleFileUpload}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
             >
               <div className="flex justify-center items-center mb-3">
                 <div className="bg-gray-50 p-2 rounded-full">
