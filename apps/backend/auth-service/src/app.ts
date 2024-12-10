@@ -1,6 +1,3 @@
-// update AWS_REDIRECT_URI
-console.log(`-------------------------`);
-
 console.log("app.ts is running...!");
 console.log("update on 09/Dec/2024, 04:02 PM");
 
