@@ -1,4 +1,4 @@
-import React, { ReactNode} from "react";
+import React, { ReactNode } from "react";
 
 import { useAuth } from "../contexts/AuthContext";
 
@@ -7,7 +7,6 @@ interface PrivateRouteProps {
 }
 
 const PrivateRoute: React.FC<PrivateRouteProps> = ({ children }) => {
-
   const { email, username } = useAuth();
 
   const isAuthenticated = !!email && !!username;
@@ -16,8 +15,8 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ children }) => {
 
   // If the user is not authenticated, redirect to Next.js signup page
   if (!isAuthenticated) {
-    window.location.href = "https://d3llp4uth9m31o.cloudfront.net/signup"; // Redirect to signup
-    //   window.open("http://localhost:3000/signup", "_blank");
+    // window.location.href = "https://d3llp4uth9m31o.cloudfront.net/signup";
+    window.location.href = "http://localhost:3000/signup";
     return null; // Return null to prevent rendering anything else
   }
 
