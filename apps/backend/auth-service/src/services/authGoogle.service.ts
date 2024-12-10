@@ -1,6 +1,4 @@
 import { URLSearchParams } from "url";
-// import dotenv from "dotenv";
-// import path from "path";
 import axios from "axios";
 import chalk from "chalk";
 import configs from "../config";
@@ -9,8 +7,9 @@ const AWS_COGNITO_DOMAIN = configs.awsCognitoDomain;
 const AWS_COGNITO_CLIENT_ID = configs.awsCognitoClientId;
 const AWS_COGNITO_CLIENT_SECRET = configs.awsCognitoClientSecret;
 const AWS_REDIRECT_URI = configs.awsRedirectUri;
+const NODE_ENV = configs.env;
 
-console.log(chalk.red("======== Using for googleSignIn =========="));
+console.log(chalk.red(`======== Using for ${NODE_ENV} Google==========`));
 
 console.log(`AWS_COGNITO_DOMAIN : ${AWS_COGNITO_DOMAIN}`);
 console.log(`AWS_COGNITO_CLIENT_ID : ${AWS_COGNITO_CLIENT_ID}`);
