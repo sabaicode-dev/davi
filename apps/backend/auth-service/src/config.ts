@@ -80,10 +80,24 @@ function loadConfig(): Config {
       ? envVars.AWS_REDIRECT_URI
       : "http://localhost:4001/v1/auth/google/callback/";
 
-  console.log(chalk.blue("==== ENV & clientUrl & awsRedirectUri ====="));
-  console.log("Environment:", process.env.NODE_ENV);
-  console.log(`clientUrl : ${clientUrl}`);
-  console.log(`awsRedirectUri : ${awsRedirectUri}`);
+  const userServiceUrl =
+    envVars.NODE_ENV === "production"
+      ? envVars.USER_SERVICE_URL
+      : "http://localhost:3000/";
+
+  console.log(
+    chalk.blue("== ENV & clientUrl & awsRedirectUri & userServiceUrl ==")
+  );
+  console.log("Environment:", chalk.greenBright(`${process.env.NODE_ENV}`));
+  console.log(`clientUrl : ${clientUrl} `, chalk.redBright("=>(dashboard)"));
+  console.log(
+    `awsRedirectUri : ${awsRedirectUri}`,
+    chalk.redBright("=>(back-end-auth)")
+  );
+  console.log(
+    `userServiceUrl : ${userServiceUrl}`,
+    chalk.redBright("=>(client-app)")
+  );
 
   return {
     env: envVars.NODE_ENV,
