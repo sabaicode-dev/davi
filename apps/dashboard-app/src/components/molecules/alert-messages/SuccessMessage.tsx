@@ -12,7 +12,7 @@ export const SuccessMessage = ({
       onClose();
     }, 5000); // Auto-close after 5 seconds
 
-    return () => clearTimeout(timer); // Cleanup on unmount
+    return () => clearTimeout(timer); // Cleanup on unmount here
   }, [onClose]);
 
   return (
