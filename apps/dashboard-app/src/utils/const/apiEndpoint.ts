@@ -1,3 +1,6 @@
+
+
+//For Development
 export const API_ENDPOINTS = {
   SIGN_UP: `${process.env.REACT_APP_API_URL_AUTH_ENDPOINT}/signup`,
   VERIFY: `${process.env.REACT_APP_API_URL_AUTH_ENDPOINT}/confirm`,
@@ -9,4 +12,14 @@ export const API_ENDPOINTS = {
   UPDATE_USER_NAME: `${process.env.REACT_APP_API_URL_AUTH_ENDPOINT}/updateUsername`,
 };
 
+
 console.log(API_ENDPOINTS);
+
+//For Development
+
+export const API_URL_AUTH = {
+  SIGN_UP: `${process.env.REACT_APP_URL_AUTH_ENDPOINT}/signup`,
+  SIGN_IN: `${process.env.REACT_APP_URL_AUTH_ENDPOINT}/login`,
+
+};
+
