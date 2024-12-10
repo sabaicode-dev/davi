@@ -109,11 +109,9 @@ function loadConfig(): Config {
     awsCognitoClientSecret: envVars.AWS_COGNITO_CLIENT_SECRET,
     awsCognitoIdentityPoolId: envVars.AWS_COGNITO_IDENTITY_POOL_ID,
     awsCognitoDomain: envVars.AWS_COGNITO_DOMAIN,
-    // awsRedirectUri: envVars.AWS_REDIRECT_URI,
-    awsRedirectUri,
-    // clientUrl: envVars.CLIENT_URL,
     clientUrl, // Dynamically assigned clientUrl
-    userServiceUrl: envVars.USER_SERVICE_URL,
+    awsRedirectUri, // Dynamically
+    userServiceUrl, // Dynamically
     awsAccessKeyId: envVars.AWS_ACCESS_KEY_ID,
     awsSecretAccessKey: envVars.AWS_SECRET_ACCESS_KEY,
   };
