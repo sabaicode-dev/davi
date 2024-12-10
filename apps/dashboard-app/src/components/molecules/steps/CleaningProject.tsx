@@ -302,7 +302,7 @@ const CleaningProject: React.FC = () => {
         <div className="relative mt-14">
           {/* Positioning the buttons */}
           <Button
-            children={"Transform v1"}
+            children={"Transform"}
             size="medium"
             radius="2xl"
             isLoading={false}

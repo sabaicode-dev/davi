@@ -1,4 +1,3 @@
-
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const Dotenv = require("dotenv-webpack");
@@ -6,7 +5,7 @@ const Dotenv = require("dotenv-webpack");
 module.exports = {
   // Entry point for your application
   entry: path.resolve(__dirname, "..", "./src/index.tsx"),
-  
+
   // Resolve extensions and aliases
   resolve: {
     extensions: [".tsx", ".ts", ".js"],
@@ -44,7 +43,7 @@ module.exports = {
 
   // Output settings
   output: {
-    path: path.resolve(__dirname, "..", "./build"), // Output directory
+    path: path.resolve(__dirname, "..", "build"), // Output directory
     filename: "bundle.js", // Output bundle
     publicPath: "/", // Ensure assets and routes are resolved relative to the root
   },
