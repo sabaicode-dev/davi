@@ -18,7 +18,7 @@ const menuItems: MenuItem[] = [
   {
     name: "Project",
     icon: <ProjectIcon />,
-    link: "/",
+    link: "/Project",
   },
   {
     name: "Visualize",
