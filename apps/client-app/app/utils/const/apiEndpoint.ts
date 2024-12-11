@@ -17,8 +17,8 @@ export const API_ENDPOINT = {
 
 //For Development
 export const API_URL_AUTH = {
-  SIGN_UP: `${process.env.NEXT_PUBLIC_URL_AUTH_ENDPOINT}/signup`,
-  SIGN_IN: `${process.env.NEXT_PUBLIC_URL_AUTH_ENDPOINT}/login`,
+  SIGN_UP : `${process.env.NEXT_PUBLIC_URL_DAIV}/signup`,
+  SIGN_IN: `${process.env.NEXT_PUBLIC_URL_DAIV}/login`,
 
 };
 

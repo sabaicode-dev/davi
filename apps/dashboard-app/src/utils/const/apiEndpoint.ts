@@ -18,8 +18,8 @@ console.log(API_ENDPOINTS);
 //For Development
 
 export const API_URL_AUTH = {
-  SIGN_UP: `${process.env.REACT_APP_URL_AUTH_ENDPOINT}/signup`,
-  SIGN_IN: `${process.env.REACT_APP_URL_AUTH_ENDPOINT}/login`,
+  SIGN_UP: `${process.env.REACT_APP_URL_DAVI}/signup`,
+  SIGN_IN: `${process.env.REACT_APP_URL_DAVI}/login`,
 
 };
 
