@@ -63,7 +63,7 @@ function extractTokensFromResponse(response: AxiosResponse): {
 
 const axiosInstance = axios.create({
   // baseURL: "http://localhost:4001",
-  baseURL: process.env.NEXT_PUBLIC_AUTH_ENDPOINT, 
+  baseURL: process.env.NEXT_PUBLIC_AUTH_ENDPOINT,
   withCredentials: true,
 });
 

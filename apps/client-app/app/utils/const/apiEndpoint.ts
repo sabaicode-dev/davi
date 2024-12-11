@@ -1,4 +1,7 @@
-export const API_ENDPOINTS = {
+
+
+// For Development
+export const API_ENDPOINT = {
   SIGN_UP: `${process.env.NEXT_PUBLIC_AUTH_ENDPOINT}/signup`,
   VERIFY: `${process.env.NEXT_PUBLIC_AUTH_ENDPOINT}/confirm`,
   SIGN_IN: `${process.env.NEXT_PUBLIC_AUTH_ENDPOINT}/signin`,
@@ -9,7 +12,17 @@ export const API_ENDPOINTS = {
   UPDATE_USER_NAME: `${process.env.NEXT_PUBLIC_AUTH_ENDPOINT}/updateUsername`,
 };
 
-export const API_PROD_AUTH = {
-  SIGN_UP: `${process.env.NEXT_PUBLIC_PROD_URL_AUTH_ENDPOINT}/signup`,
-  SIGN_IN: `${process.env.NEXT_PUBLIC_PROD_URL_AUTH_ENDPOINT}/login`,
+//For Production
+
+
+//For Development
+export const API_URL_AUTH = {
+  SIGN_UP : `${process.env.NEXT_PUBLIC_URL_DAIV}/signup`,
+  SIGN_IN: `${process.env.NEXT_PUBLIC_URL_DAIV}/login`,
+
 };
+
+
+
+
+

@@ -10,6 +10,7 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
+
   const handleLogin = async (email: string, password: string) => {
     setError(null);
     try {
@@ -26,7 +27,7 @@ export default function LoginPage() {
         // const { token } = response.data;
         // localStorage.setItem("authToken", token);
 
-        window.location.href = "http://localhost:8080";
+        window.location.href =(process.env.NEXT_PUBLIC_URL_PDASHBOARD || "");
       } else {
         setError("Login failed. Please try again.");
       }

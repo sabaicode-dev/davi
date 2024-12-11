@@ -3,6 +3,7 @@ import axios from "axios";
 import { AiOutlineLogout } from "react-icons/ai";
 import { useAuth } from "@/src/contexts/AuthContext";
 import { API_ENDPOINTS } from "@/src/utils/const/apiEndpoint";
+import { API_URL_AUTH } from "@/src/utils/const/apiEndpoint";
 
 const AccountSettings: React.FC = () => {
   const [user, setUser] = useState({
@@ -123,7 +124,7 @@ const AccountSettings: React.FC = () => {
       // Check if tokens are available
       if (!authToken || !refreshToken) {
         console.warn("No tokens found. Redirecting to login...");
-        window.location.href = "http://localhost:3000/login";
+        window.location.href = API_URL_AUTH.SIGN_IN ; //
         return;
       }
 
@@ -152,7 +153,7 @@ const AccountSettings: React.FC = () => {
         setEmail && setEmail(null);
 
         // Redirect to the login or signup page
-        window.location.href = "http://localhost:3000/login";
+        window.location.href = API_URL_AUTH.SIGN_IN ;
       } else {
         const errorData = await response.json();
         console.error("Failed to log out:", errorData);

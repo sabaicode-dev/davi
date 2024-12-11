@@ -59,7 +59,7 @@ function loadConfig(): Config {
   const { value: envVars, error } = envVarsSchema.validate(process.env, {
     abortEarly: false, // Show all validation errors at once
   });
-
+0
   // Handle validation errors
   if (error) {
     const errorMessages = error.details.map((err) => err.message).join(", ");

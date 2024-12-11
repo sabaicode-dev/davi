@@ -11,6 +11,7 @@ import "dotenv/config";
 
 // require("dotenv").config();
 
+
 export default function EmailVerification() {
   const [verificationCode, setVerificationCode] = useState([
     "",
@@ -125,7 +126,7 @@ export default function EmailVerification() {
 
       if (response.status === 200) {
         setSuccess(true);
-        router.push("http://localhost:8080"); // Redirect to dashboard
+        router.push (process.env.NEXT_PUBLIC_URL_PDASHBOARD || "")// Redirect to dashboard
       } else {
         setError("Verification failed. Please try again.");
       }
