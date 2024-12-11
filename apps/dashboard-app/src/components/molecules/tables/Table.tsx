@@ -4,6 +4,7 @@ import Number from "../charts/Number";
 import Boolean from "../charts/BooleanChart";
 import UniqueValue from "../charts/UniqueValue";
 import Analysis from "../descraptive/Analysis";
+import RightSide from "../right-side/RightSide";
 
 interface TableProps {
   headers: string[];
@@ -57,6 +58,46 @@ const Table: React.FC<TableProps> = ({
   const [selectedRows, setSelectedRows] = useState<Set<string | number>>(
     new Set()
   );
+
+  const [showRightSide, setShowRightSide] = useState<boolean>(false);
+
+  // State for sidebar display based on column selection
+  const [selectedColumnData, setSelectedColumnData] = useState<any | null>(
+    null
+  );
+
+  // Handle column selection
+  const handleColumnSelect = (header: string) => {
+    if (isSelectColumn) {
+      const newSelectedColumns = new Set(selectedColumns);
+      if (newSelectedColumns.has(header)) {
+        newSelectedColumns.delete(header);
+        setSelectedColumnData(null); // Close the sidebar
+      } else {
+        newSelectedColumns.add(header);
+        const columnChartData = generateChartDataForColumn(header);
+        setSelectedColumnData(columnChartData); // Set the selected data for the sidebar
+        setShowRightSide(true); // Open the sidebar
+      }
+      setSelectedColumns(newSelectedColumns);
+    }
+  };
+
+  const generateChartDataForColumn = (column: string) => {
+    // Generate or fetch the chart data for the selected column
+    const chartMetadata = metadata.find((meta) => meta.key === column);
+    if (chartMetadata) {
+      return {
+        category: column,
+        percentage: 50, // Example value
+      };
+    }
+    return null;
+  };
+
+  const handleCloseSidebar = () => {
+    setShowRightSide(false); // Close the RightSide sidebar
+  };
 
   // Update tableData when data prop changes
   useEffect(() => {
@@ -156,45 +197,6 @@ const Table: React.FC<TableProps> = ({
     }
   };
 
-  //hong
-  // const renderChart = (col: ChartMetadata) => {
-  //   // Check the column type and render corresponding chart component
-  //   switch (col.table_column_info.type) {
-  //     case "STRING":
-  //       // For STRING columns, access string_metrics.counts
-  //       return (
-  //         <Category
-  //           onClick={(item) =>
-  //             handleBoxClick({
-  //               category: item.category,
-  //               percentage: item.percentage,
-  //             })
-  //           }
-  //           data={col.table_column_metrics.string_metrics?.counts || []} // Handle missing data with a fallback
-  //         />
-  //       );
-  //     case "NUMERIC":
-  //       // For NUMERIC columns, access numeric_metrics.histogram.buckets
-  //       return (
-  //         <Number
-  //           data={col.table_column_metrics.numeric_metrics?.histogram?.buckets || []} // Ensure safe access
-  //         />
-  //       );
-  //     case "BOOLEAN":
-  //       // For BOOLEAN columns, access boolean_metrics
-  //       return (
-  //         <Boolean
-  //           data={col.table_column_metrics.boolean_metrics || {}} // Fallback to empty object if missing
-  //         />
-  //       );
-  //     default:
-  //       // Handle unknown column types
-  //       return <p>No chart available</p>;
-  //   }
-  // };
-
-  //hong
-
   const handleSelectRow = (id: string | number) => {
     const newSelectedRows = new Set(selectedRows);
     if (newSelectedRows.has(id)) {
@@ -210,8 +212,11 @@ const Table: React.FC<TableProps> = ({
       const newSelectedColumns = new Set(selectedColumns);
       if (newSelectedColumns.has(header)) {
         newSelectedColumns.delete(header);
+        setSelectedColumnData(null); // Close the sidebar when unselecting
       } else {
         newSelectedColumns.add(header);
+        // Trigger the chart display and show the sidebar
+        setSelectedColumnData(generateChartDataForColumn(header)); // Show chart data
       }
       setSelectedColumns(newSelectedColumns);
     }
@@ -268,7 +273,9 @@ const Table: React.FC<TableProps> = ({
 
   // Guard clause for empty data
   if (!Array.isArray(headers) || !Array.isArray(data) || headers.length === 0) {
-    return <div className="font-bold text-lg text-red-500">No data to display</div>;
+    return (
+      <div className="font-bold text-lg text-red-500">No data to display</div>
+    );
   }
 
   return (
@@ -285,20 +292,16 @@ const Table: React.FC<TableProps> = ({
             {headers.map((header) => (
               <th
                 key={header}
-                className={`border-[1px] border-t-0 border-collapse border-gray-500  py-2 w-[210px]  cursor-pointer relative group
-                  ${selectedColumns.has(header) ? "bg-blue-200" : ""}`}
-                onClick={() => handleSelectColumn(header)}
+                className={`border-[1px] border-t-0 border-collapse border-gray-500 py-2 w-[210px] cursor-pointer relative group
+                ${selectedColumns.has(header) ? "bg-blue-200" : ""}`}
+                onClick={() => handleColumnSelect(header)} // Here you call handleColumnSelect
               >
                 <div className="flex items-center justify-center">
                   {capitalizeFirstChar(header)}
                 </div>
-                {isSelectColumn && (
-                  <div className="absolute inset-0 group-hover:bg-blue-100 opacity-0 group-hover:opacity-20 transition-opacity" />
-                )}
               </th>
             ))}
           </tr>
-          {/* Row for Charts */}
           {/* Row for Charts */}
           {showChart && (
             <tr className="bg-[#F7FAFF] w-full ">
@@ -313,19 +316,6 @@ const Table: React.FC<TableProps> = ({
               ))}
             </tr>
           )}
-
-          {/* {showChart && (
-            <tr className="sticky bg-[#F7FAFF] z-10 top-[3rem]">
-              {metadata.map((col) => (
-                <td
-                  key={col.key}
-                  className="border-[1px] border-gray-500 px-2 w-[210px] overflow-hidden whitespace-nowrap"
-                >
-                  {renderChart(col)}
-                </td>
-              ))}
-            </tr>
-          )} */}
         </thead>
         <tbody className="bg-white">
           {tableData.map((row, index) => {
@@ -444,6 +434,10 @@ const Table: React.FC<TableProps> = ({
       {/* Sidebar */}
       {showSidebar && selectedData && (
         <Analysis selectedData={selectedData} onClose={closeSidebar} />
+      )}
+
+      {selectedColumnData && (
+        <RightSide selectedData={selectedColumnData} onClose={closeSidebar} />
       )}
     </div>
   );

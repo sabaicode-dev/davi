@@ -32,14 +32,4 @@ export const MenuListPhone = [
     path: "/price",
     active: false,
   },
-  {
-    name: "Login",
-    path: "/login",
-    active: false,
-  },
-  {
-    name: "Sign Up",
-    path: "/signup",
-    active: false,
-  },
 ];
