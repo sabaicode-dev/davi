@@ -19,11 +19,11 @@ const DisplayTable = ({
     handleChangeIndex(index + 1);
   };
   return (
-    <div className="h-[800px] space-y-3 border border-[#C4C1D8] rounded-lg py-3">
+    <div className="h-[700px] space-y-3 border border-[#C4C1D8] rounded-lg py-3">
       <header className="text-center font-medium text-[20px] w-[200px]">
         <h1>Display Table</h1>
       </header>
-      <div className="h-[740px] overflow-y-auto">
+      <div className="h-[640px] overflow-y-auto">
         <ul className="space-y-3 font-medium text-[14px]">
           {scrapedData && scrapedData.length > 0 ? (
             scrapedData.map((item: any, index: number) => (

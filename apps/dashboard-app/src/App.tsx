@@ -14,7 +14,7 @@ import ShowProject from "@/src/components/molecules/steps/ShowProject";
 import ProjectDetail from "@/src/components/molecules/project/ProjectDetail";
 import FinalScreen from "./components/molecules/steps/FinalScreen";
 import CleaningProject from "./components/molecules/steps/CleaningProject";
-import ProjectImport from "./components/molecules/steps/selectTable";
+import SelectTable from "./components/molecules/steps/SelectTable";
 const ProjectFlow = () => {
   return (
     <Routes>
@@ -38,7 +38,10 @@ const routes = [
   { path: "/project", element: <Project /> },
   { path: "/project/create", element: <CreateProject /> },
   { path: "/project/:projectId", element: <ProjectDetail /> },
-  { path: "/project/:projectId/pick-datasource/import/selectTable", element: <ProjectImport /> },
+  {
+    path: "/project/:projectId/pick-datasource/import/selectTable",
+    element: <SelectTable />,
+  },
   { path: "/select-project", element: <ShowProject /> },
   { path: "/project/*", element: <ProjectFlow /> },
   { path: "/project/create/pick-datasource", element: <PickDataSource /> },

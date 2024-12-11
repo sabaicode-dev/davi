@@ -68,10 +68,10 @@ const ShowTable = ({ selectedItemId, selectedIndex }: ShowTableProps) => {
     if (selectedItemId === null) return; // Don't fetch if no ID is selected
     fetchData();
   }, [selectedItemId, projectId]);
-
+  console.log("selectedItemId in showTable:::::::::::", selectedItemId);
   return (
     <div className="w-full ml-5 border border-[#C4C1D8] rounded-lg">
-      <div className="p-5 h-[800px] overflow-hidden">
+      <div className="p-5 h-[700px] overflow-hidden">
         <header className="font-medium text-[18px] mb-4">
           {selectedItemId !== null ? (
             <div>Table {selectedIndex}</div>

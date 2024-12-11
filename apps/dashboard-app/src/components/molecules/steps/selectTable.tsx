@@ -1,11 +1,11 @@
-import React from 'react'
-import ParentComponent from '../../templates/SelectedTable'
-const selectTable= () => {
+import React from "react";
+import ShowScraping from "../../templates/ShowScraping";
+const SelectTable = () => {
   return (
     <div>
-      <ParentComponent/>
+      <ShowScraping />
     </div>
-  )
-}
+  );
+};
 
-export default selectTable
+export default SelectTable;
