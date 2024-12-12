@@ -20,12 +20,32 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"Location": {
+				"properties": {
+					"region": {
+						"type": "string"
+					},
+					"capital": {
+						"type": "string"
+					},
+					"country": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"region",
+					"capital",
+					"country"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"DeviceInfo": {
 				"properties": {
 					"my_os": {
 						"type": "string"
 					},
-					"ip": {
+					"my_pub_ip": {
 						"type": "string"
 					},
 					"deviceDetails": {
@@ -45,18 +65,26 @@
 						"type": "string"
 					},
 					"location": {
+						"$ref": "#/components/schemas/Location"
+					},
+					"googleMapsLink": {
+						"type": "string"
+					},
+					"get_network_org": {
 						"type": "string"
 					}
 				},
 				"required": [
 					"my_os",
-					"ip",
+					"my_pub_ip",
 					"deviceDetails",
 					"os",
 					"browser",
 					"userAgent",
 					"currentDateTime",
-					"location"
+					"location",
+					"googleMapsLink",
+					"get_network_org"
 				],
 				"type": "object",
 				"additionalProperties": false

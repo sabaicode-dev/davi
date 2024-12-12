@@ -28,17 +28,29 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "Location": {
+        "dataType": "refObject",
+        "properties": {
+            "region": {"dataType":"string","required":true},
+            "capital": {"dataType":"string","required":true},
+            "country": {"dataType":"string","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "DeviceInfo": {
         "dataType": "refObject",
         "properties": {
             "my_os": {"dataType":"string","required":true},
-            "ip": {"dataType":"string","required":true},
+            "my_pub_ip": {"dataType":"string","required":true},
             "deviceDetails": {"dataType":"object","required":true},
             "os": {"dataType":"string","required":true},
             "browser": {"dataType":"string","required":true},
             "userAgent": {"dataType":"string","required":true},
             "currentDateTime": {"dataType":"string","required":true},
-            "location": {"dataType":"string","required":true},
+            "location": {"ref":"Location","required":true},
+            "googleMapsLink": {"dataType":"string","required":true},
+            "get_network_org": {"dataType":"string","required":true},
         },
         "additionalProperties": false,
     },

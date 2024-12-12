@@ -14,7 +14,9 @@ export const getDeviceInfo = async (request: any): Promise<DeviceInfo> => {
       ? my_os_with_quotes.replace(/"/g, "")
       : "Unknown";
 
-    const ip =
+    // let my_pub_ip = "::ffff:102.211.232.255";
+
+    let my_pub_ip =
       request.headers["cf-connecting-ip"] ||
       request.headers["x-real-ip"] ||
       (request.headers["x-forwarded-for"]
@@ -38,25 +40,54 @@ export const getDeviceInfo = async (request: any): Promise<DeviceInfo> => {
 
     const currentDateTime = new Date().toLocaleString();
 
-    let location = "Unknown";
-    if (ip && ip !== "::1" && ip !== "127.0.0.1") {
-      const locationApiResponse = await axios.get(
-        `https://ipapi.co/${ip}/json/`
-      );
-      location = `${locationApiResponse.data.city}, ${locationApiResponse.data.region}, ${locationApiResponse.data.country_name}`;
+    console.log("**********************");
+    console.log(`my_pub_ip  :::: ${my_pub_ip}`);
+    console.log("**********************");
+
+    // If the IP address is in IPv6-mapped IPv4 format, extract the actual IPv4 address
+    if (my_pub_ip.startsWith("::ffff:")) {
+      my_pub_ip = my_pub_ip.slice(7); // Remove the "::ffff:" prefix to get the actual IPv4 address
+    }
+
+    const locationApiResponse = await axios.get(
+      `https://ipapi.co/${my_pub_ip}/json/`
+    );
+
+    let location: any = {
+      region: locationApiResponse.data.region || "Unknown",
+      capital: locationApiResponse.data.country_capital || "Unknown",
+      country: locationApiResponse.data.country_name || "Unknown",
+    };
+
+    if (my_pub_ip && my_pub_ip !== "::1" && my_pub_ip !== "127.0.0.1") {
+      location;
+      console.log(`location ::::> ${location}`);
     } else {
       location = "Localhost";
     }
 
+    const latitude = locationApiResponse.data.latitude || "Unknown";
+    const longitude = locationApiResponse.data.longitude || "Unknown";
+
+    let googleMapsLink = `https://www.google.com/maps?q=${latitude},${longitude}`;
+
+    if (latitude === "Unknown" && longitude === "Unknown") {
+      googleMapsLink = "Unknown";
+    }
+
+    let get_network_org = locationApiResponse.data.org || "Unknown";
+
     return {
       my_os,
-      ip,
+      my_pub_ip,
       os,
       browser,
       userAgent: userAgentString || "No User-Agent provided",
       currentDateTime,
       location,
       deviceDetails,
+      googleMapsLink,
+      get_network_org,
     };
   } catch (error: unknown) {
     const errorMessage =
