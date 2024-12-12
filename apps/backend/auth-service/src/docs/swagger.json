@@ -20,6 +20,47 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"DeviceInfo": {
+				"properties": {
+					"my_os": {
+						"type": "string"
+					},
+					"ip": {
+						"type": "string"
+					},
+					"deviceDetails": {
+						"additionalProperties": false,
+						"type": "object"
+					},
+					"os": {
+						"type": "string"
+					},
+					"browser": {
+						"type": "string"
+					},
+					"userAgent": {
+						"type": "string"
+					},
+					"currentDateTime": {
+						"type": "string"
+					},
+					"location": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"my_os",
+					"ip",
+					"deviceDetails",
+					"os",
+					"browser",
+					"userAgent",
+					"currentDateTime",
+					"location"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"SignUpRequest": {
 				"properties": {
 					"username": {
@@ -280,6 +321,29 @@
 						}
 					}
 				}
+			}
+		},
+		"/v1/auth/device-info": {
+			"get": {
+				"operationId": "GetDeviceInfo",
+				"responses": {
+					"200": {
+						"description": "A promise that resolves to a `DeviceInfo` object with device and location details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/DeviceInfo"
+								}
+							}
+						}
+					}
+				},
+				"description": "Fetches device information for the incoming request.",
+				"tags": [
+					"Check Device Login Info"
+				],
+				"security": [],
+				"parameters": []
 			}
 		},
 		"/v1/auth/google": {
