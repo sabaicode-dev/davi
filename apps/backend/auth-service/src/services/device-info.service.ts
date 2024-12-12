@@ -1,6 +1,6 @@
 import axios from "axios";
 import { DeviceInfo } from "../controllers/types/DeviceInfo.type";
-import DeviceDetector from "node-device-detector";
+import DeviceDetector from "device-detector-js"; // Import device-detector-js
 
 const detector = new DeviceDetector();
 
@@ -28,7 +28,7 @@ export const getDeviceInfo = async (request: any): Promise<DeviceInfo> => {
       throw new Error("User-Agent header is missing.");
     }
 
-    const result = detector.detect(userAgentString);
+    const result = detector.parse(userAgentString); // Use device-detector-js's parse method
     const deviceDetails = result;
 
     console.log("Request deviceDetails ::::::", deviceDetails);
