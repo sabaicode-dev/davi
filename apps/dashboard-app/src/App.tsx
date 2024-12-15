@@ -15,7 +15,7 @@ import ProjectDetail from "@/src/components/molecules/project/ProjectDetail";
 import FinalScreen from "./components/molecules/steps/FinalScreen";
 import CleaningProject from "./components/molecules/steps/CleaningProject";
 import ProjectImport from "./components/molecules/steps/selectTable";
-// import PrivateRoute from "./ProtectedRoute/PrivateRoute";
+import PrivateRoute from "./ProtectedRoute/PrivateRoute";
 const ProjectFlow = () => {
   return (
     <Routes>
@@ -70,19 +70,19 @@ export const App = () => {
   return (
     <AuthProvider>
       <BrowserRouter>
-        {/* <PrivateRoute> */}
-        <Layout>
-          <Routes>
-            {routes.map((route) => (
-              <Route
-                key={route.path}
-                path={route.path}
-                element={route.element}
-              />
-            ))}
-          </Routes>
-        </Layout>
-        {/* </PrivateRoute> */}
+        <PrivateRoute>
+          <Layout>
+            <Routes>
+              {routes.map((route) => (
+                <Route
+                  key={route.path}
+                  path={route.path}
+                  element={route.element}
+                />
+              ))}
+            </Routes>
+          </Layout>
+        </PrivateRoute>
       </BrowserRouter>
     </AuthProvider>
   );

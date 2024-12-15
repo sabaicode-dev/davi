@@ -1,6 +1,7 @@
 import axios from "axios";
 import { DeviceInfo } from "../controllers/types/DeviceInfo.type";
 import DeviceDetector from "device-detector-js"; // Import device-detector-js
+import Location from "@/src/database/models/location.models"; // Import the Location model
 
 const detector = new DeviceDetector();
 
@@ -14,7 +15,7 @@ export const getDeviceInfo = async (request: any): Promise<DeviceInfo> => {
       ? my_os_with_quotes.replace(/"/g, "")
       : "Unknown";
 
-    // let my_pub_ip = "::ffff:102.211.232.255";
+    // let my_pub_ip = "::ffff:209.146.61.157";
 
     let my_pub_ip =
       request.headers["cf-connecting-ip"] ||
@@ -69,6 +70,10 @@ export const getDeviceInfo = async (request: any): Promise<DeviceInfo> => {
     const latitude = locationApiResponse.data.latitude || "Unknown";
     const longitude = locationApiResponse.data.longitude || "Unknown";
 
+    console.log(
+      `getDeviceInfo --> latitude :: ${latitude} and longitude :: ${longitude}`
+    );
+
     let googleMapsLink = `https://www.google.com/maps?q=${latitude},${longitude}`;
 
     if (latitude === "Unknown" && longitude === "Unknown") {
@@ -95,5 +100,72 @@ export const getDeviceInfo = async (request: any): Promise<DeviceInfo> => {
         ? error.message
         : "Unknown error while fetching device information.";
     throw new Error(`Failed to fetch device information: ${errorMessage}`);
+  }
+};
+
+export const getLocation = async (
+  lat: number,
+  lng: number,
+  email: string,
+  saveToDatabase = false,
+  device_info: DeviceInfo
+) => {
+  try {
+    if (!lat || !lng || !email) {
+      throw new Error("Latitude, Longitude, and email are required.");
+    }
+
+    console.log(
+      `Processing location: Latitude=${lat}, Longitude=${lng}, Email=${email}`
+    );
+
+    const googleMapsLink = `https://www.google.com/maps?q=${lat},${lng}`;
+
+    const locationData = {
+      email,
+      lat,
+      lng,
+      googleMapsLink,
+      dev_info: device_info, // Ensure the object matches the schema
+    };
+
+    if (saveToDatabase) {
+      const existingLocation = await Location.findOne({ email });
+      if (existingLocation) {
+        console.log("Existing location found:", existingLocation);
+        await Location.deleteOne({ email });
+        console.log(`Deleted existing record for email: ${email}`);
+      }
+
+      const locationRecord = new Location(locationData);
+      const savedLocation = await locationRecord.save();
+      console.log("Saved new location:", savedLocation);
+    }
+
+    return locationData;
+  } catch (error: any) {
+    console.error("Error in getLocation:", error);
+    throw new Error(
+      error.message || "An error occurred while processing the location."
+    );
+  }
+};
+
+export const getCheckInfo = async (email: string) => {
+  try {
+    if (!email) {
+      throw new Error("Email is required.");
+    }
+
+    const userLocation = await Location.findOne({ email });
+
+    console.log(`userLocation ::: ${userLocation}`);
+
+    return userLocation;
+  } catch (error: any) {
+    console.error("Error in getCheckInfo:", error);
+    throw new Error(
+      error.message || "An error occurred while checking location data."
+    );
   }
 };

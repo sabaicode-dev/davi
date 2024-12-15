@@ -6,7 +6,7 @@ export interface DeviceInfo {
   browser: string;
   userAgent: string;
   currentDateTime: string;
-  location: Location;
+  location?: Location;
   googleMapsLink: string;
   get_network_org: string;
 }
