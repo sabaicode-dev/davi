@@ -13,6 +13,7 @@ import CryptoJS from "crypto-js";
 
 const secretKey = process.env.NEXT_PUBLIC_SECRET_KEY || "";
 
+
 // Infer the type of RegisterFormData from RegisterSchema
 type RegisterFormData = z.infer<typeof RegisterSchema>;
 

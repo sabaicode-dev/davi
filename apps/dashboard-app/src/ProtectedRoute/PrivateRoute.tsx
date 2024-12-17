@@ -16,7 +16,7 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ children }) => {
   // If the user is not authenticated, redirect to Next.js signup page
   if (!isAuthenticated) {
     // window.location.href = "https://d3llp4uth9m31o.cloudfront.net/signup";
-    window.location.href = "http://localhost:3000/signup";
+    window.location.href = `${process.env.REACT_APP_URL_DAVI}/signup`;
     return null; // Return null to prevent rendering anything else
   }
 
