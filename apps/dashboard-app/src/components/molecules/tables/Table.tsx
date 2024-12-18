@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Category from "../charts/Catagory";
 import Number from "../charts/Number";
-import Boolean from "../charts/BooleanChart";
+import Boolean from "../charts/Boolean";
 import UniqueValue from "../charts/UniqueValue";
 import Analysis from "../descraptive/Analysis";
 
@@ -79,24 +79,18 @@ const Table: React.FC<TableProps> = ({
   };
 
   //----1
-  const [numberData, setNumberData] = useState<number[]>([]);
-  const [numberLabels, setNumberLabels] = useState<string[]>([]);
-  const [categoryData, setCategoryData] = useState<
-    { category: string; percentage: number }[]
-  >([]);
-  const [booleanData, setBooleanData] = useState<{
-    true: number;
-    false: number;
-  }>({ true: 0, false: 0 });
+
   const [showSidebar, setShowSidebar] = useState(false);
   const [selectedData, setSelectedData] = useState<{
     category: string;
     percentage: number;
+    type: string;
   } | null>(null);
 
   const handleBoxClick = (dataPoint: {
     category: string;
     percentage: number;
+    type: string;
   }) => {
     setSelectedData(dataPoint);
     setShowSidebar(true);
@@ -115,7 +109,11 @@ const Table: React.FC<TableProps> = ({
             data={col.data}
             labels={col.labels}
             onClick={() =>
-              handleBoxClick({ category: "Number Data", percentage: 50 })
+              handleBoxClick({
+                category: "Number Data",
+                percentage: 50,
+                type: col.type, // Pass the type dynamically from col
+              })
             }
           />
         );
@@ -126,6 +124,7 @@ const Table: React.FC<TableProps> = ({
               handleBoxClick({
                 category: item.category,
                 percentage: item.percentage,
+                type: col.type, // Pass the type dynamically from col
               })
             }
             data={col.data}
@@ -137,7 +136,11 @@ const Table: React.FC<TableProps> = ({
             data={col.data}
             title="Boolean"
             onClick={() =>
-              handleBoxClick({ category: "Boolean Data", percentage: 60 })
+              handleBoxClick({
+                category: "Boolean Data",
+                percentage: 60,
+                type: col.type, // Pass the type dynamically from col
+              })
             }
           />
         );
@@ -147,7 +150,11 @@ const Table: React.FC<TableProps> = ({
             value={51} // Example unique value count
             total={500} // Example total count
             onClick={() =>
-              handleBoxClick({ category: "Unique Value Data", percentage: 51 })
+              handleBoxClick({
+                category: "Unique Value Data",
+                percentage: 51,
+                type: col.type, // Pass the type dynamically from col
+              })
             }
           />
         );
@@ -268,7 +275,9 @@ const Table: React.FC<TableProps> = ({
 
   // Guard clause for empty data
   if (!Array.isArray(headers) || !Array.isArray(data) || headers.length === 0) {
-    return <div className="font-bold text-lg text-red-500">No data to display</div>;
+    return (
+      <div className="font-bold text-lg text-red-500">No data to display</div>
+    );
   }
 
   return (
@@ -443,7 +452,12 @@ const Table: React.FC<TableProps> = ({
       </table>
       {/* Sidebar */}
       {showSidebar && selectedData && (
-        <Analysis selectedData={selectedData} onClose={closeSidebar} />
+        <Analysis
+          selectedData={selectedData}
+          onClose={closeSidebar}
+          metadata={metadata} // Make sure metadata is typed correctly
+          renderChart={renderChart} // Pass the function correctly
+        />
       )}
     </div>
   );
