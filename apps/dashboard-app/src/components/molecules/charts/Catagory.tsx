@@ -58,6 +58,7 @@ const Category: React.FC<CategoryProps> = ({
   const processedData = processData(data);
 
   // Calculate the top item to trigger `onClick` for the entire component
+  // Calculate the top item to trigger `onClick` for the entire component
   const topItem = processedData[0] || { category: "", percentage: 0 };
 
   return (

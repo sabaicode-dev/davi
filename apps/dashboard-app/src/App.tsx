@@ -15,7 +15,8 @@ import ProjectDetail from "@/src/components/molecules/project/ProjectDetail";
 import FinalScreen from "./components/molecules/steps/FinalScreen";
 import CleaningProject from "./components/molecules/steps/CleaningProject";
 import PrivateRoute from "./ProtectedRoute/PrivateRoute";
-import SelectTable from "./components/molecules/steps/SelectTable";
+import SelectTable from "./components/molecules/steps/selectTable";
+
 const ProjectFlow = () => {
   return (
     <Routes>
