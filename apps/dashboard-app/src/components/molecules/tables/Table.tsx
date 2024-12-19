@@ -4,7 +4,6 @@ import Number from "../charts/Number";
 import Boolean from "../charts/Boolean";
 import UniqueValue from "../charts/UniqueValue";
 import Analysis from "../descraptive/Analysis";
-import RightSide from "../right-side/RightSide";
 
 interface TableProps {
   headers: string[];
@@ -59,46 +58,6 @@ const Table: React.FC<TableProps> = ({
     new Set()
   );
 
-  const [showRightSide, setShowRightSide] = useState<boolean>(false);
-
-  // State for sidebar display based on column selection
-  const [selectedColumnData, setSelectedColumnData] = useState<any | null>(
-    null
-  );
-
-  // Handle column selection
-  const handleColumnSelect = (header: string) => {
-    if (isSelectColumn) {
-      const newSelectedColumns = new Set(selectedColumns);
-      if (newSelectedColumns.has(header)) {
-        newSelectedColumns.delete(header);
-        setSelectedColumnData(null); // Close the sidebar
-      } else {
-        newSelectedColumns.add(header);
-        const columnChartData = generateChartDataForColumn(header);
-        setSelectedColumnData(columnChartData); // Set the selected data for the sidebar
-        setShowRightSide(true); // Open the sidebar
-      }
-      setSelectedColumns(newSelectedColumns);
-    }
-  };
-
-  const generateChartDataForColumn = (column: string) => {
-    // Generate or fetch the chart data for the selected column
-    const chartMetadata = metadata.find((meta) => meta.key === column);
-    if (chartMetadata) {
-      return {
-        category: column,
-        percentage: 50, // Example value
-      };
-    }
-    return null;
-  };
-
-  const handleCloseSidebar = () => {
-    setShowRightSide(false); // Close the RightSide sidebar
-  };
-
   // Update tableData when data prop changes
   useEffect(() => {
     if (Array.isArray(data)) {
@@ -108,10 +67,12 @@ const Table: React.FC<TableProps> = ({
 
   // Notify parent component when selected columns change
   useEffect(() => {
+    // Avoid re-triggering on same column selection
     if (onColumnSelect) {
-      // Gather the data for the selected columns
       const selectedColumnData = getDataForSelectedColumns();
-      onColumnSelect(Array.from(selectedColumns), selectedColumnData);
+      if (selectedColumns.size > 0) {
+        onColumnSelect(Array.from(selectedColumns), selectedColumnData);
+      }
     }
   }, [selectedColumns, onColumnSelect]);
 
@@ -120,7 +81,6 @@ const Table: React.FC<TableProps> = ({
   };
 
   //----1
-
   const [showSidebar, setShowSidebar] = useState(false);
   const [selectedData, setSelectedData] = useState<{
     category: string;
@@ -215,18 +175,15 @@ const Table: React.FC<TableProps> = ({
   };
 
   const handleSelectColumn = (header: string) => {
-    if (isSelectColumn) {
-      const newSelectedColumns = new Set(selectedColumns);
-      if (newSelectedColumns.has(header)) {
-        newSelectedColumns.delete(header);
-        setSelectedColumnData(null); // Close the sidebar when unselecting
+    setSelectedColumns((prev) => {
+      const updatedColumns = new Set(prev);
+      if (updatedColumns.has(header)) {
+        updatedColumns.delete(header); // Deselect column
       } else {
-        newSelectedColumns.add(header);
-        // Trigger the chart display and show the sidebar
-        setSelectedColumnData(generateChartDataForColumn(header)); // Show chart data
+        updatedColumns.add(header); // Select column
       }
-      setSelectedColumns(newSelectedColumns);
-    }
+      return updatedColumns;
+    });
   };
 
   const handleCellEdit = (rowIndex: number, header: string, value: string) => {
@@ -285,6 +242,14 @@ const Table: React.FC<TableProps> = ({
     );
   }
 
+  const uniqueHeaders = Array.from(new Set(headers)); // Ensure unique headers
+  const uniqueMetadata = metadata.filter(
+    (value, index, self) => self.findIndex((v) => v.key === value.key) === index
+  ); // Ensure unique metadata by key
+  const deduplicatedMetadata = Array.from(
+    new Map(metadata.map((item) => [item.key, item])).values()
+  );
+
   return (
     <div
       className="overflow-auto w-full border-[1px] border-gray-400 "
@@ -296,25 +261,29 @@ const Table: React.FC<TableProps> = ({
       >
         <thead className="h-12 sticky top-0 z-10 bg-[#E6EDFF] border-[1px] border-t-0 border-gray-500 ">
           <tr className="text-center font-medium text-black  tracking-wider  ">
-            {headers.map((header) => (
+            {uniqueHeaders.map((header, index) => (
               <th
-                key={header}
-                className={`border-[1px] border-t-0 border-collapse border-gray-500 py-2 w-[210px] cursor-pointer relative group
-                ${selectedColumns.has(header) ? "bg-blue-200" : ""}`}
-                onClick={() => handleColumnSelect(header)} // Here you call handleColumnSelect
+                key={`${header}-${index}`}
+                className={`border-[1px] border-t-0 border-collapse border-gray-500  py-2 w-[210px] cursor-pointer relative group ${
+                  selectedColumns.has(header) ? "bg-blue-200" : ""
+                }`}
+                onClick={() => handleSelectColumn(header)}
               >
                 <div className="flex items-center justify-center">
                   {capitalizeFirstChar(header)}
                 </div>
+                {isSelectColumn && (
+                  <div className="absolute inset-0 group-hover:bg-blue-100 opacity-0 group-hover:opacity-20 transition-opacity" />
+                )}
               </th>
             ))}
           </tr>
           {/* Row for Charts */}
           {showChart && (
             <tr className="bg-[#F7FAFF] w-full ">
-              {metadata.map((col) => (
+              {uniqueMetadata.map((col, index) => (
                 <td
-                  key={col.key}
+                  key={`${col.key}-${index}`}
                   className="border-[1px] border-gray-500 k w-[210px] overflow-hidden whitespace-nowrap"
                 >
                   {renderChart(col)}{" "}
@@ -325,114 +294,62 @@ const Table: React.FC<TableProps> = ({
           )}
         </thead>
         <tbody className="bg-white">
-          {tableData.map((row, index) => {
-            const rowId = row?.id || index;
+          {tableData.map((row, rowIndex) => {
+            const rowId = row?.id || rowIndex;
 
             return (
               <tr
-                key={rowId}
-                className={` border-[1px] border-gray-500 w-[210px] ${
+                key={`row-${rowId}`}
+                className={`border-[1px] border-gray-500 w-[210px] ${
                   selectedRows.has(rowId) ? "bg-gray-300" : ""
                 }`}
-                style={{ width: "50px" }}
               >
-                {isCheckBox ? (
-                  <>
-                    <td
-                      className="border-[1px] border-gray-500"
-                      style={{ width: "250px" }}
-                    >
-                      <div className="flex flex-row space-x-1">
-                        <div className="w-10 flex justify-center items-center">
-                          <input
-                            type="checkbox"
-                            checked={selectedRows.has(rowId)}
-                            onChange={() => handleSelectRow(rowId)}
-                            className="w-4 h-4 transition duration-200 ease-in-out transform scale-100 hover:scale-105 focus:scale-110 rounded-2xl"
-                            style={{
-                              backgroundColor: selectedRows.has(rowId)
-                                ? "#4A90E2"
-                                : "transparent",
-                            }}
-                          />
-                        </div>
-                        <div className="flex-1">
-                          <div
-                            className="overflow-hidden whitespace-nowrap text-ellipsis px-2 py-[3px]"
-                            style={{ maxWidth: "163px" }}
-                          >
-                            {Array.isArray(row[headers[0]])
-                              ? row[headers[0]][0]
-                              : row[headers[0]]}
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                    {headers.slice(1).map((header) => (
-                      <td
-                        key={header}
-                        onClick={() => handleCellClick(index, header)}
-                        className={`border-[1px] border-gray-500 overflow-hidden whitespace-nowrap text-ellipsis px-2 py-[3px]
-                          ${selectedColumns.has(header) ? "bg-blue-50" : ""}`}
-                        style={{ maxWidth: "163px" }}
-                      >
-                        {isEditCell &&
-                        editingCell.row === index &&
-                        editingCell.header === header ? (
-                          <input
-                            type="text"
-                            value={row[header] || ""}
-                            onChange={(e) =>
-                              handleCellEdit(index, header, e.target.value)
-                            }
-                            onBlur={handleInputBlur}
-                            onKeyDown={(e) =>
-                              handleInputKeyDown(e, index, header)
-                            }
-                            autoFocus
-                            className="border-[1px] px-1 w-full bg-red-100 rounded-none outline-none"
-                          />
-                        ) : Array.isArray(row[header]) ? (
-                          row[header][0]
-                        ) : (
-                          row[header]
-                        )}
-                      </td>
-                    ))}
-                  </>
-                ) : (
-                  headers.map((header) => (
-                    <td
-                      key={header}
-                      onClick={() => handleCellClick(index, header)}
-                      className={`border-[1px] border-gray-500 overflow-hidden whitespace-nowrap text-ellipsis px-2 py-[3px]
-                        ${selectedColumns.has(header) ? "bg-blue-50" : ""}`}
-                      style={{ maxWidth: "163px" }}
-                    >
-                      {isEditCell &&
-                      editingCell.row === index &&
-                      editingCell.header === header ? (
+                {uniqueHeaders.map((header, colIndex) => (
+                  <td
+                    key={`cell-${rowId}-${header}`}
+                    onClick={() => handleCellClick(rowIndex, header)}
+                    className={`border-[1px] border-gray-500 overflow-hidden whitespace-nowrap text-ellipsis px-2 py-[3px] ${
+                      selectedColumns.has(header) ? "bg-blue-50" : ""
+                    }`}
+                  >
+                    {/* Add checkbox for the first column */}
+                    {colIndex === 0 && isCheckBox ? (
+                      <div className="flex flex-row space-x-2 items-center">
                         <input
-                          type="text"
-                          value={row[header] || ""}
-                          onChange={(e) =>
-                            handleCellEdit(index, header, e.target.value)
-                          }
-                          onBlur={handleInputBlur}
-                          onKeyDown={(e) =>
-                            handleInputKeyDown(e, index, header)
-                          }
-                          autoFocus
-                          className="border-[1px] px-1 w-full bg-red-100 rounded-none outline-none"
+                          type="checkbox"
+                          checked={selectedRows.has(rowId)}
+                          onChange={() => handleSelectRow(rowId)}
+                          className="w-4 h-4 transition duration-200 ease-in-out transform scale-100 hover:scale-105 focus:scale-110 rounded-2xl"
                         />
-                      ) : Array.isArray(row[header]) ? (
-                        row[header][0]
-                      ) : (
-                        row[header]
-                      )}
-                    </td>
-                  ))
-                )}
+                        <span className="overflow-hidden whitespace-nowrap text-ellipsis">
+                          {Array.isArray(row[header])
+                            ? row[header][0]
+                            : row[header]}
+                        </span>
+                      </div>
+                    ) : isEditCell &&
+                      editingCell.row === rowIndex &&
+                      editingCell.header === header ? (
+                      <input
+                        type="text"
+                        value={row[header] || ""}
+                        onChange={(e) =>
+                          handleCellEdit(rowIndex, header, e.target.value)
+                        }
+                        onBlur={handleInputBlur}
+                        onKeyDown={(e) =>
+                          handleInputKeyDown(e, rowIndex, header)
+                        }
+                        autoFocus
+                        className="border-[1px] px-1 w-full bg-red-100 rounded-none outline-none"
+                      />
+                    ) : Array.isArray(row[header]) ? (
+                      row[header][0]
+                    ) : (
+                      row[header]
+                    )}
+                  </td>
+                ))}
               </tr>
             );
           })}
@@ -443,13 +360,9 @@ const Table: React.FC<TableProps> = ({
         <Analysis
           selectedData={selectedData}
           onClose={closeSidebar}
-          metadata={metadata} // Make sure metadata is typed correctly
-          renderChart={renderChart} // Pass the function correctly
+          metadata={metadata}
+          renderChart={renderChart}
         />
-      )}
-
-      {selectedColumnData && (
-        <RightSide selectedData={selectedColumnData} onClose={closeSidebar} />
       )}
     </div>
   );

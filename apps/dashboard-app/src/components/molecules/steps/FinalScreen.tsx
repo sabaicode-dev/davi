@@ -1,12 +1,13 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import icon from "@/public/images/icon-cleaning.png";
 import Button from "../../atoms/Button";
 import { DeleteIcon, DownloadIcon, V } from "../../atoms/icons/Icon";
 import Input from "../../atoms/Input";
 import { CiFilter } from "react-icons/ci";
 import Table from "../tables/Table";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import Spinner from "../loading/Spinner";
+import RightSide from "@/src/components/molecules/right-side/RightSide";
 
 interface ApiResponse {
   count: number;
@@ -40,12 +41,18 @@ const FinalScreen: React.FC = () => {
     totalColumns: 0,
   });
 
-  const navigate = useNavigate();
   const [tableData, setTableData] = useState<TableProps>({
     headers: [],
     data: [],
   });
   const [visibleHeaders, setVisibleHeaders] = useState<Set<string>>(new Set()); // Tracks visible headers
+  const [selectedColumns, setSelectedColumns] = useState<string[]>([]);
+  const [showRightSide, setShowRightSide] = useState(false);
+  const [chartData, setChartData] = useState<any>(null);
+  const [selectedColumnData, setSelectedColumnData] = useState<
+    Record<string, any>[] | null
+  >(null);
+
   const [showPopup, setShowPopup] = useState(false); // Tracks popup visibility
   const [metadata, setMetadata] = useState<any[]>([]);
   const { projectId, fileId } = useParams();
@@ -59,8 +66,6 @@ const FinalScreen: React.FC = () => {
   }) => {
     setFileDetails(details);
   };
-
-
 
   // Simulated Chart Data (Mock Data)
   const generateMockChartData = () => {
@@ -201,7 +206,7 @@ const FinalScreen: React.FC = () => {
         filename: jsonData.filename,
       });
 
-      setVisibleHeaders(new Set(jsonData.headers)); 
+      setVisibleHeaders(new Set(jsonData.headers));
 
       // Update file details
       if (jsonData.dataset_summary) {
@@ -222,21 +227,62 @@ const FinalScreen: React.FC = () => {
     }
   };
 
-// Toggle Popup visibility
-const handleFilterClick = () => {
-  setShowPopup(!showPopup);
-};
+  const handleColumnSelection = (columns: string[], columnData: any[]) => {
+    if (JSON.stringify(selectedColumns) !== JSON.stringify(columns)) {
+      setSelectedColumns(columns);
+      setSelectedColumnData(columnData);
+    }
+  };
 
-// Handle header visibility toggle
-const handleCheckboxChange = (header: string) => {
-  const updatedHeaders = new Set(visibleHeaders);
-  if (updatedHeaders.has(header)) {
-    updatedHeaders.delete(header); // Hide header
-  } else {
-    updatedHeaders.add(header); // Show header
-  }
-  setVisibleHeaders(updatedHeaders);
-};
+  const handleVisualizeClick = async () => {
+    if (selectedColumns.length === 0 || !fileId) return;
+
+    const payload = {
+      chart_name: "pie_chart", // Update if needed
+      x_axis: selectedColumns[0],
+      y_axis: selectedColumns[1] || null,
+      file_id: fileId,
+    };
+
+    console.log("Payload being sent:", payload);
+
+    try {
+      const response = await fetch("http://127.0.0.1:8000/api/v1/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) throw new Error("Failed to fetch chart data");
+
+      const data = await response.json();
+      setChartData(data);
+      setShowRightSide(true);
+    } catch (error) {
+      console.error("Error visualizing chart:", error);
+    }
+  };
+
+  const handleCloseRightSide = () => {
+    setShowRightSide(false);
+    setSelectedColumnData(null);
+  };
+
+  // Toggle Popup visibility
+  const handleFilterClick = () => {
+    setShowPopup(!showPopup);
+  };
+
+  // Handle header visibility toggle
+  const handleCheckboxChange = (header: string) => {
+    const updatedHeaders = new Set(visibleHeaders);
+    if (updatedHeaders.has(header)) {
+      updatedHeaders.delete(header); // Hide header
+    } else {
+      updatedHeaders.add(header); // Show header
+    }
+    setVisibleHeaders(updatedHeaders);
+  };
 
   if (isLoading)
     return (
@@ -288,7 +334,9 @@ const handleCheckboxChange = (header: string) => {
             radius="2xl"
             isLoading={false}
             color="primary"
+            onClick={handleVisualizeClick}
             startContent={<V />}
+            isDisabled={selectedColumns.length === 0}
             className=" border-blue-500"
           />
         </div>
@@ -348,42 +396,56 @@ const handleCheckboxChange = (header: string) => {
             metadata={metadata} // Pass the mock chart data here
             isEditCell={false}
             isSelectColumn={true}
+            onColumnSelect={handleColumnSelection}
             isFullHeight={true}
             showChart={true}
           />
         </div>
       </div>
 
+      {showRightSide && chartData && (
+        <RightSide
+          selectedData={
+            selectedColumnData as { category: string; percentage: number }[]
+          }
+          chartData={chartData} // Pass the chart data to RightSide
+          onClose={handleCloseRightSide}
+        />
+      )}
+
       {/* Popup */}
       {showPopup && (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-        <div className="bg-white w-[400px] rounded-lg shadow-lg p-6">
-          <h3 className="font-bold text-lg mb-4">Visibility Configuration</h3>
-          <p className="my-3">This blog post has been published. Team members will be able to edit this post and republish changes.</p>
-          <div className="grid grid-cols-1 gap-4 h-[300px] overflow-auto">
-            {tableData.headers.map((header) => (
-              <label key={header} className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  checked={visibleHeaders.has(header)}
-                  onChange={() => handleCheckboxChange(header)}
-                />
-                <span>{header}</span>
-              </label>
-            ))}
-          </div>
-          <div className="flex justify-end space-x-4 mt-4">
-            <Button
-              children={"Close"}
-              size="small"
-              radius="xl"
-              onClick={handleFilterClick}
-              className="border-blue-500"
-            />
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white w-[400px] rounded-lg shadow-lg p-6">
+            <h3 className="font-bold text-lg mb-4">Visibility Configuration</h3>
+            <p className="my-3">
+              This blog post has been published. Team members will be able to
+              edit this post and republish changes.
+            </p>
+            <div className="grid grid-cols-1 gap-4 h-[300px] overflow-auto">
+              {tableData.headers.map((header) => (
+                <label key={header} className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    checked={visibleHeaders.has(header)}
+                    onChange={() => handleCheckboxChange(header)}
+                  />
+                  <span>{header}</span>
+                </label>
+              ))}
+            </div>
+            <div className="flex justify-end space-x-4 mt-4">
+              <Button
+                children={"Close"}
+                size="small"
+                radius="xl"
+                onClick={handleFilterClick}
+                className="border-blue-500"
+              />
+            </div>
           </div>
         </div>
-      </div>
-    )}
+      )}
     </div>
   );
 };
