@@ -21,6 +21,7 @@ type Config = {
   userServiceUrl?: string;
   awsAccessKeyId: string;
   awsSecretAccessKey: string;
+  awsS3BucketName: string;
 };
 
 // Function to load and validate environment variables
@@ -54,6 +55,7 @@ function loadConfig(): Config {
     USER_SERVICE_URL: Joi.string().optional(), // Optional environment variable
     AWS_ACCESS_KEY_ID: Joi.string().required(),
     AWS_SECRET_ACCESS_KEY: Joi.string().required(),
+    AWS_S3_BUCKET_NAME: Joi.string().required(),
   })
     .unknown()
     .required();
@@ -114,6 +116,7 @@ function loadConfig(): Config {
     userServiceUrl, // Dynamically
     awsAccessKeyId: envVars.AWS_ACCESS_KEY_ID,
     awsSecretAccessKey: envVars.AWS_SECRET_ACCESS_KEY,
+    awsS3BucketName: envVars.AWS_S3_BUCKET_NAME,
   };
 }
 

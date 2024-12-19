@@ -23,9 +23,17 @@ export class CognitoController extends Controller {
   public async signUp(
     @Body() requestBody: SignUpRequest
   ): Promise<{ message: string; result: any }> {
-    const { username, email, password } = requestBody;
+    console.log("Step 01");
+
+    const {
+      username,
+      email,
+      password,
+      profile = "https://example.com/default-profile.png",
+    } = requestBody;
+
     try {
-      const result = await signUpUser(username, email, password);
+      const result = await signUpUser(username, email, password, profile);
       this.setStatus(200); // Set the response status code to 201 (Created)
       return { message: result.message, result: result }; // Ensure we always return 'result' in case of success
     } catch (error: any) {

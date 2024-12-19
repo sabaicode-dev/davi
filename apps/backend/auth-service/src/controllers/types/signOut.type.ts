@@ -6,4 +6,7 @@
 
 export interface SignOutRequest {
   refreshToken: string;
+  accessToken: string;
+  cognitoUserId: string;
+  idToken?: string;
 }

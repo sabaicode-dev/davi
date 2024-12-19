@@ -74,6 +74,8 @@ export class GoogleAuthController extends Controller {
       // Decode the ID token to extract user information
       const decodedIdToken: any = jwtDecode(tokens.id_token);
 
+      console.log("decodedIdToken :::", decodedIdToken);
+
       if (!decodedIdToken.email_verified) {
         throw new Error("Email not verified by Google");
       }
@@ -81,14 +83,27 @@ export class GoogleAuthController extends Controller {
       // Extract cognitoUserId from ID token
       const cognitoUserId = decodedIdToken.sub;
 
-      // Save the user in MongoDB or another database
-      const username = decodedIdToken.email.split("@")[0];
-      await saveUserToDB({
-        username,
+      // Extract user's first and last name from the ID token
+      const givenName = decodedIdToken.given_name || "Unknown Given Name";
+      const familyName = decodedIdToken.family_name || "Unknown Family Name";
+      const profileUrl = decodedIdToken.profile || "No Profile Image";
+      const fullName = decodedIdToken.name || "Unknown";
+
+      console.log(`User's Given Name: ${givenName}`);
+      console.log(`User's Family Name: ${familyName}`);
+      console.log(`User's Full Name: ${fullName}`);
+      console.log("User's Profile URL:", profileUrl);
+      console.log(`User's Email: ${decodedIdToken.email}`);
+
+      const saveToDB = await saveUserToDB({
+        username: fullName,
         email: decodedIdToken.email,
         cognitoUserId,
+        prfile: profileUrl,
         confirmed: true,
       });
+
+      console.log(`saveToDB ::::`, saveToDB);
 
       // Set cookies securely for tokens and cognitoUserId
       console.log("Setting cookies...");
@@ -97,15 +112,7 @@ export class GoogleAuthController extends Controller {
       setCookie(response, "refreshToken", tokens.refresh_token);
       setCookie(response, "cognitoUserId", cognitoUserId);
 
-      console.log(`configs.clientUrl : ${configs.clientUrl}`);
-
       response.redirect(configs.clientUrl);
-      // Respond with success
-      response.status(200).json({
-        message: "User authenticated and data saved successfully",
-        tokens,
-        cognitoUserId,
-      });
     } catch (error: any) {
       console.error("Error during Google callback:", error.message || error);
       errorResponse(500, { error: error.message || "Internal server error" });

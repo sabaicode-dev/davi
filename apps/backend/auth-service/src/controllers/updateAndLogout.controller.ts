@@ -10,7 +10,7 @@ import {
 } from "tsoa";
 import express, { Response } from "express";
 import UserRepository from "../database/repositories/user.repository";
-import { SignOutRequest } from "./types/signOut.type";
+// import { SignOutRequest } from "./types/signOut.type";
 import { logoutUser } from "../services/authEmail.service";
 
 @Route("/v1/auth")
@@ -37,25 +37,39 @@ export class UpdateUserName extends Controller {
    */
   @Put("logout")
   public async unifiedLogout(
-    @Body() requestBody: SignOutRequest,
     @Request() request: express.Request,
     @Res() errorResponse: TsoaResponse<500, { error: string }>
   ): Promise<{ message: string } | void> {
     try {
-      const response = (request as any).res as Response;
-      const { refreshToken } = requestBody;
+      console.log("call in logout");
 
-      // Validate that the refresh token is present
-      if (!refreshToken) {
-        throw new Error("Refresh token not found");
-      }
+      const { accessToken } = request.cookies;
+
+      console.log("accessToken", accessToken);
+
+      const response = (request as any).res as Response;
+      const clearCookie = (name: string) => {
+        response.cookie(name, "", {
+          expires: new Date(0),
+          httpOnly: true,
+        });
+      };
 
       // Revoke the refresh token using the service function
-      await logoutUser(refreshToken);
+      // await logoutUser(refreshToken, accessToken, idToken, cognitoUserId);
+      console.log("called 0");
+
+      await logoutUser({ accessToken });
+
+      console.log("called 1");
 
       // Clear the cookies storing the tokens
-      response.clearCookie("accessToken");
-      response.clearCookie("refreshToken");
+      clearCookie("refreshToken");
+      clearCookie("accessToken");
+      clearCookie("idToken");
+      clearCookie("cognitoUserId");
+
+      console.log("called 2");
 
       // Return a successful JSON response
       return { message: "User logged out successfully" };
@@ -67,4 +81,3 @@ export class UpdateUserName extends Controller {
     }
   }
 }
-

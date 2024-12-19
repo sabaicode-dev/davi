@@ -34,7 +34,7 @@ export const googleSignIn = (): string => {
     redirect_uri: AWS_REDIRECT_URI as string,
     state: state,
     identity_provider: "Google",
-    scope: "openid profile email",
+    scope: "openid profile email aws.cognito.signin.user.admin",
   });
 
   return `${AWS_COGNITO_DOMAIN}/oauth2/authorize?${authorizeParams.toString()}`;

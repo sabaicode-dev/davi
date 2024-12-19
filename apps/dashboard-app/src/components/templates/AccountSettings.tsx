@@ -152,7 +152,7 @@ const AccountSettings: React.FC = () => {
         setEmail && setEmail(null);
 
         // Redirect to the login or signup page
-        window.location.href = "http://localhost:3000/login";
+        // window.location.href = "http://localhost:3000/login";
       } else {
         const errorData = await response.json();
         console.error("Failed to log out:", errorData);

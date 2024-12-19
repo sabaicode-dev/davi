@@ -13,7 +13,6 @@ import { errorHandler } from "@/src/middleware/errorHandler";
 import cookieParser from "cookie-parser";
 import chalk from "chalk";
 import bodyParser from "body-parser";
-import cors from "cors";
 
 // Dynamically load swagger.json
 const swaggerDocument = JSON.parse(
@@ -24,7 +23,6 @@ const swaggerDocument = JSON.parse(
 // Initialize App Express
 // ========================
 const app = express();
-app.use(cors());
 
 // ========================
 // Global Middleware

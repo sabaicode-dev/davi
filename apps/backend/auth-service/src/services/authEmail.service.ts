@@ -3,8 +3,10 @@ import {
   SignUpCommand,
   AdminInitiateAuthCommand,
   ConfirmSignUpCommand,
-  RevokeTokenCommand,
+  // RevokeTokenCommand,
   ResendConfirmationCodeCommand,
+  GlobalSignOutCommandInput,
+  GlobalSignOutCommand,
 } from "@aws-sdk/client-cognito-identity-provider";
 import * as crypto from "crypto";
 import UserRepository from "../database/repositories/user.repository"; // Import the repository
@@ -47,9 +49,11 @@ const generateSecretHash = (
 export const signUpUser = async (
   username: string,
   email: string,
-  password: string
+  password: string,
+  profile: string
 ) => {
   try {
+    console.log("Step 02");
     const clientId = AWS_COGNITO_CLIENT_ID!;
     const clientSecret = AWS_COGNITO_CLIENT_SECRET!;
     const secretHash = generateSecretHash(email, clientId, clientSecret);
@@ -73,7 +77,13 @@ export const signUpUser = async (
     const response = await cognitoClient.send(command);
 
     if (response.UserSub) {
-      await UserRepository.createUser(username, email, response.UserSub, false);
+      await UserRepository.createUser(
+        username,
+        email,
+        response.UserSub,
+        profile,
+        false
+      );
     }
 
     // Return relevant data or result
@@ -207,7 +217,12 @@ export const resendConfirmationCode = async (email: string) => {
 };
 
 // Function to log out a user by revoking their refresh token
-export const logoutUser = async (refreshToken: string) => {
+export const logoutUser = async ({
+  // refreshToken,
+  accessToken,
+}: {
+  accessToken: string;
+}) => {
   try {
     const clientId = AWS_COGNITO_CLIENT_ID!;
     const clientSecret = AWS_COGNITO_CLIENT_SECRET!;
@@ -215,15 +230,32 @@ export const logoutUser = async (refreshToken: string) => {
     console.log(chalk.red(`==== for logoutUser ====`));
     console.log(`clientId ::: ${clientId}`);
     console.log(`clientSecret ::: ${clientSecret}`);
+    // console.log(`cognitoUserId ::: ${cognitoUserId}`);
 
-    const command = new RevokeTokenCommand({
-      ClientId: clientId,
-      Token: refreshToken,
-      ClientSecret: clientSecret,
-    });
+    // Revoke the refresh token
+    // const revokeRefreshTokenCommand = new RevokeTokenCommand({
+    //   ClientId: clientId,
+    //   Token: refreshToken,
+    //   ClientSecret: clientSecret,
+    // });
 
-    const response = await cognitoClient.send(command);
-    return { message: "Token revoked successfully", response };
+    // const revokeResponse = await cognitoClient.send(revokeRefreshTokenCommand);
+
+    const params: GlobalSignOutCommandInput = {
+      AccessToken: accessToken,
+    };
+    const command = new GlobalSignOutCommand(params);
+    await cognitoClient.send(command);
+
+    // Optionally, invalidate accessToken and idToken (if required)
+    // console.log(
+    //   `Revoked refresh token response: ${JSON.stringify(revokeResponse)}`
+    // );
+
+    return {
+      message: "All tokens cleared successfully",
+      // response: revokeResponse,
+    };
   } catch (error: any) {
     console.error(
       "Error logging out user (revoking token failed):",

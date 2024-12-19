@@ -7,19 +7,6 @@
 		"requestBodies": {},
 		"responses": {},
 		"schemas": {
-			"SignOutRequest": {
-				"description": "Request type for Google Sign-Out, requiring a refresh token.",
-				"properties": {
-					"refreshToken": {
-						"type": "string"
-					}
-				},
-				"required": [
-					"refreshToken"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
 			"Location": {
 				"properties": {
 					"region": {
@@ -82,7 +69,6 @@
 					"browser",
 					"userAgent",
 					"currentDateTime",
-					"location",
 					"googleMapsLink",
 					"get_network_org"
 				],
@@ -134,12 +120,16 @@
 					},
 					"password": {
 						"type": "string"
+					},
+					"profile": {
+						"type": "string"
 					}
 				},
 				"required": [
 					"username",
 					"email",
-					"password"
+					"password",
+					"profile"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -267,6 +257,139 @@
 				"parameters": []
 			}
 		},
+		"/v1/auth/upload": {
+			"post": {
+				"operationId": "UploadProfile",
+				"responses": {
+					"200": {
+						"description": "The URL of the uploaded file",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "string"
+								}
+							}
+						}
+					}
+				},
+				"description": "Upload a profile image",
+				"tags": [
+					"UploadProfile"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"multipart/form-data": {
+							"schema": {
+								"type": "object",
+								"properties": {
+									"file": {
+										"type": "string",
+										"format": "binary",
+										"description": "Profile image file to upload"
+									}
+								},
+								"required": [
+									"file"
+								]
+							}
+						}
+					}
+				}
+			}
+		},
+		"/v1/auth/image/{imageName}": {
+			"get": {
+				"operationId": "GetImage",
+				"responses": {
+					"200": {
+						"description": "Image URL",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "string"
+								}
+							}
+						}
+					}
+				},
+				"description": "Get the URL of a profile image",
+				"tags": [
+					"UploadProfile"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"description": "Name of the image to retrieve",
+						"in": "path",
+						"name": "imageName",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			},
+			"delete": {
+				"operationId": "DeleteProfileImage",
+				"responses": {
+					"200": {
+						"description": "Success message",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "string"
+								}
+							}
+						}
+					}
+				},
+				"description": "Delete a profile image",
+				"tags": [
+					"UploadProfile"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"description": "Name of the image to delete",
+						"in": "path",
+						"name": "imageName",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/v1/auth/images": {
+			"get": {
+				"operationId": "ListAllImages",
+				"responses": {
+					"200": {
+						"description": "List of image URLs",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"type": "string"
+									},
+									"type": "array"
+								}
+							}
+						}
+					}
+				},
+				"description": "List all images in the S3 bucket",
+				"tags": [
+					"UploadProfile"
+				],
+				"security": [],
+				"parameters": []
+			}
+		},
 		"/v1/auth/updateUsername": {
 			"put": {
 				"operationId": "UpdateUsername",
@@ -373,17 +496,7 @@
 					"Update and Logout"
 				],
 				"security": [],
-				"parameters": [],
-				"requestBody": {
-					"required": true,
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/SignOutRequest"
-							}
-						}
-					}
-				}
+				"parameters": []
 			}
 		},
 		"/v1/auth/device-info": {

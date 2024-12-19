@@ -9,6 +9,7 @@ export const saveUserToDB = async (userData: {
   email: string;
   username: string;
   cognitoUserId?: string;
+  prfile: string;
   confirmed?: boolean;
 }): Promise<IUser | null> => {
   try {
@@ -20,6 +21,7 @@ export const saveUserToDB = async (userData: {
         email: userData.email,
         username: userData.username,
         cognitoUserId: userData.cognitoUserId,
+        profile: userData.prfile,
         confirmed: userData.confirmed ?? false,
       });
       await user.save();
@@ -28,6 +30,7 @@ export const saveUserToDB = async (userData: {
       // Update existing user
       user.username = userData.username || user.username;
       user.cognitoUserId = userData.cognitoUserId || user.cognitoUserId;
+      user.profile = userData.prfile || user.profile;
       user.confirmed = userData.confirmed ?? user.confirmed;
       await user.save();
       console.log("Existing user updated in MongoDB:", user);
