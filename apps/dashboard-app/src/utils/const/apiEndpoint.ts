@@ -10,6 +10,9 @@ export const API_ENDPOINTS = {
   REFRESH_TOKEN: `${process.env.REACT_APP_API_URL_AUTH_ENDPOINT}/refresh-token`,
   USER_PROFILE: `${process.env.REACT_APP_API_URL_AUTH_ENDPOINT}/me`,
   UPDATE_USER_NAME: `${process.env.REACT_APP_API_URL_AUTH_ENDPOINT}/updateUsername`,
+  // http://3.24.110.41:8000/api/v1
+  // http://127.0.0.1:8000/api/v1
+  API_URL:`http://127.0.0.1:8000/api/v1`
 };
 
 

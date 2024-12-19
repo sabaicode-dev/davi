@@ -11,6 +11,7 @@ import { PreviewCleaningModal } from "../modals/PreviewCleaningModal";
 import { AutoCleaningModal } from "../modals/AutoCleaningModal";
 import axios from "axios";
 import download from "downloadjs";
+import { API_ENDPOINTS } from "@/src/utils/const/apiEndpoint";
 import DeleteProjectModal from "../modals/DeleteProjectModal";
 // Prop descripe the data response from api
 interface ApiResponse {
@@ -121,7 +122,7 @@ const CleaningProject: React.FC = () => {
     try {
       setIsLoading(true);
       const response = await request({
-        url: `http://3.24.110.41:8000/api/v1/project/${projectId}/file/${fileId}/details/`,
+        url: `${API_ENDPOINTS.API_URL}/project/${projectId}/file/${fileId}/details/`,
         method: "GET",
       });
 
@@ -161,7 +162,7 @@ const CleaningProject: React.FC = () => {
   const HandleDownLoadFile = async () => {
     try {
       const res = await axios.get(
-        `http://3.24.110.41:8000/api/v1/project/${projectId}/file/download/${filename}/`,
+        `${API_ENDPOINTS.API_URL}/project/${projectId}/file/download/${filename}/`,
         {
           responseType: "blob",
           onDownloadProgress: (ProgressEvent) => {
@@ -209,7 +210,7 @@ const CleaningProject: React.FC = () => {
       setDataIssuesError(null);
 
       const response = await request({
-        url: `http://3.24.110.41:8000/api/v1/project/${projectId}/file/${fileId}/find-anaccurate-file/`,
+        url: `${API_ENDPOINTS.API_URL}/project/${projectId}/file/${fileId}/find-anaccurate-file/`,
         method: "POST",
       });
 
