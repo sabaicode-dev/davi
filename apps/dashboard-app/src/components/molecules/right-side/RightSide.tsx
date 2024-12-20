@@ -1,16 +1,19 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { BsX, BsPencil, BsCheck } from "react-icons/bs";
 import Button from "@/src/components/atoms/Button";
+import axios from "axios";
 
 // Define the props interface for RightSide
 interface RightSideProps {
   chartData: Array<{ chartType: string; img: string }>; // Chart data with type and image URL
+  selectedColumns: string[];
   onSelectChart: (chartType: string) => void; // Callback for selecting a chart type
   onClose: () => void;
 }
 
 const RightSide: React.FC<RightSideProps> = ({
   chartData,
+  selectedColumns,
   onSelectChart,
   onClose,
 }) => {
@@ -19,10 +22,10 @@ const RightSide: React.FC<RightSideProps> = ({
   );
 
   // Description State
-  const [description, setDescription] = useState(
-    "The table lists baby products, with each product labeled under the 'toys & baby products' main category and 'Baby Products' subcategory. All products in the list belong to the same category and subcategory."
-  );
+  const [description, setDescription] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [isLoadingDescription, setIsLoadingDescription] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // Handle Edit Toggle
   const toggleEdit = () => setIsEditing(!isEditing);
@@ -39,6 +42,62 @@ const RightSide: React.FC<RightSideProps> = ({
     setSelectedChart(chartType);
     onSelectChart(chartType); // Trigger parent callback
   };
+
+  const fetchDescription = async () => {
+    if (!selectedChart) {
+      setError("No chart type selected.");
+      return;
+    }
+
+    if (selectedColumns.length === 0) {
+      setError("No columns selected.");
+      return;
+    }
+
+    try {
+      setIsLoadingDescription(true);
+      setError(null);
+
+      // Construct payload
+      const payload = {
+        columns: selectedColumns,
+        chart_type: selectedChart.replace("_", ""),
+      };
+
+      console.log("Payload for description API:", payload); // Debug log
+
+      const response = await axios.post(
+        "http://127.0.0.1:8000/api/v1/generate-description/",
+        payload,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        console.log("Description API response:", response.data); // Debug log
+        setDescription(response.data.description);
+      } else {
+        throw new Error(`Unexpected response status: ${response.status}`);
+      }
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error ? err.message : "An unexpected error occurred.";
+      setError(errorMessage);
+      console.error("Error fetching description:", errorMessage); // Debug log
+    } finally {
+      setIsLoadingDescription(false);
+    }
+  };
+
+  // Auto-fetch description when selectedColumns or selectedChart changes
+  useEffect(() => {
+    console.log("Selected columns:", selectedColumns);
+    console.log("Selected chart type:", selectedChart);
+    fetchDescription();
+  }, [selectedColumns, selectedChart]);
 
   return (
     <div className="flex flex-col w-[400px] h-full fixed top-16 right-0 bg-white shadow-2xl z-50 overflow-y-scroll">
@@ -98,29 +157,37 @@ const RightSide: React.FC<RightSideProps> = ({
       {/* Description */}
       <div className="px-6 py-4">
         <h2 className="text-sm font-bold mb-2">Description</h2>
-        <div className="flex justify-between items-start">
-          {isEditing ? (
-            <textarea
-              className="w-full text-sm text-gray-600 border rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={description}
-              onChange={handleDescriptionChange}
-              rows={4}
-            />
-          ) : (
-            <p className="text-sm text-gray-600">{description}</p>
-          )}
-          <button
-            onClick={toggleEdit}
-            className="text-gray-500 hover:text-blue-500 transition ml-2"
-            aria-label={isEditing ? "Save" : "Edit"}
-          >
+        {isLoadingDescription ? (
+          <p className="text-gray-500">Loading description...</p>
+        ) : error ? (
+          <p className="text-red-500">{error}</p>
+        ) : (
+          <div className="flex justify-between items-start">
             {isEditing ? (
-              <BsCheck className="w-5 h-5" />
+              <textarea
+                className="w-full text-sm text-gray-600 border rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={description || ""}
+                onChange={handleDescriptionChange}
+                rows={4}
+              />
             ) : (
-              <BsPencil className="w-5 h-5" />
+              <p className="text-sm text-gray-600">
+                {description || "No description available."}
+              </p>
             )}
-          </button>
-        </div>
+            <button
+              onClick={toggleEdit}
+              className="text-gray-500 hover:text-blue-500 transition ml-2"
+              aria-label={isEditing ? "Save" : "Edit"}
+            >
+              {isEditing ? (
+                <BsCheck className="w-5 h-5" />
+              ) : (
+                <BsPencil className="w-5 h-5" />
+              )}
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Save Button */}

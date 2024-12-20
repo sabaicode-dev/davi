@@ -8,6 +8,8 @@ import Table from "../tables/Table";
 import { useParams } from "react-router-dom";
 import Spinner from "../loading/Spinner";
 import RightSide from "@/src/components/molecules/right-side/RightSide";
+import axios from "axios";
+import download from "downloadjs";
 
 interface ApiResponse {
   count: number;
@@ -245,22 +247,28 @@ const FinalScreen: React.FC = () => {
 
   const handleVisualizeClick = async () => {
     if (selectedColumns.length === 0 || !fileId) return;
-    setIsLoadingVisualize(true);
+    setIsLoadingVisualize(true); // Set loading to true
 
-    // Explicitly define the type for newChartData
-    const newChartData: Array<{ chartType: string; img: string }> = [];
+    try {
+      // Clear previous chart data to prevent duplicates
+      setChartData([]);
 
-    const chartTypes = ["pie_chart", "bar_chart", "line_chart", "scatter_plot"];
+      const newChartData: Array<{ chartType: string; img: string }> = [];
+      const chartTypes = [
+        "pie_chart",
+        "bar_chart",
+        "line_chart",
+        "scatter_plot",
+      ];
 
-    for (const chartType of chartTypes) {
-      const payload = {
-        chart_name: chartType,
-        x_axis: selectedColumns[0],
-        y_axis: selectedColumns[1] || null,
-        file_id: fileId,
-      };
+      for (const chartType of chartTypes) {
+        const payload = {
+          chart_name: chartType,
+          x_axis: selectedColumns[0],
+          y_axis: selectedColumns[1] || null,
+          file_id: fileId,
+        };
 
-      try {
         const response = await fetch("http://127.0.0.1:8000/api/v1/", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -271,18 +279,62 @@ const FinalScreen: React.FC = () => {
 
         const data = await response.json();
         newChartData.push({ chartType, img: data.img });
-      } catch (error) {
-        console.error(`Error fetching ${chartType}:`, error);
       }
-    }
 
-    setChartData((prev) => [...(prev || []), ...newChartData]);
-    setShowRightSide(true);
+      setChartData((prev) => [...(prev || []), ...newChartData]);
+      setShowRightSide(true);
+    } catch (error) {
+      console.error("Error visualizing chart:", error);
+    } finally {
+      setIsLoadingVisualize(false); // Set loading to false
+    }
   };
 
   const handleCloseRightSide = () => {
     setShowRightSide(false);
+    setChartData([]);
     setSelectedColumnData(null);
+  };
+
+  // Download Handler
+  const handleDownLoadFile = async () => {
+    if (!projectId || !fileId || !fileDetails.filename) {
+      console.error("Missing required parameters for downloading the file.");
+      setError("Project ID, File ID, or filename is missing");
+      return;
+    }
+
+    try {
+      const res = await axios.get(
+        `http://3.24.110.41:8000/api/v1/project/${projectId}/file/download/${fileDetails.filename}/`,
+        {
+          responseType: "blob", // To ensure the response is treated as a binary blob
+          onDownloadProgress: (progressEvent) => {
+            const progress = Math.round(
+              (progressEvent.loaded / (progressEvent.total || 1)) * 100
+            );
+            console.log(`Download Progress: ${progress}%`);
+          },
+        }
+      );
+
+      // Validate response
+      if (res.status !== 200) {
+        throw new Error("Failed to download the file. Please try again.");
+      }
+
+      // Use downloadjs to trigger the file download
+      download(res.data, fileDetails.filename, "application/octet-stream");
+
+      console.log("File downloaded successfully.");
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "An error occurred during the download.";
+      setError(errorMessage);
+      console.error("Error during file download:", error);
+    }
   };
 
   // Toggle Popup visibility
@@ -343,17 +395,18 @@ const FinalScreen: React.FC = () => {
             isLoading={false}
             color="outline"
             startContent={<DownloadIcon />}
+            onClick={handleDownLoadFile}
             className="mr-2"
           />
           <Button
             children={"Visualize"}
             size="medium"
             radius="2xl"
-            isLoading={false}
+            isLoading={isLoadingVisualize}
             color="primary"
             onClick={handleVisualizeClick}
             startContent={<V />}
-            isDisabled={selectedColumns.length === 0}
+            isDisabled={selectedColumns.length === 0 || isLoadingVisualize}
             className=" border-blue-500"
           />
         </div>
@@ -423,8 +476,9 @@ const FinalScreen: React.FC = () => {
       {showRightSide && (
         <RightSide
           chartData={chartData}
+          selectedColumns={selectedColumns}
           onSelectChart={handleChartTypeChange}
-          onClose={() => setShowRightSide(false)}
+          onClose={handleCloseRightSide}
         />
       )}
       {/* Popup */}
