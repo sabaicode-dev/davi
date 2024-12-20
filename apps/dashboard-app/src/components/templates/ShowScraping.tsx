@@ -4,12 +4,14 @@ import ShowTable from "./ShowTable";
 import Button from "../atoms/Button";
 import { useParams } from "react-router-dom";
 import request from "@/src/utils/helper";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import LoadModal from "../molecules/modals/LoadModal";
+import { API_ENDPOINTS } from "@/src/utils/const/apiEndpoint";
 const ShowScraping = () => {
   const location = useLocation();
   const scrapedData = location.state?.scrapedData.filename; // Retrieve scraped data
   const [selectedItemId, setSelectedItemId] = useState<number | null>(null);
+  const navigate = useNavigate();
 
   const handleItemClick = useCallback((index: number) => {
     setSelectedItemId(index); // Update the selected item ID
@@ -44,7 +46,7 @@ const ShowScraping = () => {
       //   console.log("File confirm successfully");
       // }
       const response = await request({
-        url: `http://3.24.110.41:8000/api/v1/project/${projectId}/scrape/confirm-dataset/`,
+        url: `${API_ENDPOINTS.API_URL}/project/${projectId}/scrape/confirm-dataset/`,
         method: "POST",
         data: {
           confirmed_filename: confirmFileNames,
@@ -52,6 +54,9 @@ const ShowScraping = () => {
         },
       });
       console.log("confirmFile::::::::::::", confirmFileNames);
+      console.log("Attempting to navigate");
+      navigate(`/project/${projectId}/`);
+      console.log("Navigation successful");
       console.log(response);
     } catch (error) {
       console.error("Navigation error:", error);

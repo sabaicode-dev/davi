@@ -11,6 +11,7 @@ import Number from "../charts/Number";
 import Category from "../charts/Catagory";
 import Boolean from "../charts/BooleanChart";
 import UniqueValue from "../charts/UniqueValue";
+import { API_ENDPOINTS } from "@/src/utils/const/apiEndpoint";
 
 interface ApiResponse {
   count: number;
@@ -132,7 +133,7 @@ const FinalScreen: React.FC = () => {
     try {
       setIsLoading(true);
       const response = await fetch(
-        `http://3.24.110.41:8000/api/v1/project/${projectId}/file/${fileId}/details/`
+        `${API_ENDPOINTS.API_URL}/project/${projectId}/file/${fileId}/details/`
       );
 
       if (!response.ok) {

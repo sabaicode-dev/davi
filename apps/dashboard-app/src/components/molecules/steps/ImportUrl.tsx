@@ -3,6 +3,7 @@ import Logo from "@/public/images/step/step4_pic.png";
 import Button from "@/src/components/atoms/Button";
 import request from "@/src/utils/helper";
 import { useNavigate, useParams } from "react-router-dom";
+import { API_ENDPOINTS } from "@/src/utils/const/apiEndpoint";
 
 interface IImportURL {
   defaultProjectId?: string;
@@ -53,7 +54,7 @@ const ImportUrl: React.FC<IImportURL> = ({ defaultProjectId }) => {
 
     try {
       const response = await request({
-        url: `http://3.24.110.41:8000/api/v1/project/${projectId}/scrape/url/`,
+        url: `${API_ENDPOINTS.API_URL}/project/${projectId}/scrape/url/`,
         method: "POST",
         data: {
           url,
