@@ -47,8 +47,12 @@ const FinalScreen: React.FC = () => {
   });
   const [visibleHeaders, setVisibleHeaders] = useState<Set<string>>(new Set()); // Tracks visible headers
   const [selectedColumns, setSelectedColumns] = useState<string[]>([]);
+  const [selectedChartType, setSelectedChartType] =
+    useState<string>("pie_chart");
   const [showRightSide, setShowRightSide] = useState(false);
-  const [chartData, setChartData] = useState<any>(null);
+  const [chartData, setChartData] = useState<
+    Array<{ chartType: string; img: string }>
+  >([]);
   const [selectedColumnData, setSelectedColumnData] = useState<
     Record<string, any>[] | null
   >(null);
@@ -56,6 +60,7 @@ const FinalScreen: React.FC = () => {
   const [showPopup, setShowPopup] = useState(false); // Tracks popup visibility
   const [metadata, setMetadata] = useState<any[]>([]);
   const { projectId, fileId } = useParams();
+  const [isLoadingVisualize, setIsLoadingVisualize] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -234,33 +239,45 @@ const FinalScreen: React.FC = () => {
     }
   };
 
+  const handleChartTypeChange = (chartType: string) => {
+    setSelectedChartType(chartType);
+  };
+
   const handleVisualizeClick = async () => {
     if (selectedColumns.length === 0 || !fileId) return;
+    setIsLoadingVisualize(true);
 
-    const payload = {
-      chart_name: "pie_chart", // Update if needed
-      x_axis: selectedColumns[0],
-      y_axis: selectedColumns[1] || null,
-      file_id: fileId,
-    };
+    // Explicitly define the type for newChartData
+    const newChartData: Array<{ chartType: string; img: string }> = [];
 
-    console.log("Payload being sent:", payload);
+    const chartTypes = ["pie_chart", "bar_chart", "line_chart", "scatter_plot"];
 
-    try {
-      const response = await fetch("http://127.0.0.1:8000/api/v1/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+    for (const chartType of chartTypes) {
+      const payload = {
+        chart_name: chartType,
+        x_axis: selectedColumns[0],
+        y_axis: selectedColumns[1] || null,
+        file_id: fileId,
+      };
 
-      if (!response.ok) throw new Error("Failed to fetch chart data");
+      try {
+        const response = await fetch("http://127.0.0.1:8000/api/v1/", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
 
-      const data = await response.json();
-      setChartData(data);
-      setShowRightSide(true);
-    } catch (error) {
-      console.error("Error visualizing chart:", error);
+        if (!response.ok) throw new Error(`Failed to fetch ${chartType} data`);
+
+        const data = await response.json();
+        newChartData.push({ chartType, img: data.img });
+      } catch (error) {
+        console.error(`Error fetching ${chartType}:`, error);
+      }
     }
+
+    setChartData((prev) => [...(prev || []), ...newChartData]);
+    setShowRightSide(true);
   };
 
   const handleCloseRightSide = () => {
@@ -403,16 +420,13 @@ const FinalScreen: React.FC = () => {
         </div>
       </div>
 
-      {showRightSide && chartData && (
+      {showRightSide && (
         <RightSide
-          selectedData={
-            selectedColumnData as { category: string; percentage: number }[]
-          }
-          chartData={chartData} // Pass the chart data to RightSide
-          onClose={handleCloseRightSide}
+          chartData={chartData}
+          onSelectChart={handleChartTypeChange}
+          onClose={() => setShowRightSide(false)}
         />
       )}
-
       {/* Popup */}
       {showPopup && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">

@@ -72,21 +72,21 @@ export function RegisterRoutes(app: Router) {
 
 
     
-        const argsUserController_getMe: Record<string, TsoaRoute.ParameterSchema> = {
-                req: {"in":"request","name":"req","required":true,"dataType":"object"},
-                errorResponse: {"in":"res","name":"500","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"error":{"dataType":"string","required":true}}},
-        };
         app.get('/v1/auth/me',
             ...(fetchMiddlewares<RequestHandler>(UserController)),
             ...(fetchMiddlewares<RequestHandler>(UserController.prototype.getMe)),
 
             async function UserController_getMe(request: ExRequest, response: ExResponse, next: any) {
+            const args: Record<string, TsoaRoute.ParameterSchema> = {
+                    req: {"in":"request","name":"req","required":true,"dataType":"object"},
+                    errorResponse: {"in":"res","name":"500","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"error":{"dataType":"string","required":true}}},
+            };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 
             let validatedArgs: any[] = [];
             try {
-                validatedArgs = templateService.getValidatedArgs({ args: argsUserController_getMe, request, response });
+                validatedArgs = templateService.getValidatedArgs({ args, request, response });
 
                 const controller = new UserController();
 
@@ -103,20 +103,20 @@ export function RegisterRoutes(app: Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        const argsUpdateUserName_updateUsername: Record<string, TsoaRoute.ParameterSchema> = {
-                requestBody: {"in":"body","name":"requestBody","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"newUsername":{"dataType":"string","required":true},"email":{"dataType":"string","required":true}}},
-        };
         app.put('/v1/auth/updateUsername',
             ...(fetchMiddlewares<RequestHandler>(UpdateUserName)),
             ...(fetchMiddlewares<RequestHandler>(UpdateUserName.prototype.updateUsername)),
 
             async function UpdateUserName_updateUsername(request: ExRequest, response: ExResponse, next: any) {
+            const args: Record<string, TsoaRoute.ParameterSchema> = {
+                    requestBody: {"in":"body","name":"requestBody","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"newUsername":{"dataType":"string","required":true},"email":{"dataType":"string","required":true}}},
+            };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 
             let validatedArgs: any[] = [];
             try {
-                validatedArgs = templateService.getValidatedArgs({ args: argsUpdateUserName_updateUsername, request, response });
+                validatedArgs = templateService.getValidatedArgs({ args, request, response });
 
                 const controller = new UpdateUserName();
 
@@ -133,22 +133,22 @@ export function RegisterRoutes(app: Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        const argsUpdateUserName_unifiedLogout: Record<string, TsoaRoute.ParameterSchema> = {
-                requestBody: {"in":"body","name":"requestBody","required":true,"ref":"SignOutRequest"},
-                request: {"in":"request","name":"request","required":true,"dataType":"object"},
-                errorResponse: {"in":"res","name":"500","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"error":{"dataType":"string","required":true}}},
-        };
         app.put('/v1/auth/logout',
             ...(fetchMiddlewares<RequestHandler>(UpdateUserName)),
             ...(fetchMiddlewares<RequestHandler>(UpdateUserName.prototype.unifiedLogout)),
 
             async function UpdateUserName_unifiedLogout(request: ExRequest, response: ExResponse, next: any) {
+            const args: Record<string, TsoaRoute.ParameterSchema> = {
+                    requestBody: {"in":"body","name":"requestBody","required":true,"ref":"SignOutRequest"},
+                    request: {"in":"request","name":"request","required":true,"dataType":"object"},
+                    errorResponse: {"in":"res","name":"500","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"error":{"dataType":"string","required":true}}},
+            };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 
             let validatedArgs: any[] = [];
             try {
-                validatedArgs = templateService.getValidatedArgs({ args: argsUpdateUserName_unifiedLogout, request, response });
+                validatedArgs = templateService.getValidatedArgs({ args, request, response });
 
                 const controller = new UpdateUserName();
 
@@ -165,21 +165,21 @@ export function RegisterRoutes(app: Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        const argsGoogleAuthController_initiateGoogleSignIn: Record<string, TsoaRoute.ParameterSchema> = {
-                redirect: {"in":"res","name":"200","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"url":{"dataType":"string","required":true}}},
-                errorResponse: {"in":"res","name":"500","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"error":{"dataType":"string","required":true}}},
-        };
         app.get('/v1/auth/google',
             ...(fetchMiddlewares<RequestHandler>(GoogleAuthController)),
             ...(fetchMiddlewares<RequestHandler>(GoogleAuthController.prototype.initiateGoogleSignIn)),
 
             async function GoogleAuthController_initiateGoogleSignIn(request: ExRequest, response: ExResponse, next: any) {
+            const args: Record<string, TsoaRoute.ParameterSchema> = {
+                    redirect: {"in":"res","name":"200","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"url":{"dataType":"string","required":true}}},
+                    errorResponse: {"in":"res","name":"500","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"error":{"dataType":"string","required":true}}},
+            };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 
             let validatedArgs: any[] = [];
             try {
-                validatedArgs = templateService.getValidatedArgs({ args: argsGoogleAuthController_initiateGoogleSignIn, request, response });
+                validatedArgs = templateService.getValidatedArgs({ args, request, response });
 
                 const controller = new GoogleAuthController();
 
@@ -196,22 +196,22 @@ export function RegisterRoutes(app: Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        const argsGoogleAuthController_googleCallback: Record<string, TsoaRoute.ParameterSchema> = {
-                code: {"in":"query","name":"code","required":true,"dataType":"string"},
-                request: {"in":"request","name":"request","required":true,"dataType":"object"},
-                errorResponse: {"in":"res","name":"500","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"error":{"dataType":"string","required":true}}},
-        };
         app.get('/v1/auth/google/callback',
             ...(fetchMiddlewares<RequestHandler>(GoogleAuthController)),
             ...(fetchMiddlewares<RequestHandler>(GoogleAuthController.prototype.googleCallback)),
 
             async function GoogleAuthController_googleCallback(request: ExRequest, response: ExResponse, next: any) {
+            const args: Record<string, TsoaRoute.ParameterSchema> = {
+                    code: {"in":"query","name":"code","required":true,"dataType":"string"},
+                    request: {"in":"request","name":"request","required":true,"dataType":"object"},
+                    errorResponse: {"in":"res","name":"500","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"error":{"dataType":"string","required":true}}},
+            };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 
             let validatedArgs: any[] = [];
             try {
-                validatedArgs = templateService.getValidatedArgs({ args: argsGoogleAuthController_googleCallback, request, response });
+                validatedArgs = templateService.getValidatedArgs({ args, request, response });
 
                 const controller = new GoogleAuthController();
 
@@ -228,22 +228,22 @@ export function RegisterRoutes(app: Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        const argsGoogleAuthController_refreshToken: Record<string, TsoaRoute.ParameterSchema> = {
-                body: {"in":"body","name":"body","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"refreshToken":{"dataType":"string","required":true}}},
-                request: {"in":"request","name":"request","required":true,"dataType":"object"},
-                errorResponse: {"in":"res","name":"500","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"error":{"dataType":"string","required":true}}},
-        };
         app.post('/v1/auth/refresh-token',
             ...(fetchMiddlewares<RequestHandler>(GoogleAuthController)),
             ...(fetchMiddlewares<RequestHandler>(GoogleAuthController.prototype.refreshToken)),
 
             async function GoogleAuthController_refreshToken(request: ExRequest, response: ExResponse, next: any) {
+            const args: Record<string, TsoaRoute.ParameterSchema> = {
+                    body: {"in":"body","name":"body","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"refreshToken":{"dataType":"string","required":true}}},
+                    request: {"in":"request","name":"request","required":true,"dataType":"object"},
+                    errorResponse: {"in":"res","name":"500","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"error":{"dataType":"string","required":true}}},
+            };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 
             let validatedArgs: any[] = [];
             try {
-                validatedArgs = templateService.getValidatedArgs({ args: argsGoogleAuthController_refreshToken, request, response });
+                validatedArgs = templateService.getValidatedArgs({ args, request, response });
 
                 const controller = new GoogleAuthController();
 
@@ -260,20 +260,20 @@ export function RegisterRoutes(app: Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        const argsCognitoController_signUp: Record<string, TsoaRoute.ParameterSchema> = {
-                requestBody: {"in":"body","name":"requestBody","required":true,"ref":"SignUpRequest"},
-        };
         app.post('/v1/auth/signup',
             ...(fetchMiddlewares<RequestHandler>(CognitoController)),
             ...(fetchMiddlewares<RequestHandler>(CognitoController.prototype.signUp)),
 
             async function CognitoController_signUp(request: ExRequest, response: ExResponse, next: any) {
+            const args: Record<string, TsoaRoute.ParameterSchema> = {
+                    requestBody: {"in":"body","name":"requestBody","required":true,"ref":"SignUpRequest"},
+            };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 
             let validatedArgs: any[] = [];
             try {
-                validatedArgs = templateService.getValidatedArgs({ args: argsCognitoController_signUp, request, response });
+                validatedArgs = templateService.getValidatedArgs({ args, request, response });
 
                 const controller = new CognitoController();
 
@@ -290,22 +290,22 @@ export function RegisterRoutes(app: Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        const argsCognitoController_signIn: Record<string, TsoaRoute.ParameterSchema> = {
-                requestBody: {"in":"body","name":"requestBody","required":true,"ref":"SignInRequest"},
-                successResponse: {"in":"res","name":"200","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"result":{"dataType":"any","required":true},"message":{"dataType":"string","required":true}}},
-                errorResponse: {"in":"res","name":"401","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"message":{"dataType":"string","required":true}}},
-        };
         app.post('/v1/auth/signin',
             ...(fetchMiddlewares<RequestHandler>(CognitoController)),
             ...(fetchMiddlewares<RequestHandler>(CognitoController.prototype.signIn)),
 
             async function CognitoController_signIn(request: ExRequest, response: ExResponse, next: any) {
+            const args: Record<string, TsoaRoute.ParameterSchema> = {
+                    requestBody: {"in":"body","name":"requestBody","required":true,"ref":"SignInRequest"},
+                    successResponse: {"in":"res","name":"200","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"result":{"dataType":"any","required":true},"message":{"dataType":"string","required":true}}},
+                    errorResponse: {"in":"res","name":"401","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"message":{"dataType":"string","required":true}}},
+            };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 
             let validatedArgs: any[] = [];
             try {
-                validatedArgs = templateService.getValidatedArgs({ args: argsCognitoController_signIn, request, response });
+                validatedArgs = templateService.getValidatedArgs({ args, request, response });
 
                 const controller = new CognitoController();
 
@@ -322,22 +322,22 @@ export function RegisterRoutes(app: Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        const argsCognitoController_confirmSignUp: Record<string, TsoaRoute.ParameterSchema> = {
-                requestBody: {"in":"body","name":"requestBody","required":true,"ref":"ConfirmSignUpRequest"},
-                successResponse: {"in":"res","name":"200","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"result":{"dataType":"any","required":true},"message":{"dataType":"string","required":true}}},
-                errorResponse: {"in":"res","name":"401","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"message":{"dataType":"string","required":true}}},
-        };
         app.post('/v1/auth/confirm',
             ...(fetchMiddlewares<RequestHandler>(CognitoController)),
             ...(fetchMiddlewares<RequestHandler>(CognitoController.prototype.confirmSignUp)),
 
             async function CognitoController_confirmSignUp(request: ExRequest, response: ExResponse, next: any) {
+            const args: Record<string, TsoaRoute.ParameterSchema> = {
+                    requestBody: {"in":"body","name":"requestBody","required":true,"ref":"ConfirmSignUpRequest"},
+                    successResponse: {"in":"res","name":"200","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"result":{"dataType":"any","required":true},"message":{"dataType":"string","required":true}}},
+                    errorResponse: {"in":"res","name":"401","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"message":{"dataType":"string","required":true}}},
+            };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 
             let validatedArgs: any[] = [];
             try {
-                validatedArgs = templateService.getValidatedArgs({ args: argsCognitoController_confirmSignUp, request, response });
+                validatedArgs = templateService.getValidatedArgs({ args, request, response });
 
                 const controller = new CognitoController();
 
@@ -354,20 +354,20 @@ export function RegisterRoutes(app: Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        const argsCognitoController_resendCode: Record<string, TsoaRoute.ParameterSchema> = {
-                requestBody: {"in":"body","name":"requestBody","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"email":{"dataType":"string","required":true}}},
-        };
         app.post('/v1/auth/resend-code',
             ...(fetchMiddlewares<RequestHandler>(CognitoController)),
             ...(fetchMiddlewares<RequestHandler>(CognitoController.prototype.resendCode)),
 
             async function CognitoController_resendCode(request: ExRequest, response: ExResponse, next: any) {
+            const args: Record<string, TsoaRoute.ParameterSchema> = {
+                    requestBody: {"in":"body","name":"requestBody","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"email":{"dataType":"string","required":true}}},
+            };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 
             let validatedArgs: any[] = [];
             try {
-                validatedArgs = templateService.getValidatedArgs({ args: argsCognitoController_resendCode, request, response });
+                validatedArgs = templateService.getValidatedArgs({ args, request, response });
 
                 const controller = new CognitoController();
 
