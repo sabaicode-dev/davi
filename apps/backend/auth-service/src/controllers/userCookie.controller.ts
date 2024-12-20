@@ -13,7 +13,12 @@ export class UserController extends Controller {
   public async getMe(
     @Request() req: express.Request,
     @Res() errorResponse: TsoaResponse<401 | 500, { error: string }>
-  ): Promise<{ username: string; email: string; createdAt: string }> {
+  ): Promise<{
+    username: string;
+    email: string;
+    createdAt: string;
+    profile: string;
+  }> {
     try {
       // Log cookies in the request
       // console.log("Cookies in request:", req.cookies);
@@ -45,11 +50,15 @@ export class UserController extends Controller {
         ? new Date(user.createdAt).toLocaleDateString() // Convert to string if it's a Date
         : "Invalid Date";
 
+      // Provide a default profile URL if it's undefined
+      const profileUrl = user.profile || "Unknow";
+
       // Return user profile
       return {
         username: user.username,
         email: user.email,
         createdAt: formattedCreatedAt,
+        profile: profileUrl,
       };
     } catch (error) {
       console.error("Error in /v1/auth/me:", error);

@@ -21,6 +21,6 @@ export function setCookie(
     ...options,
   };
 
-  console.log(`Setting cookie: ${name}, value: ${value}`); // Add logging for debugging
+  // console.log(`Setting cookie: ${name}, value: ${value}`); // Add logging for debugging
   res.cookie(name, value, defaultOptions);
 }

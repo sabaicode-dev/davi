@@ -33,7 +33,6 @@ export const saveUserToDB = async (userData: {
       user.profile = userData.prfile || user.profile;
       user.confirmed = userData.confirmed ?? user.confirmed;
       await user.save();
-      console.log("Existing user updated in MongoDB:", user);
     }
 
     return user;

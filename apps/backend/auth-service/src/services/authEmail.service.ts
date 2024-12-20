@@ -53,7 +53,6 @@ export const signUpUser = async (
   profile: string
 ) => {
   try {
-    console.log("Step 02");
     const clientId = AWS_COGNITO_CLIENT_ID!;
     const clientSecret = AWS_COGNITO_CLIENT_SECRET!;
     const secretHash = generateSecretHash(email, clientId, clientSecret);

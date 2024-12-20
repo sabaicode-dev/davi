@@ -13,6 +13,7 @@ import { errorHandler } from "@/src/middleware/errorHandler";
 import cookieParser from "cookie-parser";
 import chalk from "chalk";
 import bodyParser from "body-parser";
+import { authorizeAdmin } from "./middleware/authorization";
 
 // Dynamically load swagger.json
 const swaggerDocument = JSON.parse(
@@ -61,6 +62,11 @@ app.use(
   swaggerUi.serve as any,
   swaggerUi.setup(swaggerDocument) as any
 );
+
+// ========================
+// Protect Admin Routes
+// ========================
+app.use("/v1/auth/adminOptions/*", authorizeAdmin);
 // ========================
 // ERROR Handler
 // ========================

@@ -20,6 +20,10 @@ import { setCookie } from "@/src/utils/cookie";
 import { jwtDecode } from "jwt-decode";
 import { saveUserToDB } from "../database/services/user.service"; // MongoDB service function to save user data
 import configs from "../config";
+import {
+  checkEmailExists,
+  checkIfUserExistsInDb,
+} from "../utils/constants/checkGmailCognito";
 
 /**
  * Controller for handling Google authentication.
@@ -58,7 +62,7 @@ export class GoogleAuthController extends Controller {
   public async googleCallback(
     @Query() code: string,
     @Request() request: express.Request,
-    @Res() errorResponse: TsoaResponse<500, { error: string }>
+    @Res() errorResponse: TsoaResponse<500 | 409, { error: string }>
   ): Promise<void> {
     try {
       if (!code) {
@@ -74,43 +78,64 @@ export class GoogleAuthController extends Controller {
       // Decode the ID token to extract user information
       const decodedIdToken: any = jwtDecode(tokens.id_token);
 
-      console.log("decodedIdToken :::", decodedIdToken);
-
       if (!decodedIdToken.email_verified) {
         throw new Error("Email not verified by Google");
       }
+
+      const email = decodedIdToken.email;
+
+      console.log("1. Checking email existence...");
+
+      // Step 1: Check if the email exists in Cognito
+      const cognitoExists = await checkEmailExists(email); // Check AWS Cognito for the email
+
+      console.log("Cognito user exists:", cognitoExists);
+
+      // if (cognitoExists) {
+      //   console.log("2. User exists in Cognito");
+      //   this.setStatus(409); // Conflict, because email exists in Cognito
+      //   return errorResponse(409, { error: "Email already exists in Cognito" });
+      // }
+
+      // // Step 2: Check if the email exists in the database
+      const dbExists = await checkIfUserExistsInDb(email); // Check the DB for existing user
+
+      console.log("Email user exists:", dbExists);
+      // if (dbExists) {
+      //   console.log("3. User exists in the database");
+      //   this.setStatus(409); // Conflict, because user exists in the DB
+      //   return errorResponse(409, {
+      //     error: "User already exists in the database",
+      //   });
+      // }
+
+      // console.log("4. User does not exist, proceeding with registration...");
 
       // Extract cognitoUserId from ID token
       const cognitoUserId = decodedIdToken.sub;
 
       // Extract user's first and last name from the ID token
-      const givenName = decodedIdToken.given_name || "Unknown Given Name";
-      const familyName = decodedIdToken.family_name || "Unknown Family Name";
       const profileUrl = decodedIdToken.profile || "No Profile Image";
       const fullName = decodedIdToken.name || "Unknown";
 
-      console.log(`User's Given Name: ${givenName}`);
-      console.log(`User's Family Name: ${familyName}`);
-      console.log(`User's Full Name: ${fullName}`);
-      console.log("User's Profile URL:", profileUrl);
-      console.log(`User's Email: ${decodedIdToken.email}`);
-
       const saveToDB = await saveUserToDB({
         username: fullName,
-        email: decodedIdToken.email,
+        email: email,
         cognitoUserId,
         prfile: profileUrl,
         confirmed: true,
       });
 
-      console.log(`saveToDB ::::`, saveToDB);
+      console.log(`5. saveToDB ::::`, saveToDB);
 
       // Set cookies securely for tokens and cognitoUserId
+
       console.log("Setting cookies...");
       setCookie(response, "idToken", tokens.id_token);
       setCookie(response, "accessToken", tokens.access_token);
       setCookie(response, "refreshToken", tokens.refresh_token);
       setCookie(response, "cognitoUserId", cognitoUserId);
+      console.log("5 .sent cookies.....");
 
       response.redirect(configs.clientUrl);
     } catch (error: any) {
