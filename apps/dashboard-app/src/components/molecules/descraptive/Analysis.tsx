@@ -8,6 +8,9 @@ import Boolean from "../charts/Boolean";
 import CategoryBig from "../charts/CatagoryBig";
 import UniqueValueBig from "../charts/UniqueValueBig";
 import BooleanBig from "../charts/BooleanBig";
+import Category from "../charts/Catagory";
+import Number from "../charts/Number";
+import UniqueValue from "../charts/UniqueValue";
 
 // Define ChartMetadata type
 type ChartMetadata = {
@@ -35,19 +38,19 @@ type AnalysisProps = {
 const chartTypes = [
   {
     type: "Number",
-    component: NumberBig,
+    component: Number,
   },
   {
     type: "Category",
-    component: CategoryBig,
+    component: Category,
   },
   {
     type: "Boolean",
-    component: BooleanBig,
+    component: Boolean,
   },
   {
     type: "UniqueValue",
-    component: UniqueValueBig,
+    component: UniqueValue,
   },
 ];
 
@@ -238,7 +241,7 @@ const Analysis: React.FC<AnalysisProps> = ({
       <div className="mt-5">
         <h3 className="text-lg font-medium mb-3">Distribution</h3>
 
-        {ActiveChartConfig ? (
+        {/* {ActiveChartConfig ? (
           <ActiveChartConfig.component
             data={transformedData} // Pass transformed data to the chart
             labels={matchingMetadata?.labels || []} // Pass labels if available
@@ -247,7 +250,7 @@ const Analysis: React.FC<AnalysisProps> = ({
           <p className="text-gray-500 text-center">
             No chart available for this data type.
           </p>
-        )}
+        )} */}
       </div>
     </div>
   );
