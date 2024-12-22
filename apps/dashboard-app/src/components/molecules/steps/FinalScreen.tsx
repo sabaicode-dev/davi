@@ -257,8 +257,8 @@ const FinalScreen: React.FC = () => {
       const chartTypes = [
         "pie_chart",
         "bar_chart",
-        "line_chart",
-        "scatter_plot",
+        "area_chart",
+        "column_chart",
       ];
 
       for (const chartType of chartTypes) {
