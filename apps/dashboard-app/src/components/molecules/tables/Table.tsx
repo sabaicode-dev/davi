@@ -216,7 +216,7 @@ const Table: React.FC<TableProps> = ({
               {headers.map((header, index) => {
                 const columnMetadata = uniqueMetadata.find(
                   (col) => col.name === header
-                ) as ChartMetadata;
+                ) as any;
                 
                 return (
                   <td

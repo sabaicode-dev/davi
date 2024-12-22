@@ -280,8 +280,6 @@ const FinalScreen: React.FC = () => {
 
   if (error) return <div className="p-4 text-red-500">Error: {error}</div>;
 
-  
-
   return (
     <div
       className="flex flex-col overflow-hidden mt-8 h-[200px]"
@@ -401,9 +399,7 @@ const FinalScreen: React.FC = () => {
           onClose={handleCloseRightSide}
         />
       )}
-
- 
-
+  
       {/* Popup */}
       {showPopup && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
