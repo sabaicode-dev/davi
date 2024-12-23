@@ -70,19 +70,19 @@ export const App = () => {
   return (
     <AuthProvider>
       <BrowserRouter>
-        {/* <PrivateRoute> */}
-        <Layout>
-          <Routes>
-            {routes.map((route) => (
-              <Route
-                key={route.path}
-                path={route.path}
-                element={route.element}
-              />
-            ))}
-          </Routes>
-        </Layout>
-        {/* </PrivateRoute> */}
+        <PrivateRoute>
+          <Layout>
+            <Routes>
+              {routes.map((route) => (
+                <Route
+                  key={route.path}
+                  path={route.path}
+                  element={route.element}
+                />
+              ))}
+            </Routes>
+          </Layout>
+        </PrivateRoute>
       </BrowserRouter>
     </AuthProvider>
   );

@@ -1,3 +1,5 @@
+console.log("server.ts is running...!");
+
 import app from "./app";
 import configs from "./config";
 import connectToMongoDB from "./database/connection";

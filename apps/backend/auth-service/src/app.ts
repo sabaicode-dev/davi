@@ -1,4 +1,7 @@
-// update AWS_REDIRECT_URI
+console.log("app.ts is running...!");
+console.log("update on 09/Dec/2024, 04:02 PM");
+
+console.log(`------ At : @SabaiCode ------`);
 
 import express from "express";
 import swaggerUi from "swagger-ui-express";
@@ -8,6 +11,9 @@ import path from "path";
 import { allowedOrigins, corsOptions } from "@/src/middleware/allowsReq";
 import { errorHandler } from "@/src/middleware/errorHandler";
 import cookieParser from "cookie-parser";
+import chalk from "chalk";
+import bodyParser from "body-parser";
+import { authorizeAdmin } from "./middleware/authorization";
 
 // Dynamically load swagger.json
 const swaggerDocument = JSON.parse(
@@ -24,6 +30,11 @@ const app = express();
 // ========================
 app.use(express.json()); // Help to get the json from request body
 
+// ========================
+// Parse JSON data in requests
+// ========================
+app.use(bodyParser.json());
+
 // =======================
 // Security Middlewares
 // =======================
@@ -34,6 +45,8 @@ app.use(cookieParser());
 app.use(corsOptions);
 
 //log show allowedOrigins
+console.log(chalk.blue("==== allowedOrigins ====="));
+
 console.log(`allowedOrigins : ${allowedOrigins}`);
 
 // ========================
@@ -49,9 +62,18 @@ app.use(
   swaggerUi.serve as any,
   swaggerUi.setup(swaggerDocument) as any
 );
+
+// ========================
+// Protect Admin Routes
+// ========================
+app.use("/v1/auth/adminOptions/*", authorizeAdmin);
 // ========================
 // ERROR Handler
 // ========================
 app.use(errorHandler);
+
+console.log(
+  chalk.green(`Server initialized on ${new Date().toLocaleString()}`)
+);
 
 export default app;
