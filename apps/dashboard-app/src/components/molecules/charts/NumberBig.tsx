@@ -6,20 +6,17 @@ interface NumberProps {
   data: number[]; // Array of bar heights
   labels: string[]; // Array of x-axis labels
   title?: string; // Optional title
-  onClick?: () => void; // Callback when the container is clicked
 }
 
-const Number: React.FC<NumberProps> = ({
+const NumberBig: React.FC<NumberProps> = ({
   data,
   labels,
-  title = "Number",
-  onClick,
 }) => {
   const chartOptions: ApexOptions = {
     chart: {
       type: "bar",
       toolbar: { show: false },
-      animations: { enabled: false },
+      animations: { enabled: true },
     },
     plotOptions: {
       bar: {
@@ -38,10 +35,10 @@ const Number: React.FC<NumberProps> = ({
       axisTicks: { show: false },
     },
     yaxis: {
-      show: false,
+      show: true,
     },
     grid: {
-      show: false,
+      show: true,
   
       
     },
@@ -60,18 +57,8 @@ const Number: React.FC<NumberProps> = ({
 
   return (
     <div
-      className="relative w-[210px] h-[149px] bg-white rounded-sm shadow-md pt-2 flex items-center justify-center cursor-pointer"
-      onClick={onClick} // Trigger callback when the container is clicked
+      className="relative w-[400px] h-[300px] bg-white rounded-sm pt-2 flex items-center justify-center cursor-pointer"
     >
-      {/* Title */}
-      {title && (
-        <div className="absolute top-2 left-2">
-          <div className="text-blue-800 text-xs bg-blue-100 px-2 py-1 rounded">
-            {title}
-          </div>
-        </div>
-      )}
-
       {/* Chart */}
       <div className="w-full h-full">
         <Chart
@@ -86,4 +73,4 @@ const Number: React.FC<NumberProps> = ({
   );
 };
 
-export default Number;
+export default NumberBig;

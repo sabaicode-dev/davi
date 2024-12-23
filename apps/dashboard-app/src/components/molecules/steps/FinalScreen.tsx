@@ -7,10 +7,6 @@ import { CiFilter } from "react-icons/ci";
 import Table from "../tables/Table";
 import { useNavigate, useParams } from "react-router-dom";
 import Spinner from "../loading/Spinner";
-import Number from "../charts/Number";
-import Category from "../charts/Catagory";
-import Boolean from "../charts/BooleanChart";
-import UniqueValue from "../charts/UniqueValue";
 
 interface ApiResponse {
   count: number;
@@ -49,6 +45,8 @@ const FinalScreen: React.FC = () => {
     headers: [],
     data: [],
   });
+  const [visibleHeaders, setVisibleHeaders] = useState<Set<string>>(new Set()); // Tracks visible headers
+  const [showPopup, setShowPopup] = useState(false); // Tracks popup visibility
   const [metadata, setMetadata] = useState<any[]>([]);
   const { projectId, fileId } = useParams();
   const [isLoading, setIsLoading] = useState(true);
@@ -61,6 +59,8 @@ const FinalScreen: React.FC = () => {
   }) => {
     setFileDetails(details);
   };
+
+
 
   // Simulated Chart Data (Mock Data)
   const generateMockChartData = () => {
@@ -77,7 +77,25 @@ const FinalScreen: React.FC = () => {
         data: [
           { category: "Electronics", percentage: 50 },
           { category: "Furniture", percentage: 30 },
-          { category: "Clothing", percentage: 20 },
+          { category: "Clothing2", percentage: 20 },
+          { category: "Electronics3", percentage: 50 },
+          { category: "Furniture4", percentage: 30 },
+          { category: "Clothing7", percentage: 20 },
+          { category: "Electronics6", percentage: 50 },
+          { category: "Furniture9", percentage: 30 },
+          { category: "Clothing26", percentage: 20 },
+          { category: "Electronicsa", percentage: 50 },
+          { category: "Furniturew", percentage: 30 },
+          { category: "Clothingo1", percentage: 20 },
+          { category: "Electronics1", percentage: 50 },
+          { category: "Furniture1", percentage: 30 },
+          { category: "Clothing21", percentage: 20 },
+          { category: "Electronics31", percentage: 50 },
+          { category: "Furniture41", percentage: 30 },
+          { category: "Clothing71", percentage: 20 },
+          { category: "Electronics61", percentage: 50 },
+          { category: "Furniture91", percentage: 30 },
+          { category: "Clothing261", percentage: 20 },
         ],
       },
       {
@@ -93,16 +111,25 @@ const FinalScreen: React.FC = () => {
       {
         type: "Number",
         key: "number_column",
-        data: [10, 20, 30, 40 ,30, 40, 10, 20],
+        data: [10, 20, 30, 40, 30, 40, 10, 20],
         labels: ["A", "B", "C", "D"],
       },
       {
         type: "Category",
         key: "category_column",
         data: [
+          { category: "Electronicsd", percentage: 50 },
+          { category: "Furnitureg", percentage: 30 },
+          { category: "Clothingg", percentage: 20 },
           { category: "Electronics", percentage: 50 },
           { category: "Furniture", percentage: 30 },
-          { category: "Clothing", percentage: 20 },
+          { category: "Clothing2", percentage: 20 },
+          { category: "Electronics3", percentage: 50 },
+          { category: "Furniture4", percentage: 30 },
+          { category: "Clothing7", percentage: 20 },
+          { category: "Electronics6", percentage: 50 },
+          { category: "Furniture9", percentage: 30 },
+          { category: "Clothing26", percentage: 20 },
         ],
       },
       {
@@ -114,6 +141,29 @@ const FinalScreen: React.FC = () => {
         type: "UniqueValue",
         key: "unique_column",
         data: { value: 51, total: 500 },
+      },
+      {
+        type: "UniqueValue",
+        key: "unique_column",
+        data: { value: 51, total: 500 },
+      },
+      {
+        type: "Category",
+        key: "category_column",
+        data: [
+          { category: "Electronicsa", percentage: 50 },
+          { category: "Furniturew", percentage: 30 },
+          { category: "Clothingo", percentage: 20 },
+          { category: "Electronics", percentage: 50 },
+          { category: "Furniture", percentage: 30 },
+          { category: "Clothing2", percentage: 20 },
+          { category: "Electronics3", percentage: 50 },
+          { category: "Furniture4", percentage: 30 },
+          { category: "Clothing7", percentage: 20 },
+          { category: "Electronics6", percentage: 50 },
+          { category: "Furniture9", percentage: 30 },
+          { category: "Clothing26", percentage: 20 },
+        ],
       },
     ];
   };
@@ -151,6 +201,8 @@ const FinalScreen: React.FC = () => {
         filename: jsonData.filename,
       });
 
+      setVisibleHeaders(new Set(jsonData.headers)); 
+
       // Update file details
       if (jsonData.dataset_summary) {
         handleFileDetailsUpdate({
@@ -170,6 +222,22 @@ const FinalScreen: React.FC = () => {
     }
   };
 
+// Toggle Popup visibility
+const handleFilterClick = () => {
+  setShowPopup(!showPopup);
+};
+
+// Handle header visibility toggle
+const handleCheckboxChange = (header: string) => {
+  const updatedHeaders = new Set(visibleHeaders);
+  if (updatedHeaders.has(header)) {
+    updatedHeaders.delete(header); // Hide header
+  } else {
+    updatedHeaders.add(header); // Show header
+  }
+  setVisibleHeaders(updatedHeaders);
+};
+
   if (isLoading)
     return (
       <div className="flex w-full justify-center items-center h-full">
@@ -180,7 +248,10 @@ const FinalScreen: React.FC = () => {
   if (error) return <div className="p-4 text-red-500">Error: {error}</div>;
 
   return (
-    <div className="flex flex-col overflow-hidden mt-8 h-[200px]" style={{ width: "100%", height: "30%" }}>
+    <div
+      className="flex flex-col overflow-hidden mt-8 h-[200px]"
+      style={{ width: "100%", height: "30%" }}
+    >
       <div className="flex flex-row justify-between items-center mb-3">
         <div className="flex flex-row gap-x-3 justify-center items-center">
           <div className="flex rounded-full bg-[#F4EBFF] w-12 h-12 justify-center items-center">
@@ -222,8 +293,12 @@ const FinalScreen: React.FC = () => {
           />
         </div>
       </div>
+
       <div className="flex flex-row justify-between items-center border-t-2 border-[#443DFF]">
-        <div className="flex justify-between items-center gap-x-4 my-4" style={{ width: "60%" }}>
+        <div
+          className="flex justify-between items-center gap-x-4 my-4"
+          style={{ width: "60%" }}
+        >
           <Input
             type="text"
             label=""
@@ -247,6 +322,7 @@ const FinalScreen: React.FC = () => {
             isIconOnly={true}
             startContent={<CiFilter className="w-6 h-6" />}
             className="border-2 border-[#E6EDFF]"
+            onClick={handleFilterClick}
           />
         </div>
         <div>
@@ -264,10 +340,12 @@ const FinalScreen: React.FC = () => {
       <div className="">
         <div className="responsive-table-height">
           <Table
-            headers={tableData.headers}
+            headers={tableData.headers.filter((header) =>
+              visibleHeaders.has(header)
+            )}
             data={tableData.data}
             isCheckBox={true}
-            metadata={metadata}  // Pass the mock chart data here
+            metadata={metadata} // Pass the mock chart data here
             isEditCell={false}
             isSelectColumn={true}
             isFullHeight={true}
@@ -275,6 +353,37 @@ const FinalScreen: React.FC = () => {
           />
         </div>
       </div>
+
+      {/* Popup */}
+      {showPopup && (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+        <div className="bg-white w-[400px] rounded-lg shadow-lg p-6">
+          <h3 className="font-bold text-lg mb-4">Visibility Configuration</h3>
+          <p className="my-3">This blog post has been published. Team members will be able to edit this post and republish changes.</p>
+          <div className="grid grid-cols-1 gap-4 h-[300px] overflow-auto">
+            {tableData.headers.map((header) => (
+              <label key={header} className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  checked={visibleHeaders.has(header)}
+                  onChange={() => handleCheckboxChange(header)}
+                />
+                <span>{header}</span>
+              </label>
+            ))}
+          </div>
+          <div className="flex justify-end space-x-4 mt-4">
+            <Button
+              children={"Close"}
+              size="small"
+              radius="xl"
+              onClick={handleFilterClick}
+              className="border-blue-500"
+            />
+          </div>
+        </div>
+      </div>
+    )}
     </div>
   );
 };
