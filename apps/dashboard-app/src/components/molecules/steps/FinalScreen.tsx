@@ -131,7 +131,7 @@ const FinalScreen: React.FC = () => {
       // Fetch metadata
       console.log("Fetching metadata...");
       const metadataResponse = await fetch(
-        `http://127.0.0.1:8000/api/v1/metadata/6766f9166e44451f957de8db/`
+        `http://127.0.0.1:8000/api/v1/metadata/6769151fc9996c016a4722a0/`
       );
 
       if (!metadataResponse.ok) {

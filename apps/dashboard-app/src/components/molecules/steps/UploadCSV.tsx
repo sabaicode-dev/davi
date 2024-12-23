@@ -124,7 +124,8 @@ const UploadCsv: React.FC<IUploadCSV> = ({ defaultProjectId }) => {
       );
 
       if (response.status === 201 || response.status === 200) {
-        const uploadedFileId = response.data?._id; // Adjust based on your response structure
+        const uploadedFileId = response.data.data?._id; // Adjust based on your response structure
+        console.log("FileDetails",uploadedFileId);
         if (uploadedFileId) {
           setUploadSuccess(true);
           setFileId(uploadedFileId);

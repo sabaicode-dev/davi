@@ -1,5 +1,3 @@
-
-
 //For Development
 export const API_ENDPOINTS = {
   SIGN_UP: `${process.env.REACT_APP_API_URL_AUTH_ENDPOINT}/signup`,
