@@ -5,7 +5,7 @@ import PickDataSource from "@/src/components/molecules/steps/PickDataSource";
 import UploadCsv from "@/src/components/molecules/steps/UploadCSV";
 import ImportUrl from "@/src/components/molecules/steps/ImportUrl";
 import Visualize from "@/src/components/pages/Visualize";
-import Dataset from "@/src/components/pages/Dataset";
+import Dataset from "./components/pages/Dataset";
 import Helps from "@/src/components/pages/Helps";
 import AccountSettings from "@/src/components/templates/AccountSettings";
 import Project from "@/src/components/pages/Project";
@@ -15,7 +15,13 @@ import ProjectDetail from "@/src/components/molecules/project/ProjectDetail";
 import FinalScreen from "./components/molecules/steps/FinalScreen";
 import CleaningProject from "./components/molecules/steps/CleaningProject";
 import PrivateRoute from "./ProtectedRoute/PrivateRoute";
-import SelectTable from "./components/molecules/steps/SelectTable";
+import SelectTable from "./components/molecules/steps/selectTable";
+
+//test_card
+import Card from "./components/molecules/models/DeletedRowCard/Card";
+import SaveVisualize from "./components/molecules/models/Save_V2/Card";
+import FileUploadAndMetadata from "./components/molecules/models/Meta/FileUploadAndMetadata";
+
 const ProjectFlow = () => {
   return (
     <Routes>
@@ -47,7 +53,7 @@ const routes = [
   { path: "/project/*", element: <ProjectFlow /> },
   { path: "/project/create/pick-datasource", element: <PickDataSource /> },
   { path: "/visualize", element: <Visualize /> },
-  { path: "/dataset", element: <Dataset /> },
+  { path: "/dataset", element: <Dataset/> },
   { path: "/helps", element: <Helps /> },
   { path: "/accountsetting", element: <AccountSettings /> },
   { path: "/cleaning", element: <AccountSettings /> },
@@ -56,6 +62,7 @@ const routes = [
     path: "/project/:projectId/file/:fileId/cleaning",
     element: <CleaningProject />,
   },
+
   {
     path: "/project/:projectId/file/:fileId/finalscreen",
     element: <FinalScreen />,
@@ -64,6 +71,11 @@ const routes = [
     path: "/project/:projectId/file/:fileId/finalscreen",
     element: <FinalScreen />,
   },
+
+  //Test_Card_Component
+  { path: "upload", element: <FileUploadAndMetadata/> },
+  
+  // { path: "/cardss", element: <SaveVisualize/> },
 ];
 
 export const App = () => {
@@ -71,17 +83,17 @@ export const App = () => {
     <AuthProvider>
       <BrowserRouter>
         <PrivateRoute>
-        <Layout>
-          <Routes>
-            {routes.map((route) => (
-              <Route
-                key={route.path}
-                path={route.path}
-                element={route.element}
-              />
-            ))}
-          </Routes>
-        </Layout>
+          <Layout>
+            <Routes>
+              {routes.map((route) => (
+                <Route
+                  key={route.path}
+                  path={route.path}
+                  element={route.element}
+                />
+              ))}
+            </Routes>
+          </Layout>
         </PrivateRoute>
       </BrowserRouter>
     </AuthProvider>

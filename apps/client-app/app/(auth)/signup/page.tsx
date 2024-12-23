@@ -41,10 +41,10 @@ export default function SignUpPage() {
   // Handle the sign-up process
   const handleSignUp = async (data: RegisterFormData) => {
     // const secretKey = "kf93!@nF3?/$rJQ2@kT6b%rTYqKq9t1n3F!qL";
-    const { email, password, username } = data;
+    const { email, password, username } = data;//Destructures the email, password, and username fields from the data object for easier access.
 
     setIsLoading(true); // Start loading spinner
-    setError(null); // Reset error message
+    setError(null); // Reset error message   & Clears any previous error messages.
 
     try {
       // Call the signup API
@@ -103,6 +103,8 @@ export default function SignUpPage() {
   const handleGoogleSignUp = async () => {
     try {
       const response = await axiosInstance.get("/google");
+      //This endpoint is expected to initiate the Google OAuth flow 
+      // and return a redirect URL for Google sign-in.
 
       if (response.data && response.data.url) {
         window.location.href = response.data.url; // Redirect to the Google OAuth page
