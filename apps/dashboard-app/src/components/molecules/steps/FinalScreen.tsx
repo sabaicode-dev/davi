@@ -75,7 +75,6 @@ const FinalScreen: React.FC = () => {
     setFileDetails(details);
   };
 
-
   const [selectedAnalysis, setSelectedAnalysis] = useState<{
     category: string;
     percentage: number;
@@ -131,7 +130,7 @@ const FinalScreen: React.FC = () => {
       // Fetch metadata
       console.log("Fetching metadata...");
       const metadataResponse = await fetch(
-        `http://127.0.0.1:8000/api/v1/metadata/6766f9166e44451f957de8db/`
+        `http://127.0.0.1:8000/api/v1/metadata/6768d4448c738597359fc8a2/`
       );
 
       if (!metadataResponse.ok) {
@@ -291,7 +290,7 @@ const FinalScreen: React.FC = () => {
     setSelectedAnalysis({
       category: columnMetadata.name,
       percentage: chartData.percentage || 0,
-      type: columnMetadata.type
+      type: columnMetadata.type,
     });
   };
 
@@ -299,7 +298,6 @@ const FinalScreen: React.FC = () => {
   const handleCloseAnalysis = () => {
     setSelectedAnalysis(null);
   };
-
 
   return (
     <div
@@ -415,12 +413,12 @@ const FinalScreen: React.FC = () => {
 
       {/* Analysis sidebar */}
       {selectedAnalysis && (
-          <Analysis
-            selectedData={selectedAnalysis}
-            onClose={handleCloseAnalysis}
-            metadata={metadata}
-          />
-        )}
+        <Analysis
+          selectedData={selectedAnalysis}
+          onClose={handleCloseAnalysis}
+          metadata={metadata}
+        />
+      )}
 
       {showRightSide && (
         <RightSide
@@ -431,7 +429,6 @@ const FinalScreen: React.FC = () => {
         />
       )}
 
-  
       {/* Popup */}
       {showPopup && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
@@ -465,9 +462,7 @@ const FinalScreen: React.FC = () => {
           </div>
         </div>
       )}
-      
     </div>
-    
   );
 };
 
