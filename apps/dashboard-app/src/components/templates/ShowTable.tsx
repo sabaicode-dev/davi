@@ -44,7 +44,7 @@ const ShowTable = ({ selectedItemId }: ShowTableProps) => {
     setLoading(true);
     setError(null); // Clear previous errors
     try {
-      const api = `http://3.24.110.41:8000/api/v1/project/${projectId}/scrape/view-dataset/${selectedItemId}`;
+      const api = `http://127.0.0.1:8000/api/v1/project/${projectId}/scrape/view-dataset/${selectedItemId}`;
       const response = await axios.get(api);
 
       // Assuming the response contains 'headers' and 'data'

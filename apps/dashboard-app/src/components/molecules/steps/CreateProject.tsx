@@ -5,7 +5,7 @@ import Button from "@/src/components/atoms/Button";
 import request from "@/src/utils/helper";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-
+import { API_ENDPOINTS } from "@/src/utils/const/apiEndpoint";
 interface Step2Props {
   onNext?: () => void;
   onBack?: () => void;
@@ -80,7 +80,7 @@ const CreateProject: React.FC<Step2Props> = ({
 
     try {
       const response = await request({
-        url: `http://3.24.110.41:8000/api/v1/project/`,
+        url: `${API_ENDPOINTS.API_URL}/project/`,
         method: "POST",
         headers: {
           "Content-Type": "application/json",

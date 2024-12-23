@@ -1,9 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { renderChart } from "@/src/utils/renderChart";
 import Category from "../charts/Catagory";
-import Number from "../charts/Number";
-import Boolean from "../charts/Boolean";
-import UniqueValue from "../charts/UniqueValue";
-import Analysis from "../descraptive/Analysis";
 
 interface TableProps {
   headers: string[];
@@ -12,6 +9,7 @@ interface TableProps {
   isCheckBox?: boolean;
   isEditCell?: boolean;
   showChart?: boolean;
+  onChartSelect?: (columnMetadata: any, chartData: any) => void; 
   isSelectColumn?: boolean;
   onSaveCell?: (
     rowId: string | number,
@@ -20,17 +18,38 @@ interface TableProps {
   ) => Promise<boolean>;
   onColumnSelect?: (selectedColumns: string[], columnData: any[]) => void;
   isFullHeight?: boolean;
+  onChartClick?: (data: {
+    category: string;
+    percentage: number;
+    type: string;
+  }) => void; // Add this property
 }
+
 
 interface ChartMetadata {
   key: string;
+  name: string;
+  description?: string;
   table_column_info: {
-    type: "STRING" | "NUMERIC" | "BOOLEAN";
+    type: "STRING" | "NUMERIC" | "BOOLEAN" | "HISTOGRAM";
+    order?: number; // Optional
+    original_type?: string; // Optional
+    extended_type?: string; // Optional
   };
   table_column_metrics: {
-    string_metrics?: { counts: any[] };
-    numeric_metrics?: { histogram: { buckets: any[] } };
-    boolean_metrics?: any;
+    string_metrics?: {
+      counts: { key: string; value: number }[];
+      most_common_value?: string;
+      most_common_value_count?: number;
+      unique_value_count?: number;
+    };
+    numeric_metrics?: {
+      histogram: { range: string; count: number }[];
+    };
+    boolean_metrics?: {
+      true_count: number;
+      false_count: number;
+    };
   };
 }
 
@@ -78,90 +97,6 @@ const Table: React.FC<TableProps> = ({
 
   const capitalizeFirstChar = (word: string) => {
     return word.charAt(0).toUpperCase() + word.slice(1);
-  };
-
-  //----1
-  const [showSidebar, setShowSidebar] = useState(false);
-  const [selectedData, setSelectedData] = useState<{
-    category: string;
-    percentage: number;
-    type: string;
-  } | null>(null);
-
-  const handleBoxClick = (dataPoint: {
-    category: string;
-    percentage: number;
-    type: string;
-  }) => {
-    setSelectedData(dataPoint);
-    setShowSidebar(true);
-  };
-
-  const closeSidebar = () => {
-    setShowSidebar(false);
-    setSelectedData(null);
-  };
-  //-----1
-  const renderChart = (col: any) => {
-    switch (col.type) {
-      case "Number":
-        return (
-          <Number
-            data={col.data}
-            labels={col.labels}
-            onClick={() =>
-              handleBoxClick({
-                category: "Number Data",
-                percentage: 50,
-                type: col.type, // Pass the type dynamically from col
-              })
-            }
-          />
-        );
-      case "Category":
-        return (
-          <Category
-            onClick={(item) =>
-              handleBoxClick({
-                category: item.category,
-                percentage: item.percentage,
-                type: col.type, // Pass the type dynamically from col
-              })
-            }
-            data={col.data}
-          />
-        );
-      case "Boolean":
-        return (
-          <Boolean
-            data={col.data}
-            title="Boolean"
-            onClick={() =>
-              handleBoxClick({
-                category: "Boolean Data",
-                percentage: 60,
-                type: col.type, // Pass the type dynamically from col
-              })
-            }
-          />
-        );
-      case "UniqueValue":
-        return (
-          <UniqueValue
-            value={51} // Example unique value count
-            total={500} // Example total count
-            onClick={() =>
-              handleBoxClick({
-                category: "Unique Value Data",
-                percentage: 51,
-                type: col.type, // Pass the type dynamically from col
-              })
-            }
-          />
-        );
-      default:
-        return null;
-    }
   };
 
   const handleSelectRow = (id: string | number) => {
@@ -250,6 +185,7 @@ const Table: React.FC<TableProps> = ({
     new Map(metadata.map((item) => [item.key, item])).values()
   );
 
+
   return (
     <div
       className="overflow-auto w-full border-[1px] border-gray-400 "
@@ -278,18 +214,24 @@ const Table: React.FC<TableProps> = ({
               </th>
             ))}
           </tr>
-          {/* Row for Charts */}
           {showChart && (
-            <tr className="bg-[#F7FAFF] w-full ">
-              {uniqueMetadata.map((col, index) => (
-                <td
-                  key={`${col.key}-${index}`}
-                  className="border-[1px] border-gray-500 k w-[210px] overflow-hidden whitespace-nowrap"
-                >
-                  {renderChart(col)}{" "}
-                  {/* Render the chart based on the column data */}
-                </td>
-              ))}
+            <tr className="bg-[#F7FAFF] ">
+              {headers.map((header, index) => {
+                const columnMetadata = uniqueMetadata.find(
+                  (col) => col.name === header
+                ) as any;
+                
+                return (
+                  <td
+                    key={`${header}-${index}`}
+                    className="border-gray-500 border-[1px] w-[210px] h-[149px] "
+                  >
+                    {columnMetadata
+                      ? renderChart(columnMetadata) // Dynamically render chart for this column
+                      : "No Chart"}
+                  </td>
+                );
+              })}
             </tr>
           )}
         </thead>
@@ -355,15 +297,6 @@ const Table: React.FC<TableProps> = ({
           })}
         </tbody>
       </table>
-      {/* Sidebar */}
-      {showSidebar && selectedData && (
-        <Analysis
-          selectedData={selectedData}
-          onClose={closeSidebar}
-          metadata={metadata}
-          renderChart={renderChart}
-        />
-      )}
     </div>
   );
 };
