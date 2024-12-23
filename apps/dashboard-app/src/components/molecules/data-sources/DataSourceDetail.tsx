@@ -8,6 +8,7 @@ import request from "@/src/utils/helper";
 import { useNavigate, useParams } from "react-router-dom";
 import Spinner from "../loading/Spinner";
 import DeleteProjectModal from "../modals/DeleteProjectModal";
+import { API_ENDPOINTS } from "@/src/utils/const/apiEndpoint";
 interface ProjectFile {
   _id: string;
   filename: string;
@@ -33,7 +34,7 @@ const DataSourceDetail: React.FC = () => {
   const handleDeleteFile = async (fileId: string) => {
     try {
       await request({
-        url: `http://3.24.110.41:8000/api/v1/project/${projectId}/file/${fileId}/delete/`,
+        url: `${API_ENDPOINTS.API_URL}/project/${projectId}/file/${fileId}/delete/`,
         method: "DELETE",
       });
       console.log("File deleted successfully");
@@ -51,12 +52,6 @@ const DataSourceDetail: React.FC = () => {
     setIsDeleteConfirmationOpen(true);
   };
 
-  // Handle Confirm Delete
-  // const handleConfirmDelete = () => {
-  //   handleDeleteFile();
-  //   setIsDeleteConfirmationOpen(false);
-  // };
-
   // Handle Close Delete Confirmation
   const handleCloseDeleteConfirmation = () => {
     setIsDeleteConfirmationOpen(false);
@@ -72,7 +67,7 @@ const DataSourceDetail: React.FC = () => {
 
       try {
         const response = await request({
-          url: `http://3.24.110.41:8000/api/v1/projects/${projectId}/files/`,
+          url: `${API_ENDPOINTS.API_URL}/projects/${projectId}/files/`,
           method: "GET",
         });
 

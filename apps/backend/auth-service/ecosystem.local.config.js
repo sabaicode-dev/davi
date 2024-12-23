@@ -1,8 +1,10 @@
+// apps/backend/auth-service/ecosystem.local.config.js
+
 module.exports = {
   apps: [
     {
       name: "auth-service",
-      script: "./build/server.js",
+      script: "./build/server.js", // Path already correct
       instances: 1,
       autorestart: true,
       watch: true,

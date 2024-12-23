@@ -8,6 +8,9 @@ import Boolean from "../charts/Boolean";
 import CategoryBig from "../charts/CatagoryBig";
 import UniqueValueBig from "../charts/UniqueValueBig";
 import BooleanBig from "../charts/BooleanBig";
+import Category from "../charts/Catagory";
+import Number from "../charts/Number";
+import UniqueValue from "../charts/UniqueValue";
 
 // Define ChartMetadata type
 type ChartMetadata = {
@@ -28,26 +31,26 @@ type AnalysisProps = {
   } | null;
   onClose: () => void;
   metadata: ChartMetadata[];
-  renderChart?: (col: ChartMetadata) => JSX.Element | null;
+  // renderChart?: (col: ChartMetadata) => JSX.Element | null;
 };
 
 // Chart type configuration
 const chartTypes = [
   {
     type: "Number",
-    component: NumberBig,
+    component: Number,
   },
   {
     type: "Category",
-    component: CategoryBig,
+    component: Category,
   },
   {
     type: "Boolean",
-    component: BooleanBig,
+    component: Boolean,
   },
   {
     type: "UniqueValue",
-    component: UniqueValueBig,
+    component: UniqueValue,
   },
 ];
 
@@ -106,44 +109,63 @@ const Analysis: React.FC<AnalysisProps> = ({
   };
 
   // Do not render if no data is selected
-  if (!selectedData) return null;
+  if (!selectedData) {
+    return <div>No data selected.</div>;
+  }
+
+  switch (selectedData.type) {
+    case "Number":
+      // Render analysis for number data
+      break;
+    case "Boolean":
+      // Render analysis for boolean data
+      break;
+    case "Category":
+      // Render analysis for category data
+      break;
+    case "UniqueValue":
+      // Render analysis for unique value data
+      break;
+    default:
+      return <div>No analysis available for the selected data.</div>;
+  }
 
   // Find matching metadata for the selected data
   const matchingMetadata = metadata.find(
-    (meta) => meta.type === selectedData.type
+    (meta) =>
+      meta.key === selectedData.category && meta.type === selectedData.type
   );
+
+  if (!matchingMetadata) {
+    return (
+      <div>
+        No metadata found for the selected data type: {selectedData.type}.
+      </div>
+    );
+  }
 
   // Check if matchingMetadata exists and handle the data appropriately
   const chartData = matchingMetadata?.data ? matchingMetadata.data : [];
 
   // Ensure the data is in the correct format (e.g., array of numbers)
-  const transformedData = Array.isArray(chartData)
-  ? chartData.map((item) => {
-      if (activeChartType === "Number") {
-        return typeof item === "number" ? item : 0;
-      } else if (activeChartType === "Category") {
-        return item;
-      } else if (activeChartType === "Boolean") {
-        if (activeChartType === "Boolean") {
-          return item === "true" || item === 1; // Ensure boolean values are handled
-        }
-        // other chart type logic
-        return item;
-      } else if (activeChartType === "UniqueValue") {
-        return item;
-      }
-      return 0;
-    })
-  : [];
-
+  const transformedData =
+    activeChartType === "Number"
+      ? matchingMetadata?.data || [] // Array of numbers
+      : activeChartType === "Boolean"
+      ? matchingMetadata?.data || { true: 0, false: 0 } // Object with true/false keys
+      : activeChartType === "Category"
+      ? matchingMetadata?.data || [] // Array of category objects
+      : activeChartType === "UniqueValue"
+      ? { value: matchingMetadata?.value, total: matchingMetadata?.total }
+      : [];
 
   // Find the active chart configuration
   const ActiveChartConfig = chartTypes.find(
     (chart) => chart.type === activeChartType
   );
   const booleanData = {
-    true: 120,  // Example count for true
-    false: 30,  // Example count for false
+    true: 120, // Example count for true
+    false: 30, // Example count for false
   };
   return (
     <div
@@ -219,7 +241,7 @@ const Analysis: React.FC<AnalysisProps> = ({
       <div className="mt-5">
         <h3 className="text-lg font-medium mb-3">Distribution</h3>
 
-        {ActiveChartConfig ? (
+        {/* {ActiveChartConfig ? (
           <ActiveChartConfig.component
             data={transformedData} // Pass transformed data to the chart
             labels={matchingMetadata?.labels || []} // Pass labels if available
@@ -228,7 +250,7 @@ const Analysis: React.FC<AnalysisProps> = ({
           <p className="text-gray-500 text-center">
             No chart available for this data type.
           </p>
-        )}
+        )} */}
       </div>
     </div>
   );

@@ -13,10 +13,19 @@ export class UserController extends Controller {
   public async getMe(
     @Request() req: express.Request,
     @Res() errorResponse: TsoaResponse<401 | 500, { error: string }>
-  ): Promise<{ username: string; email: string; createdAt: string }> {
+  ): Promise<{
+    username: string;
+    email: string;
+    createdAt: string;
+    profile: string;
+  }> {
     try {
+      // Log cookies in the request
+      // console.log("Cookies in request:", req.cookies);
+
       // Extract cognitoUserId from cookies
       const cognitoUserId = req.cookies["cognitoUserId"];
+      // const cognitoUserId = "a92e3448-80d1-7067-c67e-823c00f22437";
       if (!cognitoUserId) {
         console.error("cognitoUserId cookie not found");
         return errorResponse(401, {
@@ -28,6 +37,7 @@ export class UserController extends Controller {
 
       // Fetch the user by cognitoUserId here
       const user = await UserRepository.getUserByCognitoId(cognitoUserId);
+
       if (!user) {
         console.error(`No user found for cognitoUserId: ${cognitoUserId}`);
         return errorResponse(401, { error: "User not found." });
@@ -40,11 +50,15 @@ export class UserController extends Controller {
         ? new Date(user.createdAt).toLocaleDateString() // Convert to string if it's a Date
         : "Invalid Date";
 
+      // Provide a default profile URL if it's undefined
+      const profileUrl = user.profile || "Unknow";
+
       // Return user profile
       return {
         username: user.username,
         email: user.email,
         createdAt: formattedCreatedAt,
+        profile: profileUrl,
       };
     } catch (error) {
       console.error("Error in /v1/auth/me:", error);

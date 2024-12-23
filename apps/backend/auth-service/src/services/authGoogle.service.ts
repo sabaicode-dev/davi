@@ -1,17 +1,15 @@
 import { URLSearchParams } from "url";
-import dotenv from "dotenv";
-import path from "path";
 import axios from "axios";
+import chalk from "chalk";
+import configs from "../config";
 
-// Load environment variables from .env file
-dotenv.config({ path: path.resolve(__dirname, "../configs/.env.development") });
+const AWS_COGNITO_DOMAIN = configs.awsCognitoDomain;
+const AWS_COGNITO_CLIENT_ID = configs.awsCognitoClientId;
+const AWS_COGNITO_CLIENT_SECRET = configs.awsCognitoClientSecret;
+const AWS_REDIRECT_URI = configs.awsRedirectUri;
+const NODE_ENV = configs.env;
 
-const {
-  AWS_COGNITO_DOMAIN,
-  AWS_COGNITO_CLIENT_ID,
-  AWS_COGNITO_CLIENT_SECRET,
-  AWS_REDIRECT_URI,
-} = process.env;
+console.log(chalk.red(`======== Using for ${NODE_ENV} Google==========`));
 
 console.log(`AWS_COGNITO_DOMAIN : ${AWS_COGNITO_DOMAIN}`);
 console.log(`AWS_COGNITO_CLIENT_ID : ${AWS_COGNITO_CLIENT_ID}`);
@@ -36,7 +34,7 @@ export const googleSignIn = (): string => {
     redirect_uri: AWS_REDIRECT_URI as string,
     state: state,
     identity_provider: "Google",
-    scope: "openid profile email",
+    scope: "openid profile email aws.cognito.signin.user.admin",
   });
 
   return `${AWS_COGNITO_DOMAIN}/oauth2/authorize?${authorizeParams.toString()}`;

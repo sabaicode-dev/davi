@@ -1,6 +1,6 @@
 import React from "react";
 
-type DataItem = { category: string };
+type DataItem = { category: string; value: number };
 type ProcessedDataItem = {
   category: string;
   count: number;
@@ -8,41 +8,35 @@ type ProcessedDataItem = {
 };
 
 type CategoryProps = {
-  data: DataItem[]; // Raw data for processing
-  title?: string; // Optional title for the component
-  onClick: (item: { category: string; percentage: number }) => void; // Callback for clicks
+  data: DataItem[];
+  title?: string;
+  type?: string;
+  onClick: (item: ProcessedDataItem) => void;
 };
 
-// Process data to find top 2 categories and group the rest as "Other"
 const processData = (data: DataItem[]): ProcessedDataItem[] => {
-  const categoryCount = data.reduce<Record<string, number>>(
-    (acc, { category }) => ({ ...acc, [category]: (acc[category] || 0) + 1 }),
-    {}
-  );
+  const totalCount = data.reduce((sum, item) => sum + item.value, 0);
 
-  const sortedCategories = Object.entries(categoryCount).sort(
-    ([, a], [, b]) => b - a
-  );
+  const sortedData = [...data].sort((a, b) => b.value - a.value);
 
-  const topCategories = sortedCategories
-    .slice(0, 2)
-    .map(([category, count]) => ({
-      category,
-      count,
-      percentage: 0,
-    }));
+  const topCategories = sortedData.slice(0, 2).map((item) => ({
+    category: item.category,
+    count: item.value,
+    percentage: 0,
+  }));
 
-  const othersCount = sortedCategories
+  const othersCount = sortedData
     .slice(2)
-    .reduce((sum, [, count]) => sum + count, 0);
-  if (othersCount)
+    .reduce((sum, item) => sum + item.value, 0);
+
+  if (othersCount) {
     topCategories.push({
       category: "Other+",
       count: othersCount,
       percentage: 0,
     });
+  }
 
-  const totalCount = data.length;
   topCategories.forEach(
     (item) => (item.percentage = +((item.count / totalCount) * 100).toFixed(1))
   );
@@ -52,24 +46,22 @@ const processData = (data: DataItem[]): ProcessedDataItem[] => {
 
 const Category: React.FC<CategoryProps> = ({
   data,
-  title = "Category",
+  type = "Category",
   onClick,
 }) => {
   const processedData = processData(data);
 
-  // Calculate the top item to trigger `onClick` for the entire component
-  // Calculate the top item to trigger `onClick` for the entire component
   const topItem = processedData[0] || { category: "", percentage: 0 };
 
   return (
     <div
       className="relative w-[210px] h-[149px] bg-white rounded-sm shadow-md p-2 flex flex-col justify-center cursor-pointer"
-      onClick={() => onClick(topItem)} // Trigger onClick with the top item
+      onClick={() => onClick(topItem)}
     >
       {/* Title */}
       <div className="absolute top-2 left-2">
         <div className="text-green-800 text-xs bg-green-100 px-2 py-1 rounded">
-          {title}
+          {`${type}`}
         </div>
       </div>
 
@@ -78,8 +70,12 @@ const Category: React.FC<CategoryProps> = ({
         {processedData.map((item, index) => (
           <div key={index} className="flex flex-col space-y-1">
             <div className="flex justify-between text-xs">
-              <span>{item.category}</span>
-              <span>{item.percentage.toFixed(2)}%</span>
+              <span title={item.category}>
+                {item.category.length > 10
+                  ? `${item.category.substring(0, 10)}...`
+                  : item.category}
+              </span>
+              <span>{item.percentage.toFixed(1)}%</span>
             </div>
             <div className="w-full h-2 bg-slate-200 rounded-full">
               <div

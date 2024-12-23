@@ -3,27 +3,36 @@ import {
   SignUpCommand,
   AdminInitiateAuthCommand,
   ConfirmSignUpCommand,
-  RevokeTokenCommand,
+  // RevokeTokenCommand,
   ResendConfirmationCodeCommand,
+  GlobalSignOutCommandInput,
+  GlobalSignOutCommand,
 } from "@aws-sdk/client-cognito-identity-provider";
 import * as crypto from "crypto";
-import dotenv from "dotenv";
 import UserRepository from "../database/repositories/user.repository"; // Import the repository
-import path from "path";
+import configs from "../config";
+import chalk from "chalk";
 
-// Specify the path to your .env file
-const env = process.env.NODE_ENV || "development";
-const envPath =
-  env === "production"
-    ? path.resolve(__dirname, `./configs/.env.${env}`)
-    : path.resolve(__dirname, `../configs/.env.${env}`);
+// call config env url
+const AWS_COGNITO_REGION = configs.awsCognitoRegion;
+const AWS_COGNITO_CLIENT_ID = configs.awsCognitoClientId;
+const AWS_COGNITO_CLIENT_SECRET = configs.awsCognitoClientSecret;
+const AWS_COGNITO_USER_POOL_ID = configs.awsCognitoUserPoolId;
+const NODE_ENV = configs.env;
 
-dotenv.config({ path: envPath });
+console.log(chalk.red(`======== Using for ${NODE_ENV} Email==========`));
+
+console.log(`AWS_COGNITO_REGION : ${AWS_COGNITO_REGION}`);
+console.log(`AWS_COGNITO_CLIENT_ID : ${AWS_COGNITO_CLIENT_ID}`);
+console.log(`AWS_COGNITO_CLIENT_SECRET : ${AWS_COGNITO_CLIENT_SECRET}`);
+console.log(`AWS_COGNITO_USER_POOL_ID : ${AWS_COGNITO_USER_POOL_ID}`);
 
 // Initialize Cognito client
 const cognitoClient = new CognitoIdentityProviderClient({
-  region: process.env.AWS_COGNITO_REGION,
+  region: AWS_COGNITO_REGION,
 });
+
+console.log(chalk.red(AWS_COGNITO_REGION));
 
 // Helper function to generate the secret hash
 const generateSecretHash = (
@@ -40,12 +49,18 @@ const generateSecretHash = (
 export const signUpUser = async (
   username: string,
   email: string,
-  password: string
+  password: string,
+  profile: string
 ) => {
   try {
-    const clientId = process.env.AWS_COGNITO_CLIENT_ID!;
-    const clientSecret = process.env.AWS_COGNITO_CLIENT_SECRET!;
+    const clientId = AWS_COGNITO_CLIENT_ID!;
+    const clientSecret = AWS_COGNITO_CLIENT_SECRET!;
     const secretHash = generateSecretHash(email, clientId, clientSecret);
+
+    console.log(chalk.red(`==== for signUpUser ====`));
+    console.log(`clientId ::: ${clientId}`);
+    console.log(`clientSecret ::: ${clientSecret}`);
+    console.log(`secretHash ::: ${secretHash}`);
 
     const command = new SignUpCommand({
       ClientId: clientId,
@@ -61,7 +76,13 @@ export const signUpUser = async (
     const response = await cognitoClient.send(command);
 
     if (response.UserSub) {
-      await UserRepository.createUser(username, email, response.UserSub, false);
+      await UserRepository.createUser(
+        username,
+        email,
+        response.UserSub,
+        profile,
+        false
+      );
     }
 
     // Return relevant data or result
@@ -83,13 +104,18 @@ export const signUpUser = async (
 // Function to sign in an existing user
 export const signInUser = async (email: string, password: string) => {
   try {
-    const clientId = process.env.AWS_COGNITO_CLIENT_ID!;
-    const clientSecret = process.env.AWS_COGNITO_CLIENT_SECRET!;
+    const clientId = AWS_COGNITO_CLIENT_ID!;
+    const clientSecret = AWS_COGNITO_CLIENT_SECRET!;
     const secretHash = generateSecretHash(email, clientId, clientSecret);
+
+    console.log(chalk.red(`==== for signInUser ====`));
+    console.log(`clientId ::: ${clientId}`);
+    console.log(`clientSecret ::: ${clientSecret}`);
+    console.log(`secretHash ::: ${secretHash}`);
 
     const command = new AdminInitiateAuthCommand({
       AuthFlow: "ADMIN_NO_SRP_AUTH",
-      UserPoolId: process.env.AWS_COGNITO_USER_POOL_ID!,
+      UserPoolId: AWS_COGNITO_USER_POOL_ID!,
       ClientId: clientId,
       AuthParameters: {
         USERNAME: email,
@@ -114,9 +140,14 @@ export const confirmSignUp = async (
   confirmationCode: string
 ) => {
   try {
-    const clientId = process.env.AWS_COGNITO_CLIENT_ID!;
-    const clientSecret = process.env.AWS_COGNITO_CLIENT_SECRET!;
+    const clientId = AWS_COGNITO_CLIENT_ID!;
+    const clientSecret = AWS_COGNITO_CLIENT_SECRET!;
     const secretHash = generateSecretHash(email, clientId, clientSecret);
+
+    console.log(chalk.red(`==== for confirmSignUp ====`));
+    console.log(`clientId ::: ${clientId}`);
+    console.log(`clientSecret ::: ${clientSecret}`);
+    console.log(`secretHash ::: ${secretHash}`);
 
     const command = new ConfirmSignUpCommand({
       ClientId: clientId,
@@ -148,8 +179,15 @@ export const confirmSignUp = async (
 // Function to resend the confirmation code
 export const resendConfirmationCode = async (email: string) => {
   try {
-    const clientId = process.env.AWS_COGNITO_CLIENT_ID!;
-    const clientSecret = process.env.AWS_COGNITO_CLIENT_SECRET!;
+    const clientId = AWS_COGNITO_CLIENT_ID!;
+    const clientSecret = AWS_COGNITO_CLIENT_SECRET!;
+    // Generate the secret hash
+    const secretHash = generateSecretHash(email, clientId, clientSecret);
+
+    console.log(chalk.red(`==== for resendConfirmationCode ====`));
+    console.log(`clientId ::: ${clientId}`);
+    console.log(`clientSecret ::: ${clientSecret}`);
+    console.log(`secretHash ::: ${secretHash}`);
 
     // Check cooldown period
     const lastSentAt = await UserRepository.getLastConfirmationTimestamp(email);
@@ -157,9 +195,6 @@ export const resendConfirmationCode = async (email: string) => {
     if (lastSentAt && currentTime - lastSentAt < RESEND_CODE_LIMIT_MS) {
       throw new Error("Please wait before requesting a new confirmation code.");
     }
-
-    // Generate the secret hash
-    const secretHash = generateSecretHash(email, clientId, clientSecret);
 
     // Create and send the ResendConfirmationCode command with the SECRET_HASH
     const command = new ResendConfirmationCodeCommand({
@@ -181,19 +216,45 @@ export const resendConfirmationCode = async (email: string) => {
 };
 
 // Function to log out a user by revoking their refresh token
-export const logoutUser = async (refreshToken: string) => {
+export const logoutUser = async ({
+  // refreshToken,
+  accessToken,
+}: {
+  accessToken: string;
+}) => {
   try {
-    const clientId = process.env.AWS_COGNITO_CLIENT_ID!;
-    const clientSecret = process.env.AWS_COGNITO_CLIENT_SECRET!;
+    const clientId = AWS_COGNITO_CLIENT_ID!;
+    const clientSecret = AWS_COGNITO_CLIENT_SECRET!;
 
-    const command = new RevokeTokenCommand({
-      ClientId: clientId,
-      Token: refreshToken,
-      ClientSecret: clientSecret,
-    });
+    console.log(chalk.red(`==== for logoutUser ====`));
+    console.log(`clientId ::: ${clientId}`);
+    console.log(`clientSecret ::: ${clientSecret}`);
+    // console.log(`cognitoUserId ::: ${cognitoUserId}`);
 
-    const response = await cognitoClient.send(command);
-    return { message: "Token revoked successfully", response };
+    // Revoke the refresh token
+    // const revokeRefreshTokenCommand = new RevokeTokenCommand({
+    //   ClientId: clientId,
+    //   Token: refreshToken,
+    //   ClientSecret: clientSecret,
+    // });
+
+    // const revokeResponse = await cognitoClient.send(revokeRefreshTokenCommand);
+
+    const params: GlobalSignOutCommandInput = {
+      AccessToken: accessToken,
+    };
+    const command = new GlobalSignOutCommand(params);
+    await cognitoClient.send(command);
+
+    // Optionally, invalidate accessToken and idToken (if required)
+    // console.log(
+    //   `Revoked refresh token response: ${JSON.stringify(revokeResponse)}`
+    // );
+
+    return {
+      message: "All tokens cleared successfully",
+      // response: revokeResponse,
+    };
   } catch (error: any) {
     console.error(
       "Error logging out user (revoking token failed):",

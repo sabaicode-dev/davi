@@ -11,6 +11,10 @@ import {
   SignInRequest,
   SignUpRequest,
 } from "./types/authEmail.type";
+import {
+  checkEmailExists,
+  checkIfUserExistsInDb,
+} from "../utils/constants/checkGmailCognito";
 
 @Route("/v1/auth") // Define the base route for the controller
 @Tags("Email Integrate AWS Cognito")
@@ -23,9 +27,43 @@ export class CognitoController extends Controller {
   public async signUp(
     @Body() requestBody: SignUpRequest
   ): Promise<{ message: string; result: any }> {
-    const { username, email, password } = requestBody;
+    const default_profile =
+      "https://img.freepik.com/premium-vector/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-vector-illustration_561158-3407.jpg";
+
+    const {
+      username,
+      email,
+      password,
+      profile = default_profile,
+    } = requestBody;
+
     try {
-      const result = await signUpUser(username, email, password);
+      // step save to db
+      console.log(`requestBody::::`, requestBody);
+      console.log("step 0");
+      // Step 1: Check if the email exists in the database
+      const dbExists = await checkIfUserExistsInDb(email); // Check the DB for existing user
+      if (dbExists) {
+        console.log("1. User exists in the database");
+        this.setStatus(409); // Conflict, because user exists in the DB
+        return {
+          message: "2. User already exists. Please try logging in.",
+          result: {},
+        };
+      }
+
+      // Step 2: Check if the email exists in Cognito
+      const cognitoExists = await checkEmailExists(email); // Check AWS Cognito for the email
+      if (cognitoExists) {
+        console.log("3. User exists in Cognito");
+        this.setStatus(409); // Conflict, because email exists in Cognito
+        return { message: "4. Email already exists in Cognito.", result: {} };
+      }
+
+      const result = await signUpUser(username, email, password, profile);
+
+      console.log("step 5");
+
       this.setStatus(200); // Set the response status code to 201 (Created)
       return { message: result.message, result: result }; // Ensure we always return 'result' in case of success
     } catch (error: any) {
