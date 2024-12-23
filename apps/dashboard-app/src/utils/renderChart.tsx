@@ -5,37 +5,45 @@ import UniqueValue from "../components/molecules/charts/UniqueValue";
 type DataItem = { category: string; value: number };
 
 interface ColumnMetadata {
-    key: string;
-    name: string;
-    description?: string;
-    table_column_info: {
-      type: "STRING" | "NUMERIC" | "BOOLEAN" | "HISTOGRAM";
-      order?: number; // Optional
-      original_type?: string; // Made optional
-      extended_type: string;
+  key: string;
+  name: string;
+  description?: string;
+  table_column_info: {
+    type: "STRING" | "NUMERIC" | "BOOLEAN" | "HISTOGRAM";
+    order?: number;
+    original_type?: string;
+    extended_type: string;
+  };
+  table_column_metrics: {
+    total_count?: number;
+    non_null_count?: number;
+    valid_count?: number;
+    string_metrics?: {
+      counts: { key: string; value: number }[];
+      most_common_value?: string;
+      most_common_value_count?: number;
+      unique_value_count?: number;
     };
-    table_column_metrics: {
-      total_count?: number;
-      non_null_count?: number;
-      valid_count?: number;
-      string_metrics?: {
-        counts: { key: string; value: number }[];
-        most_common_value?: string;
-        most_common_value_count?: number;
-        unique_value_count?: number;
-      };
-      numeric_metrics?: {
-        histogram: { range: string; count: number }[];
-      };
-      boolean_metrics?: {
-        true_count: number;
-        false_count: number;
-      };
+    numeric_metrics?: {
+      histogram: { range: string; count: number }[];
     };
-  }
-  
+    boolean_metrics?: {
+      true_count: number;
+      false_count: number;
+    };
+  };
+}
 
-export const renderChart = (columnMetadata: ColumnMetadata): JSX.Element | null => {
+interface ChartSelectionData {
+  category: string;
+  percentage: number;
+  type: string;
+}
+
+export const renderChart = (
+  columnMetadata: ColumnMetadata,
+  onChartSelect?: (metadata: ColumnMetadata, chartData: ChartSelectionData) => void
+): JSX.Element | null => {
   const { table_column_info, table_column_metrics, name } = columnMetadata;
 
   if (!table_column_info || !table_column_info.type) {
@@ -64,12 +72,15 @@ export const renderChart = (columnMetadata: ColumnMetadata): JSX.Element | null 
           <UniqueValue
             uniqueValueCount={uniqueValueCount}
             totalCount={totalCount}
-            onClick={() =>
-              console.log("UniqueValue clicked:", {
-                uniqueValueCount,
-                percentage: mostCommonValuePercentage.toFixed(2),
-              })
-            }
+            onClick={() => {
+              if (onChartSelect) {
+                onChartSelect(columnMetadata, {
+                  category: name,
+                  percentage: mostCommonValuePercentage,
+                  type: "UniqueValue"
+                });
+              }
+            }}
           />
         );
       }
@@ -85,12 +96,15 @@ export const renderChart = (columnMetadata: ColumnMetadata): JSX.Element | null 
           }
           title={name || "Category"}
           type={type}
-          onClick={(item) =>
-            console.log("Category clicked:", {
-              category: item.category,
-              percentage: item.percentage,
-            })
-          }
+          onClick={(item) => {
+            if (onChartSelect) {
+              onChartSelect(columnMetadata, {
+                category: item.category,
+                percentage: item.percentage,
+                type: "STRING"
+              });
+            }
+          }}
         />
       );
     }
@@ -99,12 +113,4 @@ export const renderChart = (columnMetadata: ColumnMetadata): JSX.Element | null 
       console.warn("Unsupported chart type:", type);
       return <p>No Chart</p>;
   }
-};
-
-// Process data to transform key-value pairs into category-value pairs
-const processData = (data: { key: string; value: number }[]): DataItem[] => {
-  return data.map((item) => ({
-    category: item.key,
-    value: item.value,
-  }));
 };

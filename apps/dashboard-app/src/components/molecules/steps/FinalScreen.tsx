@@ -75,6 +75,13 @@ const FinalScreen: React.FC = () => {
     setFileDetails(details);
   };
 
+
+  const [selectedAnalysis, setSelectedAnalysis] = useState<{
+    category: string;
+    percentage: number;
+    type: string;
+  } | null>(null);
+
   // Fetch data when component mounts or when params change
   useEffect(() => {
     if (projectId && fileId) {
@@ -280,6 +287,20 @@ const FinalScreen: React.FC = () => {
 
   if (error) return <div className="p-4 text-red-500">Error: {error}</div>;
 
+  const handleChartSelection = (columnMetadata: any, chartData: any) => {
+    setSelectedAnalysis({
+      category: columnMetadata.name,
+      percentage: chartData.percentage || 0,
+      type: columnMetadata.type
+    });
+  };
+
+  // Add handler for closing analysis
+  const handleCloseAnalysis = () => {
+    setSelectedAnalysis(null);
+  };
+
+
   return (
     <div
       className="flex flex-col overflow-hidden mt-8 h-[200px]"
@@ -387,9 +408,19 @@ const FinalScreen: React.FC = () => {
             onColumnSelect={handleColumnSelection}
             isFullHeight={true}
             showChart={true}
+            onChartSelect={handleChartSelection}
           />
         </div>
       </div>
+
+      {/* Analysis sidebar */}
+      {selectedAnalysis && (
+          <Analysis
+            selectedData={selectedAnalysis}
+            onClose={handleCloseAnalysis}
+            metadata={metadata}
+          />
+        )}
 
       {showRightSide && (
         <RightSide
@@ -399,6 +430,7 @@ const FinalScreen: React.FC = () => {
           onClose={handleCloseRightSide}
         />
       )}
+
   
       {/* Popup */}
       {showPopup && (
@@ -433,7 +465,9 @@ const FinalScreen: React.FC = () => {
           </div>
         </div>
       )}
+      
     </div>
+    
   );
 };
 

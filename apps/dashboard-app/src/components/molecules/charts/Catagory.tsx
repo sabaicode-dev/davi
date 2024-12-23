@@ -46,7 +46,6 @@ const processData = (data: DataItem[]): ProcessedDataItem[] => {
 
 const Category: React.FC<CategoryProps> = ({
   data,
-  title = "Category",
   type = "Category",
   onClick,
 }) => {

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { renderChart } from "@/src/utils/renderChart";
+import Category from "../charts/Catagory";
 
 interface TableProps {
   headers: string[];
@@ -8,6 +9,7 @@ interface TableProps {
   isCheckBox?: boolean;
   isEditCell?: boolean;
   showChart?: boolean;
+  onChartSelect?: (columnMetadata: any, chartData: any) => void; 
   isSelectColumn?: boolean;
   onSaveCell?: (
     rowId: string | number,
@@ -182,6 +184,7 @@ const Table: React.FC<TableProps> = ({
   const deduplicatedMetadata = Array.from(
     new Map(metadata.map((item) => [item.key, item])).values()
   );
+
 
   return (
     <div
