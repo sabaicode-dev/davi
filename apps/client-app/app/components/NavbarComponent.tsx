@@ -7,10 +7,10 @@ import { MenuList, MenuListPhone } from "./menu";
 import { usePathname } from "next/navigation";
 
 // Importing icons from react-icons
-import { AiOutlineHome, AiOutlineAppstore, AiOutlineDollarCircle, AiOutlineLogin, AiOutlineUserAdd } from "react-icons/ai";
+import { AiOutlineHome, AiOutlineAppstore, AiOutlineDollarCircle } from "react-icons/ai";
 
 // Define type for menu items to match with icon keys
-type MenuItemName = "Service" | "Resource" | "Pricing" | "Login" | "Sign Up";
+type MenuItemName = "Service" | "Resource" | "Pricing";
 
 export default function NavbarComponent() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -38,8 +38,6 @@ export default function NavbarComponent() {
     Service: <AiOutlineAppstore />,
     Resource: <AiOutlineHome />,
     Pricing: <AiOutlineDollarCircle />,
-    Login: <AiOutlineLogin />,
-    "Sign Up": <AiOutlineUserAdd />,
   };
 
   return (
@@ -64,7 +62,7 @@ export default function NavbarComponent() {
           </div>
         </div>
         {/* Navigation Links */}
-        <div className="hidden md:flex space-x-8">
+        <div className="hidden md:flex space-x-9">
           {MenuList.map((item, index) => (
             <Link
               key={index}
@@ -78,22 +76,6 @@ export default function NavbarComponent() {
               {item.name}
             </Link>
           ))}
-        </div>
-        {/* Action Buttons */}
-        <div className="hidden md:flex items-center space-x-4">
-          <Link
-            href="/login"
-            className="text-white hover:text-gray-200 font-medium"
-          >
-            Login
-          </Link>
-          <span className="text-white">|</span>
-          <Link
-            href="/signup"
-            className="text-white hover:text-gray-200 font-medium"
-          >
-            Sign Up
-          </Link>
         </div>
         {/* Hamburger Menu for Mobile */}
         <div className="md:hidden">

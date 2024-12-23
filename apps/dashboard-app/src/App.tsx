@@ -12,9 +12,10 @@ import Project from "@/src/components/pages/Project";
 import { AuthProvider } from "@/src/contexts/AuthContext";
 import ShowProject from "@/src/components/molecules/steps/ShowProject";
 import ProjectDetail from "@/src/components/molecules/project/ProjectDetail";
-import FinalScreen from "@/src/components/molecules/steps/FinalScreen";
-import CleaningProject from "@/src/components/molecules/steps/CleaningProject";
-import PrivateRoute from "@/src/ProtectedRoute/PrivateRoute";
+import FinalScreen from "./components/molecules/steps/FinalScreen";
+import CleaningProject from "./components/molecules/steps/CleaningProject";
+import PrivateRoute from "./ProtectedRoute/PrivateRoute";
+import SelectTable from "./components/molecules/steps/selectTable";
 
 const ProjectFlow = () => {
   return (
@@ -29,7 +30,8 @@ const ProjectFlow = () => {
     </Routes>
   );
 };
-
+// project/projectId/pick-datasource/import/
+// http://localhost:8080/project/pick-datasource/import/6752655b6b20191452f44cb4
 const routes = [
   {
     path: "/",
@@ -38,6 +40,10 @@ const routes = [
   { path: "/project", element: <Project /> },
   { path: "/project/create", element: <CreateProject /> },
   { path: "/project/:projectId", element: <ProjectDetail /> },
+  {
+    path: "/project/:projectId/pick-datasource/import/selectTable",
+    element: <SelectTable />,
+  },
   { path: "/select-project", element: <ShowProject /> },
   { path: "/project/*", element: <ProjectFlow /> },
   { path: "/project/create/pick-datasource", element: <PickDataSource /> },
@@ -51,9 +57,15 @@ const routes = [
     path: "/project/:projectId/file/:fileId/cleaning",
     element: <CleaningProject />,
   },
-  { path: "/project/:projectId/file/:fileId/finalscreen", element: <FinalScreen/> },
+  {
+    path: "/project/:projectId/file/:fileId/finalscreen",
+    element: <FinalScreen />,
+  },
+  {
+    path: "/project/:projectId/file/:fileId/finalscreen",
+    element: <FinalScreen />,
+  },
 ];
-
 
 export const App = () => {
   return (

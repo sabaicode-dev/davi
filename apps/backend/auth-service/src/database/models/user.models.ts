@@ -7,6 +7,7 @@ export interface IUser extends Document {
   email: string;
   password?: string; // Optional if not storing locally
   cognitoUserId?: string;
+  profile?: string;
   confirmed: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -19,6 +20,7 @@ const UserSchema: Schema<IUser> = new Schema(
     email: { type: String, required: true, unique: true },
     password: { type: String },
     cognitoUserId: { type: String, unique: true },
+    profile: { type: String },
     confirmed: { type: Boolean, default: false },
     lastConfirmationSentAt: { type: Number },
   },

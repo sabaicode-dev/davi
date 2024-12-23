@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import Logo from "@/public/images/header/logo.png";
-import ProfileUser from "@/public/images/header/roem-reaksmey.jpeg";
 import FileImg from "@/public/images/header/status-up.png";
 import { AiOutlineLogout } from "react-icons/ai";
 import { FiUser } from "react-icons/fi";
@@ -8,10 +7,14 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/src/contexts/AuthContext";
 import { API_ENDPOINTS } from "@/src/utils/const/apiEndpoint";
 
+// const profile =
+//   "https://lh3.googleusercontent.com/a/ACg8ocL_Lr7sprv6IR1-anI0qaEiqeT9p5x5SWA2WVB-c9eBVY0Gu-g=s96-c";
+
 const Header: React.FC = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
-  const { setUsername, username, setEmail, email } = useAuth();
+  const { setUsername, username, setEmail, email, setProfile, profile } =
+    useAuth();
 
   const navigate = useNavigate();
 
@@ -23,42 +26,46 @@ const Header: React.FC = () => {
   const handleLogout = async () => {
     try {
       // Retrieve tokens from localStorage
-      const authToken = localStorage.getItem("authToken");
-      const refreshToken = localStorage.getItem("refreshToken"); // Replace "dummyRefreshToken" with the real token
+      // const authToken = localStorage.getItem("authToken");
+      // const refreshToken = localStorage.getItem("refreshToken"); // Replace "dummyRefreshToken" with the real token
 
       // Check if tokens are available
-      if (!authToken || !refreshToken) {
-        console.warn("No tokens found. Redirecting to login...");
-        window.location.href = "http://localhost:3000/login";
-        return;
-      }
+      // if (!authToken || !refreshToken) {
+      //   console.warn("No tokens found. Redirecting to login...");
+      //   window.location.href = "http://localhost:3000/login";
+      //   return;
+      // }
 
       // Call the logout API with the refresh token
       const response = await fetch(API_ENDPOINTS.SIGN_OUT, {
         method: "PUT",
-        credentials: "include", // Include cookies if necessary
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${authToken}`, // Include authToken in the header
         },
-        body: JSON.stringify({
-          refreshToken, // Send the refreshToken in the body
-        }),
+        credentials: "include",
+        // headers: {
+        //   "Content-Type": "application/json",
+        //   Authorization: `Bearer ${authToken}`, // Include authToken in the header
+        // },
+        // body: JSON.stringify({
+        //   refreshToken, // Send the refreshToken in the body
+        // }),
       });
 
       if (response.ok) {
         console.log("User logged out successfully");
 
         // Clear tokens and user state from the frontend
-        localStorage.removeItem("authToken");
-        localStorage.removeItem("refreshToken");
+        // localStorage.removeItem("authToken");
+        // localStorage.removeItem("refreshToken");
 
         // Clear any additional user-related state (if necessary)
         setUsername && setUsername(null);
         setEmail && setEmail(null);
+        setProfile && setProfile(null);
 
         // Redirect to the login or signup page
-        window.location.href = "http://localhost:3000/login";
+        // window.location.href = "http://localhost:3000/login";
       } else {
         const errorData = await response.json();
         console.error("Failed to log out:", errorData);
@@ -168,7 +175,8 @@ const Header: React.FC = () => {
           onClick={toggleProfileDropdown}
         >
           <img
-            src={ProfileUser}
+            src={profile || undefined}
+            height={200}
             alt="Profile"
             className="size-8 rounded-full"
           />
@@ -197,8 +205,8 @@ const Header: React.FC = () => {
             <div className="flex justify-between items-center pb-2 border-b">
               <div className="flex items-center">
                 <img
-                  src={ProfileUser}
-                  alt="User"
+                  src={profile || undefined}
+                  alt="Profile"
                   className="w-14 h-14 rounded-full"
                 />
                 <div className="ml-3">

@@ -3,6 +3,7 @@ import Logo from "@/public/images/step/step4_pic.png";
 import Button from "@/src/components/atoms/Button";
 import request from "@/src/utils/helper";
 import { useNavigate, useParams } from "react-router-dom";
+import { API_ENDPOINTS } from "@/src/utils/const/apiEndpoint";
 
 interface IImportURL {
   defaultProjectId?: string;
@@ -53,7 +54,7 @@ const ImportUrl: React.FC<IImportURL> = ({ defaultProjectId }) => {
 
     try {
       const response = await request({
-        url: `http://3.24.110.41:8000/api/v1/scrape/url/`,
+        url: `${API_ENDPOINTS.API_URL}/project/${projectId}/scrape/url/`,
         method: "POST",
         data: {
           url,
@@ -65,7 +66,13 @@ const ImportUrl: React.FC<IImportURL> = ({ defaultProjectId }) => {
       if (response.success || response.status === 201) {
         setScrapedData(response.data);
         console.log("Scraped Data:", response.data);
-        navigate("/visualize");
+        // Pass scrapedData via navigate to DisplayTable
+        navigate(`/project/${projectId}/pick-datasource/import/selectTable`, {
+          state: { scrapedData: response.data },
+        });
+        // navigate(`/project/import?projectId=${projectId}`, {
+        //   state: { scrapedData: response.data },
+        // });
       } else {
         setError(response.message || "Failed to scrape the URL.");
       }

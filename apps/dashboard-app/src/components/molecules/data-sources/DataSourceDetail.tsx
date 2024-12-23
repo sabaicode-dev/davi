@@ -7,7 +7,8 @@ import ImageProject from "@/public/images/saveImage.png";
 import request from "@/src/utils/helper";
 import { useNavigate, useParams } from "react-router-dom";
 import Spinner from "../loading/Spinner";
-
+import DeleteProjectModal from "../modals/DeleteProjectModal";
+import { API_ENDPOINTS } from "@/src/utils/const/apiEndpoint";
 interface ProjectFile {
   _id: string;
   filename: string;
@@ -26,6 +27,35 @@ const DataSourceDetail: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] =
+    useState(false);
+  const [fileIdToDelete, setFileIdToDelete] = useState<string | null>(null);
+
+  const handleDeleteFile = async (fileId: string) => {
+    try {
+      await request({
+        url: `${API_ENDPOINTS.API_URL}/project/${projectId}/file/${fileId}/delete/`,
+        method: "DELETE",
+      });
+      console.log("File deleted successfully");
+      // Immediately remove the deleted file from the UI
+      setProjectFiles((prevFiles) =>
+        prevFiles.filter((file) => file._id !== fileId)
+      );
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "An error occurred");
+      console.error("Error Delete file:", error);
+    }
+  };
+  const handleDeleteButtonClick = (fileId: string) => {
+    setFileIdToDelete(fileId); // Store the file ID to delete
+    setIsDeleteConfirmationOpen(true);
+  };
+
+  // Handle Close Delete Confirmation
+  const handleCloseDeleteConfirmation = () => {
+    setIsDeleteConfirmationOpen(false);
+  };
 
   const handleCardClick = (fileId: string) => {
     navigate(`/project/${projectId}/file/${fileId}/cleaning`);
@@ -37,7 +67,7 @@ const DataSourceDetail: React.FC = () => {
 
       try {
         const response = await request({
-          url: `http://3.24.110.41:8000/api/v1/projects/${projectId}/files/`,
+          url: `${API_ENDPOINTS.API_URL}/projects/${projectId}/files/`,
           method: "GET",
         });
 
@@ -59,29 +89,7 @@ const DataSourceDetail: React.FC = () => {
     };
 
     fetchProjectFiles();
-  }, []);
-
-  const handleDeleteFile = async (fileId: string) => {
-    alert("Error url delete file,")
-    return false
-    try {
-      const response = await request({
-        url: `http://3.24.110.41:8000/api/v1/projects/${projectId}/files/${fileId}`,
-        method: "DELETE",
-      });
-
-      if (response.success) {
-        setProjectFiles((prevFiles) =>
-          prevFiles.filter((file) => file._id !== fileId)
-        );
-      } else {
-        throw new Error(response.message || "Failed to delete file");
-      }
-    } catch (err: any) {
-      setError(err.message || "Failed to delete file");
-    }
-  };
-
+  }, [projectId]);
   if (error) {
     return (
       <div className="text-red-500 p-4 bg-red-50 rounded-lg">
@@ -109,7 +117,9 @@ const DataSourceDetail: React.FC = () => {
           projectFiles.map((file, index) => (
             <div
               key={file._id}
-              onClick={() => {handleCardClick(file._id)}}
+              onClick={() => {
+                handleCardClick(file._id);
+              }}
               className="flex justify-between items-center p-2  bg-[#f2f5fd] shadow-lg rounded-md cursor-pointer ring-1 hover:ring-blue-500 transition-all"
             >
               <div className="flex flex-row space-x-16 xl:space-x-6 2xl:space-x-12">
@@ -180,12 +190,20 @@ const DataSourceDetail: React.FC = () => {
                     startContent={
                       <DeleteIcon className="!text-red-500 bg-gray-200 hover:bg-gray-300 duration-150 p-2 w-10 h-10 xl:w-9 xl:h-w-9 2xl:w-10 2xl:h-10 rounded-xl" />
                     }
-                    onClick={() => handleDeleteFile(file._id)}
+                    onClick={() => handleDeleteButtonClick(file._id)}
                     size="small"
                     radius="2xl"
                     color="secondary"
                     isLoading={false}
                     isIconOnly={false}
+                  />
+                  <DeleteProjectModal
+                    isOpen={isDeleteConfirmationOpen}
+                    onClose={handleCloseDeleteConfirmation}
+                    onConfirm={() => {
+                      handleDeleteFile(file._id);
+                      setIsDeleteConfirmationOpen(false);
+                    }}
                   />
                 </div>
               </div>

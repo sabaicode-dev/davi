@@ -9,7 +9,10 @@ import { ShowCleaningModal } from "../modals/ShowCleaningModal";
 import request from "@/src/utils/helper";
 import { PreviewCleaningModal } from "../modals/PreviewCleaningModal";
 import { AutoCleaningModal } from "../modals/AutoCleaningModal";
-
+import axios from "axios";
+import download from "downloadjs";
+import { API_ENDPOINTS } from "@/src/utils/const/apiEndpoint";
+import DeleteProjectModal from "../modals/DeleteProjectModal";
 // Prop descripe the data response from api
 interface ApiResponse {
   count: number;
@@ -36,7 +39,6 @@ interface TableProps {
   total_column?: number;
   filename?: string;
 }
-
 // Define Cleaning project page
 const CleaningProject: React.FC = () => {
   const [fileDetails, setFileDetails] = useState({
@@ -51,7 +53,6 @@ const CleaningProject: React.FC = () => {
   const [isPreviewCleaningModalOpen, setIsPreviewCleaningModalOpen] =
     useState(false);
   const [isAutoCleaningModalOpen, setIsAutoCleaningModalOpen] = useState(false);
-
   const handleOpenShowCleaningModal = () => {
     setIsShowCleaningModalOpen(true);
   };
@@ -106,7 +107,7 @@ const CleaningProject: React.FC = () => {
     duplicateRows: [],
     outliers: {},
   });
-
+  const [filename, setFilename] = useState();
   // Handle useEffect to fetch data to table before take it to cleaning.
   useEffect(() => {
     fetchData();
@@ -121,7 +122,7 @@ const CleaningProject: React.FC = () => {
     try {
       setIsLoading(true);
       const response = await request({
-        url: `http://3.24.110.41:8000/api/v1/project/${projectId}/file/${fileId}/details/`,
+        url: `${API_ENDPOINTS.API_URL}/project/${projectId}/file/${fileId}/details/`,
         method: "GET",
       });
 
@@ -135,7 +136,7 @@ const CleaningProject: React.FC = () => {
           total_column: jsonData.dataset_summary?.total_columns,
           filename: jsonData.filename,
         });
-
+        setFilename(response.data.filename);
         // Debug data
         console.log(response.data.headers);
         console.log(response.data.filename);
@@ -158,7 +159,30 @@ const CleaningProject: React.FC = () => {
       setIsLoading(false);
     }
   };
-
+  const HandleDownLoadFile = async () => {
+    try {
+      const res = await axios.get(
+        `${API_ENDPOINTS.API_URL}/project/${projectId}/file/download/${filename}/`,
+        {
+          responseType: "blob",
+          onDownloadProgress: (ProgressEvent) => {
+            console.log(
+              "Download Progress: " +
+                Math.round(ProgressEvent.loaded / (ProgressEvent.total ?? 1)) *
+                  100
+            ) + "%";
+          },
+        }
+      );
+      console.log(res);
+      const data = res.data as Blob;
+      download(data, filename);
+      console.log("Downloaded");
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "An error occurred");
+      console.error("Error Download file:", error);
+    }
+  };
   const [dataIssues, setDataIssues] = useState({
     outlierValues: 0,
     missingRows: 0,
@@ -186,7 +210,7 @@ const CleaningProject: React.FC = () => {
       setDataIssuesError(null);
 
       const response = await request({
-        url: `http://3.24.110.41:8000/api/v1/project/${projectId}/file/${fileId}/find-anaccurate-file/`,
+        url: `${API_ENDPOINTS.API_URL}/project/${projectId}/file/${fileId}/find-anaccurate-file/`,
         method: "POST",
       });
 
@@ -285,6 +309,7 @@ const CleaningProject: React.FC = () => {
             isLoading={false}
             color="outline"
             startContent={<DownloadIcon />}
+            onClick={() => HandleDownLoadFile()}
           />
         </div>
       </div>
@@ -302,7 +327,7 @@ const CleaningProject: React.FC = () => {
         <div className="relative mt-14">
           {/* Positioning the buttons */}
           <Button
-            children={"Transform v1"}
+            children={"Transform"}
             size="medium"
             radius="2xl"
             isLoading={false}

@@ -1,5 +1,5 @@
 import { TranfromIcon } from "../../atoms/icons/Icon";
-import { X } from "lucide-react";
+import { CircleAlert, X } from "lucide-react";
 import Spinner from "../loading/Spinner";
 
 interface ModalProps {
@@ -15,7 +15,6 @@ interface ModalProps {
     duplicateRows: number;
   };
   onAutoClean?: () => void;
-
 }
 
 export function ShowCleaningModal({
@@ -78,11 +77,33 @@ export function ShowCleaningModal({
 
         {/* Body - modal */}
         <div className="px-20 py-2 space-y-3">
-          {/* outlier value */}
+          {/* Outlier Values */}
           <div className="flex flex-row justify-between items-center">
-            <h2 className="text-lg">Outlier Values:</h2>
+            <h2 className="text-lg flex items-center gap-2">
+              Outlier Values:
+              <div className="relative group">
+                <CircleAlert className="w-4 h-4 text-green-500 cursor-pointer" />
+                <div className="absolute bg-white text-gray-600 text-xs font-medium rounded border shadow-md py-1 px-4 right-1/2 translate-x-1/2 bottom-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 w-[220px] translate-y-[-8px]">
+                  An outlier value is a data point in a dataset that differs
+                  significantly from other observations.
+                  <svg
+                    className="absolute text-gray-100 h-2 w-full left-1/2 -translate-x-1/2 top-full"
+                    x="0px"
+                    y="0px"
+                    viewBox="0 0 255 255"
+                    xmlSpace="preserve"
+                  >
+                    <polygon
+                      className="fill-current"
+                      points="0,0 127.5,127.5 255,0"
+                    />
+                  </svg>
+                </div>
+              </div>
+            </h2>
             <p className="font-bold">{dataIssues.outlierValues}</p>
           </div>
+
           {/* missing row */}
           <div className="flex flex-row justify-between items-center">
             <h2 className="text-lg">Total number of missing rows:</h2>

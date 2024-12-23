@@ -1,6 +1,9 @@
+console.log("config.ts is running...!");
+
 import dotenv from "dotenv";
 import path from "path";
 import Joi from "joi";
+import chalk from "chalk";
 
 // Define a TypeScript type for the configuration
 type Config = {
@@ -18,6 +21,7 @@ type Config = {
   userServiceUrl?: string;
   awsAccessKeyId: string;
   awsSecretAccessKey: string;
+  awsS3BucketName: string;
 };
 
 // Function to load and validate environment variables
@@ -51,6 +55,7 @@ function loadConfig(): Config {
     USER_SERVICE_URL: Joi.string().optional(), // Optional environment variable
     AWS_ACCESS_KEY_ID: Joi.string().required(),
     AWS_SECRET_ACCESS_KEY: Joi.string().required(),
+    AWS_S3_BUCKET_NAME: Joi.string().required(),
   })
     .unknown()
     .required();
@@ -59,7 +64,7 @@ function loadConfig(): Config {
   const { value: envVars, error } = envVarsSchema.validate(process.env, {
     abortEarly: false, // Show all validation errors at once
   });
-
+0
   // Handle validation errors
   if (error) {
     const errorMessages = error.details.map((err) => err.message).join(", ");
@@ -77,11 +82,25 @@ function loadConfig(): Config {
       ? envVars.AWS_REDIRECT_URI
       : "http://localhost:4001/v1/auth/google/callback/";
 
-  console.log("=======================================");
+  const userServiceUrl =
+    envVars.NODE_ENV === "production"
+      ? envVars.USER_SERVICE_URL
+      : "http://localhost:3000/";
 
-  console.log(`clientUrl : ${clientUrl}`);
-  console.log(`awsRedirectUri : ${awsRedirectUri}`);
-  console.log("=======================================");
+  console.log(
+    chalk.blue("== ENV & clientUrl & awsRedirectUri & userServiceUrl ==")
+  );
+  console.log("Environment:", chalk.greenBright(`${process.env.NODE_ENV}`));
+  console.log(`clientUrl : ${clientUrl} `, chalk.redBright("=>(dashboard)"));
+  console.log(
+    `awsRedirectUri : ${awsRedirectUri}`,
+    chalk.redBright("=>(back-end-auth)")
+  );
+  console.log(
+    `userServiceUrl : ${userServiceUrl}`,
+    chalk.redBright("=>(client-app)")
+  );
+
   return {
     env: envVars.NODE_ENV,
     port: envVars.PORT,
@@ -92,13 +111,12 @@ function loadConfig(): Config {
     awsCognitoClientSecret: envVars.AWS_COGNITO_CLIENT_SECRET,
     awsCognitoIdentityPoolId: envVars.AWS_COGNITO_IDENTITY_POOL_ID,
     awsCognitoDomain: envVars.AWS_COGNITO_DOMAIN,
-    // awsRedirectUri: envVars.AWS_REDIRECT_URI,
-    awsRedirectUri,
-    // clientUrl: envVars.CLIENT_URL,
     clientUrl, // Dynamically assigned clientUrl
-    userServiceUrl: envVars.USER_SERVICE_URL,
+    awsRedirectUri, // Dynamically
+    userServiceUrl, // Dynamically
     awsAccessKeyId: envVars.AWS_ACCESS_KEY_ID,
     awsSecretAccessKey: envVars.AWS_SECRET_ACCESS_KEY,
+    awsS3BucketName: envVars.AWS_S3_BUCKET_NAME,
   };
 }
 

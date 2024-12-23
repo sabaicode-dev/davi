@@ -8,9 +8,16 @@ class UserRepository {
     username: string,
     email: string,
     cognitoUserId: string,
+    profile: string,
     confirmed: boolean = false
   ): Promise<IUser> {
-    const user = new User({ username, email, cognitoUserId, confirmed });
+    const user = new User({
+      username,
+      email,
+      cognitoUserId,
+      profile,
+      confirmed,
+    });
     return await user.save();
   }
 
