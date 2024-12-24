@@ -81,6 +81,8 @@ const FinalScreen: React.FC = () => {
     type: string;
   } | null>(null);
 
+  console.log(" selectedAnalysis::: ", selectedAnalysis);
+
   // Fetch data when component mounts or when params change
   useEffect(() => {
     if (projectId && fileId) {
@@ -130,7 +132,7 @@ const FinalScreen: React.FC = () => {
       // Fetch metadata
       console.log("Fetching metadata...");
       const metadataResponse = await fetch(
-        `http://127.0.0.1:8000/api/v1/metadata/6768d4448c738597359fc8a2/`
+        `http://127.0.0.1:8000/api/v1/metadata/67691e3ebe7479aa09da151d/`
       );
 
       if (!metadataResponse.ok) {
@@ -181,8 +183,8 @@ const FinalScreen: React.FC = () => {
       const chartTypes = [
         "pie_chart",
         "bar_chart",
-        "line_chart",
-        "scatter_plot",
+        "area_chart",
+        "column_chart",
       ];
 
       for (const chartType of chartTypes) {
@@ -277,15 +279,6 @@ const FinalScreen: React.FC = () => {
     setVisibleHeaders(updatedHeaders);
   };
 
-  if (isLoading)
-    return (
-      <div className="flex w-full justify-center items-center h-full">
-        <Spinner />
-      </div>
-    );
-
-  if (error) return <div className="p-4 text-red-500">Error: {error}</div>;
-
   const handleChartSelection = (columnMetadata: any, chartData: any) => {
     setSelectedAnalysis({
       category: columnMetadata.name,
@@ -298,6 +291,15 @@ const FinalScreen: React.FC = () => {
   const handleCloseAnalysis = () => {
     setSelectedAnalysis(null);
   };
+
+  if (isLoading)
+    return (
+      <div className="flex w-full justify-center items-center h-full">
+        <Spinner />
+      </div>
+    );
+
+  if (error) return <div className="p-4 text-red-500">Error: {error}</div>;
 
   return (
     <div
@@ -394,20 +396,18 @@ const FinalScreen: React.FC = () => {
 
       <div className="">
         <div className="responsive-table-height">
-          <Table
-            headers={tableData.headers.filter((header) =>
-              visibleHeaders.has(header)
-            )}
-            data={tableData.data}
-            metadata={metadata}
-            isCheckBox={true}
-            isEditCell={false}
-            isSelectColumn={true}
-            onColumnSelect={handleColumnSelection}
-            isFullHeight={true}
-            showChart={true}
-            onChartSelect={handleChartSelection}
-          />
+        <Table
+        headers={tableData.headers.filter((header) => visibleHeaders.has(header))}
+        data={tableData.data}
+        metadata={metadata}
+        isCheckBox={true}
+        isEditCell={false}
+        isSelectColumn={true}
+        onColumnSelect={handleColumnSelection}
+        isFullHeight={true}
+        showChart={true}
+        onChartSelect={handleChartSelection}
+      />
         </div>
       </div>
 

@@ -22,13 +22,36 @@ const RightSide: React.FC<RightSideProps> = ({
   );
 
   // Description State
+  const [descriptionsCache, setDescriptionsCache] = useState<
+    Record<string, string>
+  >({});
   const [description, setDescription] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [isLoadingDescription, setIsLoadingDescription] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Handle Edit Toggle
-  const toggleEdit = () => setIsEditing(!isEditing);
+  const toggleEdit = () => {
+    if (isEditing) {
+      saveDescription(); // Save the edited description when exiting edit mode
+    }
+    setIsEditing(!isEditing);
+  };
+
+  // Save Description
+  const saveDescription = () => {
+    if (!selectedChart || !selectedColumns.length) return;
+
+    const cacheKey = generateCacheKey(selectedColumns, selectedChart);
+
+    // Update the cache with the edited description
+    setDescriptionsCache((prevCache) => ({
+      ...prevCache,
+      [cacheKey]: description || "",
+    }));
+
+    console.log("Description saved:", description);
+  };
 
   // Handle Input Change
   const handleDescriptionChange = (
@@ -43,6 +66,10 @@ const RightSide: React.FC<RightSideProps> = ({
     onSelectChart(chartType); // Trigger parent callback
   };
 
+  const generateCacheKey = (columns: string[], chartType: string | null) => {
+    return `${columns.join(",")}-${chartType}`;
+  };
+
   const fetchDescription = async () => {
     if (!selectedChart) {
       setError("No chart type selected.");
@@ -51,6 +78,15 @@ const RightSide: React.FC<RightSideProps> = ({
 
     if (selectedColumns.length === 0) {
       setError("No columns selected.");
+      return;
+    }
+
+    const cacheKey = generateCacheKey(selectedColumns, selectedChart);
+
+    // Check if the description is already cached
+    if (descriptionsCache[cacheKey]) {
+      setDescription(descriptionsCache[cacheKey]);
+      console.log("Description fetched from cache:", descriptionsCache[cacheKey]);
       return;
     }
 
@@ -79,6 +115,12 @@ const RightSide: React.FC<RightSideProps> = ({
       if (response.status === 200) {
         console.log("Description API response:", response.data); // Debug log
         setDescription(response.data.description);
+
+        // Cache the description
+        setDescriptionsCache((prevCache) => ({
+          ...prevCache,
+          [cacheKey]: response.data.description,
+        }));
       } else {
         throw new Error(`Unexpected response status: ${response.status}`);
       }
