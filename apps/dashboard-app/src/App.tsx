@@ -18,8 +18,8 @@ import PrivateRoute from "./ProtectedRoute/PrivateRoute";
 import SelectTable from "./components/molecules/steps/selectTable";
 
 //test_card
-import Card from "./components/molecules/models/DeletedRowCard/Card";
-import SaveVisualize from "./components/molecules/models/Save_V2/Card";
+// import Card from "./components/molecules/models/DeletedRowCard/Card";
+// import SaveVisualize from "./components/molecules/models/Save_V2/Card";
 import FileUploadAndMetadata from "./components/molecules/models/Meta/FileUploadAndMetadata";
 
 const ProjectFlow = () => {
