@@ -9,7 +9,7 @@ interface TableProps {
   isCheckBox?: boolean;
   isEditCell?: boolean;
   showChart?: boolean;
-  onChartSelect?: (columnMetadata: any, chartData: any) => void; 
+  onChartSelect?: (columnMetadata: any, chartData: any) => void;
   isSelectColumn?: boolean;
   onSaveCell?: (
     rowId: string | number,
@@ -45,6 +45,7 @@ interface ChartMetadata {
     };
     numeric_metrics?: {
       histogram: { range: string; count: number }[];
+      buckets: [];
     };
     boolean_metrics?: {
       true_count: number;

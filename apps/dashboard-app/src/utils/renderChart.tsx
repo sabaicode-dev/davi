@@ -1,8 +1,7 @@
 import React from "react";
 import Category from "../components/molecules/charts/Catagory";
 import UniqueValue from "../components/molecules/charts/UniqueValue";
-
-type DataItem = { category: string; value: number };
+import Number from "../components/molecules/charts/Number";
 
 interface ColumnMetadata {
   key: string;
@@ -40,9 +39,20 @@ interface ChartSelectionData {
   type: string;
 }
 
+interface HistogramBucket {
+  index: number;
+  label: string;
+  left_value: number;
+  right_value: number;
+  count: number;
+}
+
 export const renderChart = (
   columnMetadata: ColumnMetadata,
-  onChartSelect?: (metadata: ColumnMetadata, chartData: ChartSelectionData) => void
+  onChartSelect?: (
+    metadata: ColumnMetadata,
+    chartData: ChartSelectionData
+  ) => void
 ): JSX.Element | null => {
   const { table_column_info, table_column_metrics, name } = columnMetadata;
 
@@ -63,7 +73,6 @@ export const renderChart = (
         return <p>No Chart</p>;
       }
 
-      // Check if the most common value is 100%
       const mostCommonValuePercentage =
         ((stringMetrics?.most_common_value_count || 0) / totalCount) * 100;
 
@@ -77,7 +86,7 @@ export const renderChart = (
                 onChartSelect(columnMetadata, {
                   category: name,
                   percentage: mostCommonValuePercentage,
-                  type: "UniqueValue"
+                  type: "UniqueValue",
                 });
               }
             }}
@@ -85,7 +94,6 @@ export const renderChart = (
         );
       }
 
-      // Render Category chart if the most common value is not 100%
       return (
         <Category
           data={
@@ -95,18 +103,50 @@ export const renderChart = (
             })) || []
           }
           title={name || "Category"}
-          type={type}
           onClick={(item) => {
             if (onChartSelect) {
+              const percentage = (item.value / totalCount) * 100;
               onChartSelect(columnMetadata, {
                 category: item.category,
-                percentage: item.percentage,
-                type: "STRING"
+                percentage,
+                type: "STRING",
               });
             }
           }}
         />
       );
+    }
+
+    case "NUMERIC": {
+      const numericMetrics = table_column_metrics?.numeric_metrics;
+      const histogramBuckets = numericMetrics?.histogram?.buckets;
+
+      if (Array.isArray(histogramBuckets) && histogramBuckets.length > 0) {
+        const data = histogramBuckets.map((bucket) => bucket.count || 0); 
+        const labels = histogramBuckets.map(
+          (bucket) => bucket.label || "Unknown"
+        ); 
+
+        return (
+          <Number
+            data={data}
+            labels={labels}
+            title={name || "Numeric Data"}
+            onClick={() => {
+              if (onChartSelect) {
+                onChartSelect(columnMetadata, {
+                  category: name || "Numeric Data",
+                  percentage: 0,
+                  type: "NUMERIC",
+                });
+              }
+            }}
+          />
+        );
+      } else {
+        console.warn("Invalid or missing histogram buckets:", histogramBuckets);
+        return <p>No Chart Data</p>;
+      }
     }
 
     default:
