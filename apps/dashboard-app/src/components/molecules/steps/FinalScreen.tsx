@@ -75,12 +75,13 @@ const FinalScreen: React.FC = () => {
     setFileDetails(details);
   };
 
-
   const [selectedAnalysis, setSelectedAnalysis] = useState<{
     category: string;
     percentage: number;
     type: string;
   } | null>(null);
+
+  console.log(" selectedAnalysis::: ", selectedAnalysis);
 
   // Fetch data when component mounts or when params change
   useEffect(() => {
@@ -278,20 +279,11 @@ const FinalScreen: React.FC = () => {
     setVisibleHeaders(updatedHeaders);
   };
 
-  if (isLoading)
-    return (
-      <div className="flex w-full justify-center items-center h-full">
-        <Spinner />
-      </div>
-    );
-
-  if (error) return <div className="p-4 text-red-500">Error: {error}</div>;
-
   const handleChartSelection = (columnMetadata: any, chartData: any) => {
     setSelectedAnalysis({
       category: columnMetadata.name,
       percentage: chartData.percentage || 0,
-      type: columnMetadata.type
+      type: columnMetadata.type,
     });
   };
 
@@ -300,6 +292,14 @@ const FinalScreen: React.FC = () => {
     setSelectedAnalysis(null);
   };
 
+  if (isLoading)
+    return (
+      <div className="flex w-full justify-center items-center h-full">
+        <Spinner />
+      </div>
+    );
+
+  if (error) return <div className="p-4 text-red-500">Error: {error}</div>;
 
   return (
     <div
@@ -396,31 +396,29 @@ const FinalScreen: React.FC = () => {
 
       <div className="">
         <div className="responsive-table-height">
-          <Table
-            headers={tableData.headers.filter((header) =>
-              visibleHeaders.has(header)
-            )}
-            data={tableData.data}
-            metadata={metadata}
-            isCheckBox={true}
-            isEditCell={false}
-            isSelectColumn={true}
-            onColumnSelect={handleColumnSelection}
-            isFullHeight={true}
-            showChart={true}
-            onChartSelect={handleChartSelection}
-          />
+        <Table
+        headers={tableData.headers.filter((header) => visibleHeaders.has(header))}
+        data={tableData.data}
+        metadata={metadata}
+        isCheckBox={true}
+        isEditCell={false}
+        isSelectColumn={true}
+        onColumnSelect={handleColumnSelection}
+        isFullHeight={true}
+        showChart={true}
+        onChartSelect={handleChartSelection}
+      />
         </div>
       </div>
 
       {/* Analysis sidebar */}
       {selectedAnalysis && (
-          <Analysis
-            selectedData={selectedAnalysis}
-            onClose={handleCloseAnalysis}
-            metadata={metadata}
-          />
-        )}
+        <Analysis
+          selectedData={selectedAnalysis}
+          onClose={handleCloseAnalysis}
+          metadata={metadata}
+        />
+      )}
 
       {showRightSide && (
         <RightSide
@@ -431,7 +429,6 @@ const FinalScreen: React.FC = () => {
         />
       )}
 
-  
       {/* Popup */}
       {showPopup && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
@@ -465,9 +462,7 @@ const FinalScreen: React.FC = () => {
           </div>
         </div>
       )}
-      
     </div>
-    
   );
 };
 

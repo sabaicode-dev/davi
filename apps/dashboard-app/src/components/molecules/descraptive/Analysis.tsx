@@ -3,16 +3,17 @@ import { AiOutlineEdit, AiOutlineCheck } from "react-icons/ai"; // Import icons 
 import { XIcon } from "../../atoms/icons/Icon"; // Replace with your custom icon path
 
 // Import chart components
-import NumberBig from "../charts/NumberBig";
 import Boolean from "../charts/Boolean";
-import CategoryBig from "../charts/CatagoryBig";
-import UniqueValueBig from "../charts/UniqueValueBig";
-import BooleanBig from "../charts/BooleanBig";
 import Category from "../charts/Catagory";
 import Number from "../charts/Number";
 import UniqueValue from "../charts/UniqueValue";
 
-// Define ChartMetadata type
+type ChartSelectionData = {
+  category: string;
+  percentage: number;
+  type: string;
+};
+
 type ChartMetadata = {
   key: string;
   type: string;
@@ -22,17 +23,27 @@ type ChartMetadata = {
   total?: any;
 };
 
-// Define props for the Analysis component
 type AnalysisProps = {
-  selectedData: {
-    category: string;
-    percentage: number;
-    type: string;
-  } | null;
+  selectedData: ChartSelectionData | null;
   onClose: () => void;
   metadata: ChartMetadata[];
-  // renderChart?: (col: ChartMetadata) => JSX.Element | null;
 };
+
+// Types for the Category component
+type CategoryProps = {
+  data: DataItem[];
+  title?: string;
+  type?: string;
+  onClick?: (item: DataItem) => void;
+  onChartSelect?: (data: ChartSelectionData) => void;
+};
+
+type DataItem = {
+  category: string;
+  value: number;
+};
+
+
 
 // Chart type configuration
 const chartTypes = [
@@ -163,10 +174,12 @@ const Analysis: React.FC<AnalysisProps> = ({
   const ActiveChartConfig = chartTypes.find(
     (chart) => chart.type === activeChartType
   );
+
   const booleanData = {
     true: 120, // Example count for true
     false: 30, // Example count for false
   };
+
   return (
     <div
       ref={sidebarRef}

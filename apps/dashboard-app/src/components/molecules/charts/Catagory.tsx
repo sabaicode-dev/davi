@@ -7,12 +7,12 @@ type ProcessedDataItem = {
   percentage: number;
 };
 
-type CategoryProps = {
+interface CategoryProps {
   data: DataItem[];
   title?: string;
   type?: string;
-  onClick: (item: ProcessedDataItem) => void;
-};
+  onClick: (item: DataItem) => void;
+}
 
 const processData = (data: DataItem[]): ProcessedDataItem[] => {
   const totalCount = data.reduce((sum, item) => sum + item.value, 0);
@@ -51,24 +51,30 @@ const Category: React.FC<CategoryProps> = ({
 }) => {
   const processedData = processData(data);
 
-  const topItem = processedData[0] || { category: "", percentage: 0 };
+  const handleItemClick = (item: ProcessedDataItem) => {
+    onClick({
+      category: item.category,
+      value: item.count,
+    });
+  };
 
   return (
-    <div
-      className="relative w-[210px] h-[149px] bg-white rounded-sm shadow-md p-2 flex flex-col justify-center cursor-pointer"
-      onClick={() => onClick(topItem)}
-    >
+    <div className="relative w-[210px] h-[149px] bg-white rounded-sm shadow-md p-2 flex flex-col justify-center">
       {/* Title */}
       <div className="absolute top-2 left-2">
         <div className="text-green-800 text-xs bg-green-100 px-2 py-1 rounded">
-          {`${type}`}
+          {type}
         </div>
       </div>
 
       {/* Categories */}
       <div className="w-full h-full flex flex-col justify-evenly pt-6 px-2">
         {processedData.map((item, index) => (
-          <div key={index} className="flex flex-col space-y-1">
+          <div
+            key={index}
+            className="flex flex-col space-y-1 cursor-pointer"
+            onClick={() => handleItemClick(item)}
+          >
             <div className="flex justify-between text-xs">
               <span title={item.category}>
                 {item.category.length > 10
