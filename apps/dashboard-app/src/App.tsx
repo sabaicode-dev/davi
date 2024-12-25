@@ -19,7 +19,7 @@ import SelectTable from "./components/molecules/steps/selectTable";
 
 //test_card
 // import Card from "./components/molecules/models/DeletedRowCard/Card";
-// import SaveVisualize from "./components/molecules/models/Save_V2/Card";
+import SaveVisualize from "./components/molecules/models/Save_V2/Card";
 import FileUploadAndMetadata from "./components/molecules/models/Meta/FileUploadAndMetadata";
 
 const ProjectFlow = () => {
@@ -75,7 +75,7 @@ const routes = [
   //Test_Card_Component
   { path: "upload", element: <FileUploadAndMetadata/> },
   
-  // { path: "/cardss", element: <SaveVisualize/> },
+  { path: "/cardss", element: <SaveVisualize/> },
 ];
 
 export const App = () => {
