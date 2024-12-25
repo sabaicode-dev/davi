@@ -2,13 +2,14 @@ import React from "react";
 import Category from "../components/molecules/charts/Catagory";
 import UniqueValue from "../components/molecules/charts/UniqueValue";
 import Number from "../components/molecules/charts/Number";
+import Boolean from "../components/molecules/charts/Boolean";
 
 interface ColumnMetadata {
   key: string;
   name: string;
   description?: string;
   table_column_info: {
-    type: "STRING" | "NUMERIC" | "BOOLEAN" | "HISTOGRAM";
+    type: "STRING" | "NUMERIC" | "BOOLEAN";
     order?: number;
     original_type?: string;
     extended_type: string;
@@ -37,6 +38,7 @@ interface ChartSelectionData {
   category: string;
   percentage: number;
   type: string;
+  name: string; // Add this property
 }
 
 interface HistogramBucket {
@@ -87,6 +89,7 @@ export const renderChart = (
                   category: name,
                   percentage: mostCommonValuePercentage,
                   type: "UniqueValue",
+                  name: name || "Unknown Header", // Add `name` for clarity
                 });
               }
             }}
@@ -102,12 +105,13 @@ export const renderChart = (
               value: item.value,
             })) || []
           }
-          title={name || "Category"}
+          name={name || "Unknown Header"} // Pass the name property here
           onClick={(item) => {
             if (onChartSelect) {
               const percentage = (item.value / totalCount) * 100;
               onChartSelect(columnMetadata, {
-                category: item.category,
+                category: columnMetadata.key, // Pass the `key` to identify metadata
+                name: name || "Unknown Header", // Add `name` for clarity
                 percentage,
                 type: "STRING",
               });
@@ -120,25 +124,34 @@ export const renderChart = (
     case "NUMERIC": {
       const numericMetrics = table_column_metrics?.numeric_metrics;
       const histogramBuckets = numericMetrics?.histogram?.buckets;
-
+    
       if (Array.isArray(histogramBuckets) && histogramBuckets.length > 0) {
-        const data = histogramBuckets.map((bucket) => bucket.count || 0); 
+        const data = histogramBuckets.map((bucket) => bucket.count || 0);
         const labels = histogramBuckets.map(
           (bucket) => bucket.label || "Unknown"
-        ); 
-
+        );
+    
         return (
           <Number
             data={data}
             labels={labels}
-            title={name || "Numeric Data"}
-            onClick={() => {
+            name={name || "Numeric Data"}
+            type="NUMERIC"
+            onClick={({ category, name, value }) => {
+              console.log("Chart Clicked:", { category, name, value });
               if (onChartSelect) {
+                const percentage =
+                  (value / data.reduce((sum, v) => sum + v, 0)) * 100;
+    
+                // Pass columnMetadata.key instead of category
                 onChartSelect(columnMetadata, {
-                  category: name || "Numeric Data",
-                  percentage: 0,
+                  category: columnMetadata.key, // Use columnMetadata.key
+                  percentage,
                   type: "NUMERIC",
+                  name,
                 });
+              } else {
+                console.error("Metadata is not available for this chart");
               }
             }}
           />
@@ -147,6 +160,37 @@ export const renderChart = (
         console.warn("Invalid or missing histogram buckets:", histogramBuckets);
         return <p>No Chart Data</p>;
       }
+    }
+    
+    
+    case "BOOLEAN": {
+      const booleanMetrics = table_column_metrics?.boolean_metrics;
+
+      if (booleanMetrics) {
+        const data = {
+          true: booleanMetrics.true_count || 0,
+          false: booleanMetrics.false_count || 0,
+        };
+
+        return (
+          <Boolean
+            data={data}
+            title={name || "Boolean Data"}
+            onClick={({ label, value }) => {
+              if (onChartSelect) {
+                onChartSelect(columnMetadata, {
+                  category: label,
+                  percentage: (data.true / value) * 100, // Example: true percentage
+                  type: "BOOLEAN",
+                  name: name || "Unknown Header", // Add `name` for clarity
+                });
+              }
+            }}
+          />
+        );
+      }
+
+      return <p>No Boolean Data Available</p>;
     }
 
     default:

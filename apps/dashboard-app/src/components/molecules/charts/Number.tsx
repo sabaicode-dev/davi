@@ -2,109 +2,134 @@ import React from "react";
 import Chart from "react-apexcharts";
 import { ApexOptions } from "apexcharts";
 
-
 interface NumberProps {
-  data: number[]; 
-  labels: string[]; 
-  title: string; 
-  type?: string; 
-  onClick: () => void; 
+  data: number[];
+  labels: string[];
+  name?: string;
+  type?: string;
+  onClick: (item: { category: string; name: string; value: number }) => void;
+  isAnalysisView?: boolean; // Prop to toggle between normal and analysis view
 }
-
 
 const Number: React.FC<NumberProps> = ({
   data,
   labels,
-  title,
+  name = "Unknown Header",
   type = "Number",
   onClick,
+  isAnalysisView = false, // Default to normal view
 }) => {
-  
-  const MAX_BARS = 8;
+  const MAX_BARS = isAnalysisView ? data.length : 8; // Show all bars in analysis view
 
-  
-  const processedData = data.length > MAX_BARS
-    ? [
-        ...data.slice(0, MAX_BARS - 1), 
-        data.slice(MAX_BARS - 1).reduce((sum, value) => sum + value, 0), 
-      ]
-    : data;
+  const processedData =
+    data.length > MAX_BARS
+      ? [
+          ...data.slice(0, MAX_BARS - 1),
+          data.slice(MAX_BARS - 1).reduce((sum, value) => sum + value, 0),
+        ]
+      : data;
 
-  const processedLabels = labels.length > MAX_BARS
-    ? [
-        ...labels.slice(0, MAX_BARS - 1), 
-        "Others",
-      ]
-    : labels;
-
+  const processedLabels =
+    labels.length > MAX_BARS
+      ? [...labels.slice(0, MAX_BARS - 1), "Others"]
+      : labels;
 
   const chartOptions: ApexOptions = {
     chart: {
-      type: "bar", 
-      toolbar: { show: false }, 
-      animations: { enabled: true }, 
+      type: "bar",
+      toolbar: { show: false },
+      animations: { enabled: true },
+      events: {
+        dataPointSelection: (event, chartContext, config) => {
+          const index = config.dataPointIndex;
+          if (index >= 0 && index < processedLabels.length) {
+            const selectedLabel = processedLabels[index];
+            const selectedValue = processedData[index];
+            console.log("Bar Clicked:", { selectedLabel, selectedValue });
+            onClick({
+              category: selectedLabel,
+              name,
+              value: selectedValue,
+            });
+          }
+        },
+      },
     },
     plotOptions: {
       bar: {
-        borderRadius: 2, 
-        horizontal: false, 
-        columnWidth: "80%", 
+        borderRadius: 2,
+        horizontal: false,
+        columnWidth: "80%",
       },
     },
     dataLabels: {
-      enabled: false, 
+      enabled: false,
     },
     xaxis: {
-      categories: processedLabels, 
-      labels: { show: false }, 
-      axisBorder: { show: false }, 
-      axisTicks: { show: false }, 
+      categories: processedLabels,
+      labels: isAnalysisView ? { show: true } : { show: false }, // Show labels in analysis view
+      axisBorder: { show: false },
+      axisTicks: { show: false },
     },
     yaxis: {
-      show: false,
+      show: isAnalysisView, // Show y-axis in analysis view
     },
     grid: {
-      show: false, 
+      show: isAnalysisView, // Show grid in analysis view
     },
-    colors: ["#3b82f6"], 
+    colors: ["#3b82f6"],
     tooltip: {
-      enabled: true, 
+      enabled: true,
       y: {
-        formatter: (value) => `${value}`, 
+        formatter: (value) => `${value}`,
       },
     },
   };
 
-  // Chart data
   const chartSeries = [
     {
-      name: "Count", 
-      data: processedData, 
+      name: "Count",
+      data: processedData,
     },
   ];
 
   return (
     <div
-      className="relative w-[210px] h-[149px] bg-white rounded-sm shadow-md pt-2 flex items-center justify-center cursor-pointer"
-      onClick={onClick} 
+      className={`relative ${
+        isAnalysisView ? "w-[400px] h-[300px]" : "w-[210px] h-[149px]"
+      } bg-white rounded-sm shadow-md pt-2 flex items-center justify-center cursor-pointer`}
+      onClick={() => {
+        const totalValue = processedData.reduce((sum, v) => sum + v, 0);
+        console.log("Chart Box Clicked:", {
+          category: type || "Category",
+          name,
+          value: totalValue,
+        });
+        onClick({
+          category: type || "Category",
+          name,
+          value: totalValue,
+        });
+      }}
     >
-      {/* Title */}
-      {title && (
+      {/* Title - Rendered only when not in Analysis View */}
+      {!isAnalysisView && name && (
         <div className="absolute top-2 left-2">
-          <div className="text-blue-800 text-xs bg-blue-100 px-2 py-1 rounded">
+          <div
+            className={`text-xs text-blue-800 bg-blue-100 px-2 py-1 rounded`}
+          >
             {`${type}`}
           </div>
         </div>
       )}
-
       {/* Chart */}
       <div className="w-full h-full">
         <Chart
-          options={chartOptions} 
-          series={chartSeries} 
-          type="bar" 
-          width="100%" 
-          height="100%" 
+          options={chartOptions}
+          series={chartSeries}
+          type="bar"
+          width="100%"
+          height="100%"
         />
       </div>
     </div>

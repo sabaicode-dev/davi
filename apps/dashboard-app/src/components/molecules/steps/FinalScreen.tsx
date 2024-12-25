@@ -12,6 +12,44 @@ import axios from "axios";
 import download from "downloadjs";
 import Analysis from "../descraptive/Analysis";
 
+export interface ChartSelectionData {
+  category: string;
+  percentage: number;
+  type: string;
+  name?: string;
+}
+
+export interface ChartMetadata {
+  key: string;
+  name: string;
+  description?: string;
+  table_column_info: {
+    type: "STRING" | "NUMERIC" | "BOOLEAN";
+    order?: number;
+    original_type?: string;
+    extended_type: string;
+  };
+  table_column_metrics: {
+    total_count?: number;
+    non_null_count?: number;
+    valid_count?: number;
+    string_metrics?: {
+      counts: { key: string; value: number }[];
+      most_common_value?: string;
+      most_common_value_count?: number;
+      unique_value_count?: number;
+    };
+    numeric_metrics?: {
+      histogram: { range: string; count: number }[];
+    };
+    boolean_metrics?: {
+      true_count: number;
+      false_count: number;
+    };
+  };
+}
+
+
 interface ApiResponse {
   count: number;
   next: boolean;
@@ -49,6 +87,7 @@ const FinalScreen: React.FC = () => {
     data: [],
   });
   const [visibleHeaders, setVisibleHeaders] = useState<Set<string>>(new Set()); // Tracks visible headers
+  const [metadata, setMetadata] = useState<any[]>([]);
   const [selectedColumns, setSelectedColumns] = useState<string[]>([]);
   const [selectedChartType, setSelectedChartType] =
     useState<string>("pie_chart");
@@ -60,8 +99,11 @@ const FinalScreen: React.FC = () => {
     Record<string, any>[] | null
   >(null);
 
+  const [descriptionMap, setDescriptionMap] = useState<{ [key: string]: string }>(
+    {}
+  );
+
   const [showPopup, setShowPopup] = useState(false); // Tracks popup visibility
-  const [metadata, setMetadata] = useState<any[]>([]);
   const { projectId, fileId } = useParams();
   const [isLoadingVisualize, setIsLoadingVisualize] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -80,6 +122,8 @@ const FinalScreen: React.FC = () => {
     percentage: number;
     type: string;
   } | null>(null);
+
+  console.log(" selectedAnalysis::: ", selectedAnalysis);
 
   console.log(" selectedAnalysis::: ", selectedAnalysis);
 
@@ -140,15 +184,16 @@ const FinalScreen: React.FC = () => {
       }
 
       const metadataJson = await metadataResponse.json();
+      setMetadata(metadataJson.metadata || []);
       console.log("Fetched metadata:", metadataJson);
 
-      // Validate and update metadata state
       if (metadataJson && Array.isArray(metadataJson.metadata)) {
-        setMetadata(metadataJson.metadata); // Use the metadata array
+        setMetadata(metadataJson.metadata); // Ensure metadata is an array
       } else {
-        console.error("Invalid metadata format:", metadataJson);
-        setMetadata([]); // Fallback to an empty array
+        console.error("Metadata is not properly formatted:", metadataJson.metadata);
+        setMetadata([]); // Set an empty array as a fallback
       }
+      
     } catch (error) {
       // Handle errors
       setError(
@@ -159,6 +204,41 @@ const FinalScreen: React.FC = () => {
       setIsLoading(false);
     }
   };
+
+  
+  const handleChartSelect = (
+    metadata: ChartMetadata | ChartMetadata[],
+    chartData: ChartSelectionData
+  ) => {
+    console.log("Chart Data:", chartData); // Debug chart data
+    console.log("Metadata:", metadata);   // Debug metadata
+  
+    // Ensure metadata is always treated as an array
+    const metadataArray = Array.isArray(metadata) ? metadata : [metadata];
+  
+    // Find the matching metadata by key
+    const matchedMetadata = metadataArray.find(
+      (meta) => meta.key === chartData.category
+    );
+  
+    console.log("Matched Metadata:", matchedMetadata); // Debug matched metadata
+  
+    // Update the selected analysis state
+    setSelectedAnalysis(
+      matchedMetadata
+        ? { ...chartData, name: matchedMetadata.name }
+        : null
+    );
+  
+    if (!matchedMetadata) {
+      console.warn(
+        `No matching metadata found for category: ${chartData.category}`
+      );
+    }
+  };
+  
+  
+  
 
   const handleColumnSelection = (columns: string[], columnData: any[]) => {
     if (JSON.stringify(selectedColumns) !== JSON.stringify(columns)) {
@@ -279,19 +359,19 @@ const FinalScreen: React.FC = () => {
     setVisibleHeaders(updatedHeaders);
   };
 
-  const handleChartSelection = (columnMetadata: any, chartData: any) => {
-    setSelectedAnalysis({
-      category: columnMetadata.name,
-      percentage: chartData.percentage || 0,
-      type: columnMetadata.type,
-    });
-  };
 
-  // Add handler for closing analysis
   const handleCloseAnalysis = () => {
     setSelectedAnalysis(null);
   };
 
+  if (isLoading)
+    return (
+      <div className="flex w-full justify-center items-center h-full">
+        <Spinner />
+      </div>
+    );
+
+  if (error) return <div className="p-4 text-red-500">Error: {error}</div>;
   if (isLoading)
     return (
       <div className="flex w-full justify-center items-center h-full">
@@ -396,28 +476,30 @@ const FinalScreen: React.FC = () => {
 
       <div className="">
         <div className="responsive-table-height">
-        <Table
-        headers={tableData.headers.filter((header) => visibleHeaders.has(header))}
-        data={tableData.data}
-        metadata={metadata}
-        isCheckBox={true}
-        isEditCell={false}
-        isSelectColumn={true}
-        onColumnSelect={handleColumnSelection}
-        isFullHeight={true}
-        showChart={true}
-        onChartSelect={handleChartSelection}
-      />
+          <Table
+            headers={tableData.headers.filter((header) =>
+              visibleHeaders.has(header)
+            )}
+            data={tableData.data}
+            metadata={metadata}
+            isCheckBox={true}
+            isEditCell={false}
+            isSelectColumn={true}
+            onColumnSelect={handleColumnSelection}
+            isFullHeight={true}
+            showChart={true}
+            onChartSelect={handleChartSelect}
+          />
         </div>
       </div>
 
       {/* Analysis sidebar */}
       {selectedAnalysis && (
         <Analysis
-          selectedData={selectedAnalysis}
-          onClose={handleCloseAnalysis}
-          metadata={metadata}
-        />
+        selectedData={selectedAnalysis}
+        onClose={() => setSelectedAnalysis(null)}
+        metadata={metadata}
+      />  
       )}
 
       {showRightSide && (

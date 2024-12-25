@@ -80,7 +80,7 @@ const CreateProject: React.FC<Step2Props> = ({
 
     try {
       const response = await request({
-        url: `${API_ENDPOINTS.API_URL}/project/`,
+        url: `${API_ENDPOINTS.API_URL}/projects/`,
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -3,12 +3,17 @@ import Chart from "react-apexcharts";
 import { ApexOptions } from "apexcharts";
 
 type BooleanProps = {
-  data: { true: number; false: number };
-  title: string;
-  onClick: () => void; // Callback for click
+  data: { true: number; false: number }; // Boolean data for true/false counts
+  title: string; // Title for the chart
+  onClick: (chartData: { label: string; value: number }) => void; // Callback for click with data
 };
 
 const Boolean: React.FC<BooleanProps> = ({ data, title = "Boolean", onClick }) => {
+  // Calculate percentages for true/false values
+  const total = data.true + data.false;
+  const truePercentage = ((data.true / total) * 100).toFixed(1);
+  const falsePercentage = ((data.false / total) * 100).toFixed(1);
+
   const chartOptions: ApexOptions = {
     chart: {
       type: "pie",
@@ -24,22 +29,27 @@ const Boolean: React.FC<BooleanProps> = ({ data, title = "Boolean", onClick }) =
     },
     colors: ["#3b82f6", "#a5b4fc"],
     tooltip: {
-      enabled: false,
+      enabled: true,
       y: {
-        formatter: (value: number) => `${value}%`,
+        formatter: (value: number) => `${value.toFixed(1)}%`,
       },
     },
   };
 
   const chartSeries = [
-    ((data.true / (data.true + data.false)) * 100).toFixed(1),
-    ((data.false / (data.true + data.false)) * 100).toFixed(1),
-  ].map((value) => parseFloat(value));
+    parseFloat(truePercentage),
+    parseFloat(falsePercentage),
+  ];
 
   return (
     <div
-      className="relative w-[210px] h-[149px] bg-white rounded-sm shadow-md p-2 pt-4 flex items-center justify-center cursor-pointer "
-      onClick={onClick} // Use onClick prop
+      className="relative w-[210px] h-[149px] bg-white rounded-sm shadow-md p-2 pt-4 flex items-center justify-center cursor-pointer"
+      onClick={() =>
+        onClick({
+          label: "Boolean Data",
+          value: total,
+        })
+      } // Pass total data when clicked
     >
       {/* Title */}
       {title && (
