@@ -11,6 +11,7 @@ import RightSide from "@/src/components/molecules/right-side/RightSide";
 import axios from "axios";
 import download from "downloadjs";
 import Analysis from "../descraptive/Analysis";
+import { API_ENDPOINTS } from "@/src/utils/const/apiEndpoint";
 
 interface ApiResponse {
   count: number;
@@ -99,7 +100,7 @@ const FinalScreen: React.FC = () => {
 
       // Fetch table data
       const tableResponse = await fetch(
-        `http://3.24.110.41:8000/api/v1/project/${projectId}/file/${fileId}/details/`
+        `${API_ENDPOINTS.API_URL}/project/${projectId}/file/${fileId}/details/`
       );
 
       if (!tableResponse.ok) {
@@ -132,7 +133,7 @@ const FinalScreen: React.FC = () => {
       // Fetch metadata
       console.log("Fetching metadata...");
       const metadataResponse = await fetch(
-        `http://127.0.0.1:8000/api/v1/metadata/6769151fc9996c016a4722a0/`
+        `${API_ENDPOINTS.API_URL}/metadata/6769151fc9996c016a4722a0/`
       );
 
       if (!metadataResponse.ok) {
@@ -195,7 +196,7 @@ const FinalScreen: React.FC = () => {
           file_id: fileId,
         };
 
-        const response = await fetch("http://127.0.0.1:8000/api/v1/", {
+        const response = await fetch(`${API_ENDPOINTS.API_URL}/`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
@@ -232,7 +233,7 @@ const FinalScreen: React.FC = () => {
 
     try {
       const res = await axios.get(
-        `http://3.24.110.41:8000/api/v1/project/${projectId}/file/download/${fileDetails.filename}/`,
+        `${API_ENDPOINTS.API_URL}/project/${projectId}/file/download/${fileDetails.filename}/`,
         {
           responseType: "blob", // To ensure the response is treated as a binary blob
           onDownloadProgress: (progressEvent) => {

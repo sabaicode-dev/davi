@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { BsX, BsPencil, BsCheck } from "react-icons/bs";
 import Button from "@/src/components/atoms/Button";
+import { SaveDialog } from "@/src/components/molecules/models/Save_V1/SaveVisualizeV1";
+import Modal from "@/src/components/molecules/models/Save_V2/SaveVisualizeV2";
 import axios from "axios";
+import { API_ENDPOINTS } from "@/src/utils/const/apiEndpoint";
 
 // Define the props interface for RightSide
 interface RightSideProps {
@@ -27,6 +30,9 @@ const RightSide: React.FC<RightSideProps> = ({
   >({});
   const [description, setDescription] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [savedVisualizations, setSavedVisualizations] = useState<any[]>([]);
   const [isLoadingDescription, setIsLoadingDescription] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -86,7 +92,10 @@ const RightSide: React.FC<RightSideProps> = ({
     // Check if the description is already cached
     if (descriptionsCache[cacheKey]) {
       setDescription(descriptionsCache[cacheKey]);
-      console.log("Description fetched from cache:", descriptionsCache[cacheKey]);
+      console.log(
+        "Description fetched from cache:",
+        descriptionsCache[cacheKey]
+      );
       return;
     }
 
@@ -103,7 +112,7 @@ const RightSide: React.FC<RightSideProps> = ({
       console.log("Payload for description API:", payload); // Debug log
 
       const response = await axios.post(
-        "http://127.0.0.1:8000/api/v1/generate-description/",
+        `${API_ENDPOINTS.API_URL}/generate-description/`,
         payload,
         {
           headers: {
@@ -136,11 +145,77 @@ const RightSide: React.FC<RightSideProps> = ({
 
   // Auto-fetch description when selectedColumns or selectedChart changes
   useEffect(() => {
-    console.log("Selected columns:", selectedColumns);
-    console.log("Selected chart type:", selectedChart);
     fetchDescription();
   }, [selectedColumns, selectedChart]);
 
+  useEffect(() => {
+    // Load saved visualizations from localStorage
+    const savedData = JSON.parse(
+      localStorage.getItem("savedVisualizations") || "[]"
+    );
+    setSavedVisualizations(savedData);
+  }, []);
+
+  const handleSaveNew = (name: string) => {
+    const selectedChartData = chartData.find(
+      (chart) => chart.chartType === selectedChart
+    );
+
+    const visualizationData = {
+      name,
+      chartType: selectedChart,
+      chartImage: selectedChartData?.img,
+      description,
+      selectedColumns,
+      date: new Date().toISOString(),
+    };
+
+    const updatedVisualizations = [...savedVisualizations, visualizationData];
+    localStorage.setItem(
+      "savedVisualizations",
+      JSON.stringify(updatedVisualizations)
+    );
+    setSavedVisualizations(updatedVisualizations);
+    setIsDialogOpen(false); // Close the dialog
+    setIsModalOpen(false); // Close the modal if open
+  };
+
+  const handleSaveExisting = (name: string) => {
+    const updatedVisualizations = savedVisualizations.map((viz) =>
+      viz.name === name
+        ? {
+            ...viz,
+            charts: [
+              ...(viz.charts || []),
+              {
+                chartType: selectedChart,
+                chartImage: chartData.find(
+                  (chart) => chart.chartType === selectedChart
+                )?.img,
+                description,
+                selectedColumns,
+                date: new Date().toISOString(),
+              },
+            ],
+          }
+        : viz
+    );
+
+    localStorage.setItem(
+      "savedVisualizations",
+      JSON.stringify(updatedVisualizations)
+    );
+    setSavedVisualizations(updatedVisualizations);
+    setIsModalOpen(false); // Close the modal
+  };
+
+  const handleSaveButtonClick = () => {
+    if (savedVisualizations.length === 0) {
+      setIsDialogOpen(true);
+    } else {
+      setIsModalOpen(true);
+    }
+  };
   return (
     <div className="flex flex-col w-[400px] h-full fixed top-16 right-0 bg-white shadow-2xl z-50 overflow-y-scroll">
       {/* Header */}
@@ -238,10 +313,29 @@ const RightSide: React.FC<RightSideProps> = ({
           children="Save"
           size="medium"
           radius="2xl"
+          onClick={handleSaveButtonClick}
           color="primary"
           className="px-12 py-2"
         />
       </div>
+
+      {/* Conditional Dialog */}
+      <SaveDialog
+        isOpen={isDialogOpen}
+        onClose={() => setIsDialogOpen(false)}
+        onSave={(name) => handleSaveNew(name)}
+      />
+
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSave={(name) => handleSaveExisting(name)}
+        onSaveNew={() => {
+          setIsModalOpen(false); // Close Modal
+          setTimeout(() => setIsDialogOpen(true), 100); // Open SaveDialog after delay
+        }}
+        savedVisualizations={savedVisualizations}
+      />
     </div>
   );
 };

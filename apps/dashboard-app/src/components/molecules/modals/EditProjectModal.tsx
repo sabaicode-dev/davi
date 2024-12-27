@@ -174,7 +174,7 @@ const Modal: React.FC<ICreateProjectModalProps> = ({
       <dialog
         ref={dialogRef}
         id="modal_project"
-        className="modal bg-red-200 fixed top-1/4 left-1/2 transform -translate-x-1/2 -translate-y-1/4 flex flex-col justify-center items-center w-1/2 xl:w-1/2 2xl:w-1/3 p-5 rounded-xl shadow-xl border-[1px] z-50"
+        className="modal fixed top-1/2 left-1/3 transform -translate-x-1/2 -translate-y-1/4 flex flex-col justify-center items-center w-1/2 xl:w-1/2 2xl:w-1/3 p-5 rounded-xl shadow-xl border-[1px] z-50"
       >
         <motion.div
           initial="hidden"

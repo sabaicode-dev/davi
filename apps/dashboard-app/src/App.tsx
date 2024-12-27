@@ -16,6 +16,7 @@ import FinalScreen from "./components/molecules/steps/FinalScreen";
 import CleaningProject from "./components/molecules/steps/CleaningProject";
 import PrivateRoute from "./ProtectedRoute/PrivateRoute";
 import SelectTable from "./components/molecules/steps/selectTable";
+import DetailVisualize from "./components/molecules/visualize/DetailVisualize";
 
 const ProjectFlow = () => {
   return (
@@ -65,6 +66,7 @@ const routes = [
     path: "/project/:projectId/file/:fileId/finalscreen",
     element: <FinalScreen />,
   },
+  { path: "/visualize/detail-visualize", element: <DetailVisualize />},
 ];
 
 export const App = () => {
