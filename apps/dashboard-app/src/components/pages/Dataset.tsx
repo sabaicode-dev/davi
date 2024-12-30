@@ -1,355 +1,219 @@
-
-import { useEffect, useState } from "react";
-import axios from "axios";
-import { useNavigate, useParams } from "react-router-dom";
-import { DeleteIcon } from "../atoms/icons/Icon";
+import React, { useEffect, useState } from "react";
 import ImageProject from "@/public/images/saveImage.png";
+import formatDate from "@/src/utils/formatDate";
+import { useNavigate } from "react-router-dom";
+import { DeleteIcon } from "@/src/components/atoms/icons/Icon";
+import SkeletonLoader from "@/src/components/molecules/loading/SelectProjectSkeleton";
+import EditProject from "@/src/components/molecules/modals/EditProjectModal";
+import request from "@/src/utils/helper";
 
-interface Dataset {
+interface Project {
   _id: string;
-  project_id: string;
-  filename: string;
-  file: string;
-  size: number;
-  type: string;
+  project_name: string;
+  project_description: string;
   created_at: string;
-  uuid: string;
-  is_original: boolean;
-  is_deleted: boolean;
-  is_sample: boolean;
-  original_file: string | null;
 }
 
-interface ApiResponse {
-  success: boolean;
-  message: string;
-  data: Dataset[];
+interface SelectProjectProps {
+  selectedSort?: "recent" | "alphabetical" | null;
+  onBack?: () => void;
+  children?: React.ReactNode;
+  onDataFetch?: (data: any[]) => void;
+  onError?: (error: string) => void;
 }
 
-const Dataset = () => {
-  const { projectId } = useParams<{ projectId: string }>(); // Get projectId from the URL
-  const navigate = useNavigate();
-  const [files, setFiles] = useState<Dataset[]>([]);
+const ShowProject: React.FC<SelectProjectProps> = ({
+  selectedSort = "recent",
+  children,
+  onDataFetch,
+  onError,
+}) => {
+  const [isDeleting, setIsDeleting] = useState<string | null>(null);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-const idProject="67690fb51bcae8b9eded07c9";
-  useEffect(() => {
-    const fetchFiles = async () => {
-      try {
-        const response = await axios.get<ApiResponse>(
-          `http://127.0.0.1:8000/api/v1/projects/${idProject}/files/`
-        );
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(
+    null
+  );
 
-        if (response.data.success && response.data.data) {
-          const filteredFiles = response.data.data.filter(
-            (file) => file.is_sample
+  const navigate = useNavigate();
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchProjects = async () => {
+      if (!isMounted) return;
+
+      setIsLoading(true);
+      try {
+        const response = await request({
+          url: `http://3.24.110.41:8000/api/v1/projects/`,
+          method: "GET",
+        });
+
+        if (isMounted && response.data?.results) {
+          console.log("API Response:", response.data.results); 
+          const filteredProjects = response.data.results.filter(
+            (project: any) =>
+              project.project_name === "Dataset" ||
+              project.project_name === "Sample_Data" ||
+              project.project_name === "Data_Sample"
           );
-          console.log("Filtered files (is_sample):", filteredFiles);
-          setFiles(filteredFiles);
-        } else {
-          throw new Error(response.data.message || "Failed to fetch files");
+          console.log("Filtered Projects:", filteredProjects); 
+          setProjects(filteredProjects);
+          onDataFetch?.(filteredProjects);
+        } else if (isMounted) {
+          throw new Error("Failed to fetch projects.");
         }
-      } catch (err) {
-        console.error("Error fetching files:", err);
-        setError(err instanceof Error ? err.message : "Unknown error occurred");
+      } catch (err: any) {
+        if (isMounted) {
+          const errorMessage =
+            err.message || "An error occurred while fetching projects.";
+          setError(errorMessage);
+          onError?.(errorMessage);
+        }
       } finally {
-        setIsLoading(false);
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
     };
 
-    fetchFiles();
-  }, [projectId]);
+    fetchProjects();
 
-  const handleTemporaryDelete = (fileId: string) => {
-    // Temporarily remove the card from the state
-    setFiles((prevFiles) => prevFiles.filter((file) => file._id !== fileId));
-  };
-  // const handleNext = (fileId: string) => {
-  //   if (projectId && fileId) {
-  //     console.log(`Navigating to: /project/${projectId}/file/${fileId}/cleaning`);
-  //     window.location.href = `/project/${projectId}/file/${fileId}/cleaning`;
-  //   } else {
-  //     console.error("Missing projectId or fileId", { projectId, fileId });
-  //   }
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  // const handleDeleteProject = (projectId: string) => {
+  //   // Temporarily remove the project from the UI
+  //   setProjects((prevProjects) =>
+  //     prevProjects.filter((project) => project._id !== projectId)
+  //   );
   // };
 
+  if (children) {
+    return <>{children}</>;
+  }
+
+  const getFilteredProjects = (filter: "recent" | "alphabetical" | null) => {
+    if (filter === "recent") {
+      return [...projects].sort(
+        (a, b) =>
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      );
+    }
+    if (filter === "alphabetical") {
+      return [...projects].sort((a, b) =>
+        a.project_name.localeCompare(b.project_name)
+      );
+    }
+    return projects;
+  };
+
+  const filteredProjects = getFilteredProjects(selectedSort);
+
+  const handleProjectSelect = (project: Project) => {
+    navigate(`/project/${project._id}`, {
+      state: {
+        projectName: project.project_name,
+        projectDescription: project.project_description,
+      },
+    });
+  };
+
+  const updateProject = (
+    projectId: string,
+    newName: string,
+    newDescription: string
+  ) => {
+    setProjects((prevProjects) =>
+      prevProjects.map((project) =>
+        project._id === projectId
+          ? {
+              ...project,
+              project_name: newName,
+              project_description: newDescription,
+            }
+          : project
+      )
+    );
+  };
+
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <SkeletonLoader />;
   }
 
   if (error) {
-    return <div>Error: {error}</div>;
+    return <p className="text-red-500">Error: {error}</p>;
   }
 
   return (
-    <div className="px-72">
-      <div className="flex flex-col space-y-6">
-        <div className="font-bold">Datasets</div>
-        <div className="flex flex-col space-y-6">
-          {files.map((file, index) => (
-            <div
-              key={file._id}
-              className="flex justify-between items-center p-2 bg-[#f2f5fd] shadow-lg rounded-md cursor-pointer ring-1 hover:ring-blue-500 transition-all"
-              // onClick={() => handleNext(file._id)} // Trigger `handleNext` when clicking the card
-            >
-              <div className="flex flex-row space-x-16 xl:space-x-6 2xl:space-x-12">
-                <div className="flex flex-row justify-center items-center space-x-16 pl-10 xl:space-x-6 2xl:space-x-12">
-                  <p className="text-xl xl:text-sm 2xl:text-base">
-                    #{index + 1}
-                  </p>
-                  <div className="border-l-2 border-gray-500 h-12" />
-                </div>
-                <div className="flex flex-row items-center space-x-4">
-                  <img
-                    src={ImageProject}
-                    alt="File icon"
-                    className="w-12 h-12 object-cover rounded-lg"
-                  />
-                  <div className="flex flex-col">
-                    <h1 className="font-bold text-lg">{file.filename}</h1>
-                    <p className="text-gray-600 text-sm">
-                      Size: {file.size} bytes
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div className="flex flex-row justify-between items-center">
-                <button
-                  className="!ml-0 !pl-0 !px-0 bg-transparent border-transparent hover:bg-transparent hover:border-transparent"
-                  onClick={() => handleTemporaryDelete(file._id)} // Handle temporary delete
-                >
-                  <DeleteIcon className="!text-red-500 bg-gray-200 hover:bg-gray-300 duration-150 p-2 w-10 h-10 xl:w-9 xl:h-w-9 2xl:w-10 2xl:h-10 rounded-xl" />
-                </button>
-              </div>
+    <div className="space-y-5 overflow-auto mt-20 px-40 w-full pb-12">
+      <h1 className="font-bold"> Datasets</h1>
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-10 backdrop-blur-sm z-40" />
+      )}
+      <div className="flex flex-col justify-items-center mt-8 gap-y-4 w-full">
+        {filteredProjects.map((project: Project, index) => (
+          <div
+            key={project._id}
+            onClick={() => handleProjectSelect(project)}
+            className="w-full  p-5 flex space-x-10 rounded-lg ring-2"
+          >
+            {/* Left Section */}
+            <div className="space-x-5 pl-5 flex justify-center items-center text-center text-[18px] ">
+              <span>#{index + 1}</span>
+              <span>|</span>
+              <img
+                src={ImageProject}
+                alt="Project icon"
+                className="w-12 h-12 object-cover rounded-full"
+              />
             </div>
-          ))}
-        </div>
+
+            {/* Middle Section */}
+            <div className="flex justify-between w-full">
+              <div className="font-medium text-[14px] cursor-pointer w-[95%]">
+                <p className="font-bold text-lg">{project.project_name}</p>
+                <p className="text-gray-600">
+                  {formatDate(project.created_at)}
+                </p>
+              </div>
+              {/* <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDeleteProject(project._id);
+                }}
+                className="text-red-500 !bg-transparent text-2xl pr-7 "
+              >
+                <DeleteIcon className="!text-red-500 bg-gray-200 hover:bg-gray-300 duration-150 p-2 w-10 h-10 rounded-xl" />
+              </button> */}
+            </div>
+          </div>
+        ))}
       </div>
+      {isModalOpen && selectedProjectId && (
+        <EditProject
+          projectId={selectedProjectId}
+          initialProjectName={
+            filteredProjects.find((p) => p._id === selectedProjectId)
+              ?.project_name || ""
+          }
+          initialDescription={
+            filteredProjects.find((p) => p._id === selectedProjectId)
+              ?.project_description || ""
+          }
+          onUpdateProject={updateProject}
+          onClose={() => {
+            setIsModalOpen(false);
+          }}
+        />
+      )}
     </div>
   );
 };
 
-export default Dataset;
-// import React, { useEffect, useState } from "react";
-// import Button from "../atoms/Button";
-// import { DeleteIcon,EditIcon } from "../atoms/icons/Icon";
-// import formatDate from "@/src/utils/formatDate";
-// import formatFileSize from "@/src/utils/formatSizeFile";
-// import ImageProject from "@/public/images/saveImage.png";
-// import request from "@/src/utils/helper";
-// import { useNavigate, useParams } from "react-router-dom";
-// import Spinner from "../molecules/loading/Spinner";
-// import DeleteProjectModal from "../molecules/modals/DeleteProjectModal";
-// interface ProjectFile {
-//   _id: string;
-//   filename: string;
-//   size: number;
-//   type: string;
-//   created_at: string;
-//   uuid: string;
-//   is_original: boolean;
-//   is_deleted: boolean;
-//   is_sample: boolean;
-// }
-
-// const Dataset: React.FC = () => {
-//   const { projectId } = useParams();
-//   const [projectFiles, setProjectFiles] = useState<ProjectFile[]>([]);
-//   const [isLoading, setIsLoading] = useState(true);
-//   const [error, setError] = useState<string | null>(null);
-//   const navigate = useNavigate();
-//   const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] =
-//     useState(false);
-//   const [fileIdToDelete, setFileIdToDelete] = useState<string | null>(null);
-
-//   const handleDeleteFile = async (fileId: string) => {
-//     try {
-//       await request({
-//         url: `http://3.24.110.41:8000/api/v1/project/${projectId}/file/${fileId}/delete/`,
-//         method: "DELETE",
-//       });
-//       console.log("File deleted successfully");
-//       // Immediately remove the deleted file from the UI
-//       setProjectFiles((prevFiles) =>
-//         prevFiles.filter((file) => file._id !== fileId)
-//       );
-//     } catch (error) {
-//       setError(error instanceof Error ? error.message : "An error occurred");
-//       console.error("Error Delete file:", error);
-//     }
-//   };
-//   const handleDeleteButtonClick = (fileId: string) => {
-//     setFileIdToDelete(fileId); // Store the file ID to delete
-//     setIsDeleteConfirmationOpen(true);
-//   };
-
-//   // Handle Confirm Delete
-//   // const handleConfirmDelete = () => {
-//   //   handleDeleteFile();
-//   //   setIsDeleteConfirmationOpen(false);
-//   // };
-
-//   // Handle Close Delete Confirmation
-//   const handleCloseDeleteConfirmation = () => {
-//     setIsDeleteConfirmationOpen(false);
-//   };
-
-//   const handleCardClick = (fileId: string) => {
-//     navigate(`/project/${projectId}/file/${fileId}/cleaning`);
-//   };
-
-//   useEffect(() => {
-//     const fetchProjectFiles = async () => {
-//       if (!projectId) return;
-
-//       try {
-//         const response = await request({
-//           url: `http://3.24.110.41:8000/api/v1/projects/${projectId}/files/`,
-//           method: "GET",
-//         });
-
-//         if (response.success && response.data?.data) {
-//           console.log("All file response:", response.data.data);
-//           setProjectFiles(response.data.data);
-//         } else {
-//           console.log("Throwing error due to unsuccessful response");
-//           throw new Error(response.message || "Failed to fetch files");
-//         }
-//       } catch (err: any) {
-//         console.error("Full error object:", err);
-//         const errorMessage =
-//           err.message || "An error occurred while fetching data.";
-//         setError(errorMessage);
-//       } finally {
-//         setIsLoading(false);
-//       }
-//     };
-
-//     fetchProjectFiles();
-//   }, [projectId]);
-//   if (error) {
-//     return (
-//       <div className="text-red-500 p-4 bg-red-50 rounded-lg">
-//         Error: {error}
-//       </div>
-//     );
-//   }
-
-//   if (isLoading) {
-//     return (
-//       <div className="flex justify-center items-center h-48">
-//         <Spinner />
-//       </div>
-//     );
-//   }
-
-//   return (
-//     <div className="flex flex-col space-y-6">
-//       <div className="flex flex-col space-y-6">
-//         {projectFiles.length === 0 ? (
-//           <div className="text-center p-8 bg-gray-50 rounded-xl">
-//             No files found
-//           </div>
-//         ) : (
-//           projectFiles.map((file, index) => (
-//             <div
-//               key={file._id}
-//               onClick={() => {
-//                 handleCardClick(file._id);
-//               }}
-//               className="flex justify-between items-center p-2  bg-[#f2f5fd] shadow-lg rounded-md cursor-pointer ring-1 hover:ring-blue-500 transition-all"
-//             >
-//               <div className="flex flex-row space-x-16 xl:space-x-6 2xl:space-x-12">
-//                 <div className="flex flex-row justify-center items-center space-x-16 pl-10 xl:space-x-6 2xl:space-x-12">
-//                   <p className="text-xl xl:text-sm 2xl:text-base">
-//                     #{index + 1}
-//                   </p>
-//                   <div className="border-l-2 border-gray-500 h-12" />
-//                 </div>
-//                 <div className="flex flex-row items-center space-x-4">
-//                   <img
-//                     src={ImageProject}
-//                     alt="File icon"
-//                     className="w-12 h-12 object-cover rounded-lg"
-//                   />
-//                   <div className="flex flex-col">
-//                     <h1 className="font-bold text-lg">{file.filename}</h1>
-//                     <p className="text-gray-600 text-sm">
-//                       Size: {formatFileSize(file.size)}
-//                     </p>
-//                     <div className="flex gap-2">
-//                       <p className="text-[10px] text-gray-500 bg-blue-200 rounded-md p-1 px-2">
-//                         {formatDate(file.created_at)}
-//                       </p>
-//                       {file.is_original && (
-//                         <span className="text-[10px] text-green-700 bg-green-200 rounded-md p-1 px-2">
-//                           Original
-//                         </span>
-//                       )}
-//                       {file.is_sample && (
-//                         <span className="text-[10px] text-purple-700 bg-purple-200 rounded-md p-1 px-2">
-//                           Sample
-//                         </span>
-//                       )}
-//                     </div>
-//                   </div>
-//                 </div>
-//               </div>
-//               <div className="flex flex-row justify-between items-center">
-//                 <div
-//                   onClick={(e) => {
-//                     e.stopPropagation();
-//                   }}
-//                 >
-//                   <Button
-//                     className="flex !mr-0 !pr-0 !px-0 !pl-2 !py-1 bg-transparent border-transparent hover:bg-transparent hover:border-transparent"
-//                     // onClick={() => handleEditClick(file._id)}
-//                     onClick={() => alert("Edit")}
-//                     startContent={
-//                       <EditIcon className="!text-blue-500 bg-gray-200 hover:bg-gray-300 duration-150 p-2 w-10 h-10 rounded-xl" />
-//                     }
-//                     children=""
-//                     size="small"
-//                     radius="2xl"
-//                     color="secondary"
-//                     isLoading={false}
-//                     isIconOnly={false}
-//                     isDisabled={false}
-//                   />
-//                 </div>
-//                 <div
-//                   onClick={(e) => {
-//                     e.stopPropagation();
-//                   }}
-//                 >
-//                   <Button
-//                     className="!ml-0 !pl-0 !px-0 bg-transparent border-transparent hover:bg-transparent hover:border-transparent"
-//                     startContent={
-//                       <DeleteIcon className="!text-red-500 bg-gray-200 hover:bg-gray-300 duration-150 p-2 w-10 h-10 xl:w-9 xl:h-w-9 2xl:w-10 2xl:h-10 rounded-xl" />
-//                     }
-//                     onClick={() => handleDeleteButtonClick(file._id)}
-//                     size="small"
-//                     radius="2xl"
-//                     color="secondary"
-//                     isLoading={false}
-//                     isIconOnly={false}
-//                   />
-//                   <DeleteProjectModal
-//                     isOpen={isDeleteConfirmationOpen}
-//                     onClose={handleCloseDeleteConfirmation}
-//                     onConfirm={() => {
-//                       handleDeleteFile(file._id);
-//                       setIsDeleteConfirmationOpen(false);
-//                     }}
-//                   />
-//                 </div>
-//               </div>
-//             </div>
-//           ))
-//         )}
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default Dataset;
+export default ShowProject;
