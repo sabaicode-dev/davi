@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import Button from "@/src/components/atoms/Button";
 import Input from "@/src/components/atoms/Input";
 import { FaPlus } from "react-icons/fa6";
-import { FileVisualizeIcon, SortIcon } from "@/src/components/atoms/icons/Icon";
+import { DeleteIcon, FileVisualizeIcon, SortIcon } from "@/src/components/atoms/icons/Icon";
 import { IoIosSearch, IoMdTrash, IoMdCheckmark } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 import moment from "moment";
@@ -176,12 +176,12 @@ const VisualizeCreated: React.FC = () => {
               onClick={() =>
                 navigate("/visualize/detail-visualize", { state: { viz } })
               }
-              className="w-full bg-[#EBF1FF] p-5 flex space-x-10 border-2 border-blue-200 hover:border-blue-500 duration-300 rounded-lg"
+              className="w-full p-5 flex space-x-6 border-2 border-blue-200 hover:border-blue-500 duration-300 rounded-lg"
             >
               {/* Left Section */}
-              <div className="space-x-5 flex justify-center items-center text-center text-[18px]">
-                <span>#{index + 1}</span>
-                <span>|</span>
+              <div className="space-x-4 flex justify-center items-center text-center text-[18px]">
+                <span className="text-lg">#{index + 1}</span>
+                <span className="text-lg">|</span>
                 <span className="bg-[#F4EBFF] rounded-full w-10 h-10 flex justify-center items-center">
                   <FileVisualizeIcon />
                 </span>
@@ -190,7 +190,7 @@ const VisualizeCreated: React.FC = () => {
               {/* Middle Section */}
               <div className="flex justify-between w-full">
                 <div className="font-medium text-[14px] cursor-pointer w-[95%]">
-                  <p className="font-medium">{viz.name}</p>
+                  <h1 className="font-bold">{viz.name}</h1>
                   <p className="text-gray-600">{moment(viz.date).fromNow()}</p>
                 </div>
                 <button
@@ -201,8 +201,7 @@ const VisualizeCreated: React.FC = () => {
                   }}
                   className="text-red-500 !bg-transparent text-2xl"
                 >
-                  <IoMdTrash />
-                </button>
+                  <DeleteIcon className="!text-red-500 bg-gray-200 hover:bg-gray-300 duration-150 p-2 w-10 h-10 rounded-xl" />        </button>
               </div>
             </div>
           ))}

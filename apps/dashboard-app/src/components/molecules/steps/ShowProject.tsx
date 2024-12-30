@@ -307,21 +307,23 @@ const ShowProject: React.FC<SelectProjectProps> = ({
         </p>
       )}
 
-      {filteredProjects.map((project: Project) => (
+      {filteredProjects.map((project: Project, index) => (
         <div
           key={project._id}
           className="flex justify-between items-center px-4 py-2 shadow-lg rounded-md cursor-pointer ring-2 hover:ring-blue-500 transition-all"
           onClick={() => handleProjectSelect(project)}
         >
           <div className="flex flex-row items-center space-x-4">
+            <span className="text-lg">#{index + 1}</span>
+            <span className="text-lg">|</span>
             <img
               src={ImageProject}
               alt="Project icon"
-              className="w-12 h-12 object-cover rounded-lg"
+              className="w-11 h-11 object-cover rounded-lg"
             />
             <div className="flex flex-col">
-              <h1 className="font-bold text-lg">{project.project_name}</h1>
-              <p className="text-gray-600">
+              <h1 className="font-bold">{project.project_name}</h1>
+              <p className="text-gray-600 text-sm">
                 {project.project_description || "No description"}
               </p>
               <p className="text-xs text-gray-500">
