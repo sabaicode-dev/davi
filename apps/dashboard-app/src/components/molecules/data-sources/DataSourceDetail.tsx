@@ -109,7 +109,7 @@ const DataSourceDetail: React.FC = () => {
   return (
     <div className="flex flex-col space-y-6">
       <div className="flex flex-col space-y-6">
-        {projectFiles.length === 0 ? (
+        {projectFiles.length === 0? (
           <div className="text-center p-8 bg-gray-50 rounded-xl">
             No files found
           </div>
