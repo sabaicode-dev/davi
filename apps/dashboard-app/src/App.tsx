@@ -16,6 +16,12 @@ import FinalScreen from "./components/molecules/steps/FinalScreen";
 import CleaningProject from "./components/molecules/steps/CleaningProject";
 import PrivateRoute from "./ProtectedRoute/PrivateRoute";
 import SelectTable from "./components/molecules/steps/selectTable";
+import { MongoConnection } from "./components/molecules/steps/MongoConnection";
+import { MySQLConnection } from "./components/molecules/steps/MySQLConnection";
+import { SQLServerConnection } from "./components/molecules/steps/SQLServerConnection";
+import { ConfirmFiles } from "./components/molecules/steps/ConfirmFiles";
+import { PosgresSQLConnection } from "./components/molecules/steps/PosgresSQLConnection";
+import { MariaDBConnection } from "./components/molecules/steps/MariaDBConnection";
 
 const ProjectFlow = () => {
   return (
@@ -27,6 +33,26 @@ const ProjectFlow = () => {
         element={<UploadCsv />}
       />
       <Route path="pick-datasource/import/:projectId" element={<ImportUrl />} />
+      <Route
+        path="pick-datasource/mongoDB_Connection/:projectId"
+        element={<MongoConnection />}
+      />
+      <Route
+        path="pick-datasource/MySQL_connection/:projectId"
+        element={<MySQLConnection />}
+      />
+      <Route
+        path="pick-datasource/SQLServer_connection/:projectId"
+        element={<SQLServerConnection />}
+      />
+      <Route
+        path="pick-datasource/PosgresSQL_connection/:projectId"
+        element={<PosgresSQLConnection />}
+      />
+      <Route
+        path="pick-datasource/MariaDB_connection/:projectId"
+        element={<MariaDBConnection />}
+      />
     </Routes>
   );
 };
@@ -43,6 +69,10 @@ const routes = [
   {
     path: "/project/:projectId/pick-datasource/import/selectTable",
     element: <SelectTable />,
+  },
+  {
+    path: "/project/:projectId/pick-datasource/query/confirmFiles",
+    element: <ConfirmFiles />,
   },
   { path: "/select-project", element: <ShowProject /> },
   { path: "/project/*", element: <ProjectFlow /> },

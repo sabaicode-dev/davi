@@ -1,4 +1,3 @@
-import React from "react";
 import ShowScraping from "../../templates/ShowScraping";
 const SelectTable = () => {
   return (
