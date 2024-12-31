@@ -164,16 +164,21 @@ const RightSide: React.FC<RightSideProps> = ({
     const selectedChartData = chartData.find(
       (chart) => chart.chartType === chartType
     );
-
+  
     const visualizationData = {
       name,
-      chartType,
-      chartImage: selectedChartData?.img,
-      description,
-      selectedColumns,
+      charts: [
+        {
+          chartType,
+          chartImage: selectedChartData?.img,
+          description,
+          selectedColumns,
+          date: new Date().toISOString(),
+        },
+      ],
       date: new Date().toISOString(),
     };
-
+  
     const updatedVisualizations = [...savedVisualizations, visualizationData];
     localStorage.setItem(
       "savedVisualizations",
