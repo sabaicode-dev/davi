@@ -156,14 +156,18 @@ const RightSide: React.FC<RightSideProps> = ({
     setSavedVisualizations(savedData);
   }, []);
 
-  const handleSaveNew = (name: string) => {
+  const handleSaveNew = (
+    name: string,
+    chartType: string | null,
+    description: string | null
+  ) => {
     const selectedChartData = chartData.find(
-      (chart) => chart.chartType === selectedChart
+      (chart) => chart.chartType === chartType
     );
 
     const visualizationData = {
       name,
-      chartType: selectedChart,
+      chartType,
       chartImage: selectedChartData?.img,
       description,
       selectedColumns,
@@ -323,7 +327,9 @@ const RightSide: React.FC<RightSideProps> = ({
       <SaveDialog
         isOpen={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
-        onSave={(name) => handleSaveNew(name)}
+        onSave={handleSaveNew}
+        chartType={selectedChart}
+        description={description}
       />
 
       <Modal

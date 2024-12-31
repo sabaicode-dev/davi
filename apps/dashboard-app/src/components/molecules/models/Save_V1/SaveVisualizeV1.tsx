@@ -5,10 +5,12 @@ import { SaveVisualizeIcon } from "@/src/components/atoms/icons/Icon";
 interface SaveDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (name: string) => void;
+  onSave: (name: string, chartType: string | null, description: string | null) => void;
+  chartType: string | null;
+  description: string | null;
 }
 
-export function SaveDialog({ isOpen, onClose, onSave }: SaveDialogProps) {
+export function SaveDialog({ isOpen, onClose, onSave, chartType, description }: SaveDialogProps) {
   const [name, setName] = useState("");
 
   useEffect(() => {
@@ -19,7 +21,7 @@ export function SaveDialog({ isOpen, onClose, onSave }: SaveDialogProps) {
 
   const handleSave = () => {
     if (name.trim()) {
-      onSave(name);
+      onSave(name, chartType, description);
       setName("");
     }
   };
