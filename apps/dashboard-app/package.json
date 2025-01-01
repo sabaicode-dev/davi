@@ -12,7 +12,9 @@
     "test-storybook": "test-storybook"
   },
   "dependencies": {
+    "@codemirror/lang-sql": "^6.8.0",
     "@emailjs/browser": "^4.4.1",
+    "@uiw/react-codemirror": "^4.23.7",
     "add": "^2.0.6",
     "apexcharts": "^4.1.0",
     "button": "^1.1.1",
