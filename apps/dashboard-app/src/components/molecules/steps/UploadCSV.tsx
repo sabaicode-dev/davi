@@ -24,6 +24,8 @@ const UploadCsv: React.FC<IUploadCSV> = ({ defaultProjectId }) => {
   const [fileId, setFileId] = useState<string | null>(null);
   const [error, setError] = useState<string>("");
   const [isDragOver, setIsDragOver] = useState<boolean>(false);
+  const [metadataId, setMetadataId] = useState<string | null>(null);
+
 
   const MAX_FILENAME_LENGTH = 30;
 
@@ -92,10 +94,10 @@ const UploadCsv: React.FC<IUploadCSV> = ({ defaultProjectId }) => {
       setError("Project ID is missing.");
       return;
     }
-
+  
     setError("");
     setProgress(0);
-
+  
     try {
       const formData = new FormData();
       formData.append("file", file);
@@ -103,7 +105,7 @@ const UploadCsv: React.FC<IUploadCSV> = ({ defaultProjectId }) => {
       formData.append("size", file.size.toString());
       formData.append("type", "csv");
       formData.append("project_id", projectId);
-
+  
       const config: AxiosRequestConfig = {
         headers: {
           "Content-Type": "multipart/form-data",
@@ -116,21 +118,32 @@ const UploadCsv: React.FC<IUploadCSV> = ({ defaultProjectId }) => {
           setProgress(percentCompleted);
         },
       };
-
+  
       const response = await axios.post(
         `${API_ENDPOINTS.API_URL}/project/${projectId}/file/upload/`,
         formData,
         config
       );
-
+  
+      console.log("Full upload response:", response);
+  
       if (response.status === 201 || response.status === 200) {
-        const uploadedFileId = response.data.data?._id; // Adjust based on your response structure
-        console.log("FileDetails",uploadedFileId);
+        const uploadedFileId = response.data.data?._id;
+        const extractedMetadataId = response.data.data?.metadata_id;
+  
+        console.log("FileDetails", uploadedFileId);
+        console.log("Metadata", extractedMetadataId);
+        
+  
         if (uploadedFileId) {
           setUploadSuccess(true);
           setFileId(uploadedFileId);
+        }
+  
+        if (extractedMetadataId) {
+          setMetadataId(extractedMetadataId); // Save metadataId to state
         } else {
-          setError("File ID not returned in response.");
+          console.warn("Metadata ID not found in response.");
         }
       } else {
         setError("Failed to upload file. Please try again.");
@@ -139,6 +152,7 @@ const UploadCsv: React.FC<IUploadCSV> = ({ defaultProjectId }) => {
       setError("Failed to upload file. Please try again.");
     }
   };
+  
 
   const truncateFileName = (name: string) => {
     const extension = name.split(".").pop();
@@ -154,10 +168,20 @@ const UploadCsv: React.FC<IUploadCSV> = ({ defaultProjectId }) => {
   };
 
   const handleNext = () => {
-    if (uploadSuccess && fileId) {
-      window.location.href = `/project/${projectId}/file/${fileId}/cleaning`;
+    if (uploadSuccess && fileId && metadataId) {
+      const cleaningUrl = `/project/${projectId}/file/${fileId}/cleaning?metadataId=${metadataId}`;
+      console.log("Navigating to URL:", cleaningUrl); // Debugging log
+      window.location.href = cleaningUrl; // Use window.location.href to navigate
+    } else if (uploadSuccess && fileId) {
+      const cleaningUrl = `/project/${projectId}/file/${fileId}/cleaning`;
+      console.log("Navigating to URL without metadata ID:", cleaningUrl); // Debugging log
+      window.location.href = cleaningUrl;
+    } else {
+      console.error("Upload was not successful or fileId/metadataId is missing.");
     }
   };
+  
+  
 
   return (
     <div>

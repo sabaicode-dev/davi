@@ -10,6 +10,11 @@ interface NumberProps {
   onClick: (item: { category: string; name: string; value: number }) => void;
   isAnalysisView?: boolean; // Prop to toggle between normal and analysis view
 }
+type NumericMetrics = {
+  histogram: {
+    buckets: { range: string; count: number }[];
+  };
+};
 
 const Number: React.FC<NumberProps> = ({
   data,
@@ -19,7 +24,7 @@ const Number: React.FC<NumberProps> = ({
   onClick,
   isAnalysisView = false, // Default to normal view
 }) => {
-  const MAX_BARS = isAnalysisView ? data.length : 8; // Show all bars in analysis view
+  const MAX_BARS = isAnalysisView ? 16 : 8; // Show 16 bins in analysis view
 
   const processedData =
     data.length > MAX_BARS
@@ -37,7 +42,24 @@ const Number: React.FC<NumberProps> = ({
   const chartOptions: ApexOptions = {
     chart: {
       type: "bar",
-      toolbar: { show: false },
+      toolbar: {
+        show: isAnalysisView, // Enable toolbar only in analysis view
+        tools: {
+          download: true, // Enable download
+          selection: true, // Enable selection
+          zoom: true, // Enable zoom
+          zoomin: true, // Enable zoom in
+          zoomout: true, // Enable zoom out
+          pan: true, // Enable pan
+          reset: true, // Enable reset
+        },
+        autoSelected: "zoom", // Default tool selected
+      },
+      zoom: {
+        enabled: true, // Enable zoom functionality
+        type: "x", // Enable x-axis zoom
+        autoScaleYaxis: true, // Automatically scale the y-axis
+      },
       animations: { enabled: true },
       events: {
         dataPointSelection: (event, chartContext, config) => {
@@ -118,7 +140,7 @@ const Number: React.FC<NumberProps> = ({
           <div
             className={`text-xs text-blue-800 bg-blue-100 px-2 py-1 rounded`}
           >
-            {`${type}`}
+            Number
           </div>
         </div>
       )}

@@ -1,4 +1,7 @@
-import React from "react";
+import React, { useRef, useState } from "react";
+import Chart from "react-apexcharts";
+import { toPng } from "html-to-image";
+import { ApexOptions } from "apexcharts";
 
 type DataItem = { category: string; value: number };
 type ProcessedDataItem = {
@@ -15,12 +18,11 @@ interface CategoryProps {
   isBig?: boolean; // Determines if the component should render as CategoryBig
 }
 
-// Process data for the normal view
+// Process data
 const processData = (data: DataItem[], showAll: boolean): ProcessedDataItem[] => {
   const totalCount = data.reduce((sum, item) => sum + item.value, 0);
 
   if (showAll) {
-    // Show all categories in the detailed view
     return data.map((item) => ({
       category: item.category,
       count: item.value,
@@ -28,7 +30,6 @@ const processData = (data: DataItem[], showAll: boolean): ProcessedDataItem[] =>
     }));
   }
 
-  // Summarize data for the normal view with "Other+"
   const sortedData = [...data].sort((a, b) => b.value - a.value);
   const topCategories = sortedData.slice(0, 2).map((item) => ({
     category: item.category,
@@ -48,7 +49,6 @@ const processData = (data: DataItem[], showAll: boolean): ProcessedDataItem[] =>
     });
   }
 
-  // Calculate percentages
   topCategories.forEach(
     (item) => (item.percentage = +((item.count / totalCount) * 100).toFixed(1))
   );
@@ -61,14 +61,81 @@ const Category: React.FC<CategoryProps> = ({
   name = "Unknown Header",
   type = "Category",
   onClick,
-  isBig = false, // Default to normal view
+  isBig = false,
 }) => {
   const processedData = processData(data, isBig);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [dropdownVisible, setDropdownVisible] = useState(false);
+
+  const downloadImage = () => {
+    if (dropdownRef.current) {
+      dropdownRef.current.style.display = "none"; // Hide the dropdown temporarily
+    }
+
+    if (containerRef.current) {
+      toPng(containerRef.current)
+        .then((dataUrl) => {
+          const link = document.createElement("a");
+          link.href = dataUrl;
+          link.download = `${name || "image"}.png`;
+          link.click();
+        })
+        .catch((error) => {
+          console.error("Failed to download image", error);
+        })
+        .finally(() => {
+          if (dropdownRef.current) {
+            dropdownRef.current.style.display = ""; // Restore the dropdown visibility
+          }
+        });
+    }
+  };
+
+  const downloadData = () => {
+    const csvContent = processedData
+      .map((item) => `${item.category},${item.count},${item.percentage}%`)
+      .join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `${name || "data"}.csv`;
+    link.click();
+  };
 
   if (isBig) {
-    // Render CategoryBig
     return (
-      <div className="relative w-[400px] bg-white rounded-sm p-4 flex flex-col justify-center">
+      <div
+        ref={containerRef}
+        className="relative w-[400px] bg-white rounded-sm p-4 flex flex-col justify-center"
+      >
+        <div
+          ref={dropdownRef}
+          className="absolute top-0 right-4"
+        >
+          <button
+            className="text-gray-500 hover:text-black"
+            onClick={() => setDropdownVisible(!dropdownVisible)}
+          >
+            ☰
+          </button>
+          {dropdownVisible && (
+            <div className="absolute top-33 w-[120px] right-1 bg-white shadow rounded flex flex-col space-y-1 ">
+              <button
+                onClick={downloadImage}
+                className="text-[11px]  px-4 py-2 hover:bg-gray-100"
+              >
+                Download PNG
+              </button>
+              <button
+                onClick={downloadData}
+                className="text-[11px] px-4 py-2 hover:bg-gray-100"
+              >
+                Download CSV
+              </button>
+            </div>
+          )}
+        </div>
         <div className="w-full h-full flex flex-col justify-evenly">
           {processedData.map((item, index) => (
             <div key={index} className="flex flex-col space-y-2 py-1">
@@ -89,7 +156,6 @@ const Category: React.FC<CategoryProps> = ({
     );
   }
 
-  // Render normal Category
   return (
     <div
       className="relative w-[210px] h-[149px] bg-white rounded-sm shadow-md p-2 flex flex-col justify-center hover:shadow-lg transition-shadow duration-200 cursor-pointer"
@@ -101,14 +167,11 @@ const Category: React.FC<CategoryProps> = ({
         })
       }
     >
-      {/* Title */}
       <div className="absolute top-2 left-2">
         <div className="text-green-800 text-xs bg-green-100 px-2 py-1 rounded">
           {type}
         </div>
       </div>
-
-      {/* Categories */}
       <div className="w-full h-full flex flex-col justify-evenly pt-6 px-2">
         {processedData.map((item, index) => (
           <div

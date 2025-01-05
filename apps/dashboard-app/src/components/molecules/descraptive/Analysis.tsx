@@ -4,13 +4,14 @@ import { XIcon } from "../../atoms/icons/Icon";
 import Boolean from "../charts/Boolean";
 import Category from "../charts/Catagory";
 import Number from "../charts/Number";
-import UniqueValue from "../charts/UniqueValue";
+import DateTimeChart from "../charts/DateTimeChart";
 
 type ChartSelectionData = {
-  category: string; // Matches the key in metadata
+  name?: string;
+  category: string;
   percentage: number;
-  type: string;
-  name?: string; // Chart name
+  type?: string;
+   
 };
 
 type ChartMetadata = {
@@ -18,7 +19,7 @@ type ChartMetadata = {
   name: string;
   description?: string;
   table_column_info: {
-    type: "STRING" | "NUMERIC" | "BOOLEAN";
+    type: "STRING" | "NUMERIC" | "BOOLEAN" | "DATE_TIME";
     order?: number;
     original_type?: string;
     extended_type: string;
@@ -39,6 +40,20 @@ type ChartMetadata = {
     boolean_metrics?: {
       true_count: number;
       false_count: number;
+    };
+    date_time_metrics?: {
+      mean: string;
+      minimum: string;
+      maximum: string;
+      histogram: {
+        buckets: {
+          index: number;
+          label: string;
+          left_value: string;
+          right_value: string;
+          count: number;
+        }[];
+      };
     };
   };
 };
@@ -64,14 +79,9 @@ const Analysis: React.FC<AnalysisProps> = ({
   const matchingMetadata = metadata.find(
     (meta) => meta.key === selectedData.category
   );
-  console.log("Matching Metadata:", matchingMetadata); 
 
-  // // Match metadata by key
-  // const matchingMetadata = selectedData
-  //   ? metadata.find((meta) => meta.key === selectedData.category)
-  //   : null;
-
-  const chartName = selectedData?.name || matchingMetadata?.name || "Unknown Header";
+  const chartName =
+    selectedData?.name || matchingMetadata?.name || "Unknown Header";
 
   // Close the sidebar when clicking outside
   useEffect(() => {
@@ -96,6 +106,36 @@ const Analysis: React.FC<AnalysisProps> = ({
       );
     }
   }, [selectedData, matchingMetadata]);
+
+  // Save description to the backend
+  const saveDescription = async () => {
+    try {
+      const response = await fetch(
+        "http://127.0.0.1:8000/api/v1/update-description/",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: matchingMetadata?.key,
+            description,
+          }),
+        }
+      );
+
+      const result = await response.json();
+
+      if (result.status === "success") {
+        console.log("Description updated successfully");
+        setIsEditing(false); // Exit edit mode on success
+      } else {
+        console.error("Failed to update description:", result.message);
+      }
+    } catch (error) {
+      console.error("Failed to save description:", error);
+    }
+  };
 
   return (
     <div
@@ -123,9 +163,7 @@ const Analysis: React.FC<AnalysisProps> = ({
         </div>
         <div className="bg-orange-400 rounded-lg p-3 text-center flex-1">
           <p className="text-sm text-gray-700">Empty Values</p>
-          <p className="text-lg font-bold">
-            {0 || 0}
-          </p>
+          <p className="text-lg font-bold">{0 || 0}</p>
         </div>
         <div className="bg-purple-300 rounded-lg p-3 text-center flex-1">
           <p className="text-sm text-gray-700">Unique Values</p>
@@ -156,7 +194,10 @@ const Analysis: React.FC<AnalysisProps> = ({
             </p>
           )}
           <button
-            onClick={() => setIsEditing(!isEditing)}
+            onClick={() => {
+              if (isEditing) saveDescription();
+              else setIsEditing(true);
+            }}
             className="ml-2 text-gray-500 hover:text-gray-700"
           >
             {isEditing ? (
@@ -168,72 +209,116 @@ const Analysis: React.FC<AnalysisProps> = ({
         </div>
       </div>
 
-      {/* Data Type Section */}
-      <div className="mb-5">
-        <h3 className="text-lg font-medium mb-3">Data Type</h3>
-        <span className="bg-blue-100 text-blue-700 text-xs px-3 py-1 rounded-full">
-          {selectedData?.type || "Unknown Header"}
-        </span>
+      {/* Distribution Bar Chart */}
+      <div className="mt-5">
+        <h3 className="text-lg font-medium mb-3">Distribution</h3>
+        <div className=" rounded-lg flex items-center justify-center">
+          {(() => {
+            // Determine the chart type dynamically
+            switch (selectedData?.type) {
+              case "NUMERIC":
+                const numericMetrics = matchingMetadata?.table_column_metrics
+                  ?.numeric_metrics as any;
+
+                const histogram = numericMetrics?.histogram?.buckets;
+
+                if (Array.isArray(histogram)) {
+                  return (
+                    <Number
+                      data={histogram.map((bucket) => bucket.count)}
+                      labels={histogram.map((bucket) => bucket.label)}
+                      name={selectedData.name || "Numeric Distribution"}
+                      type="NUMERIC"
+                      onClick={() => {}}
+                      isAnalysisView={true}
+                    />
+                  );
+                } else {
+                  return <p>No Numeric Data Available</p>;
+                }
+
+              case "STRING":
+                const stringCounts =
+                  matchingMetadata?.table_column_metrics?.string_metrics
+                    ?.counts;
+
+                if (Array.isArray(stringCounts)) {
+                  return (
+                    <Category
+                      data={stringCounts.map((item) => ({
+                        category: item.key,
+                        value: item.value,
+                      }))}
+                      name={selectedData.name || "Category Distribution"}
+                      type="STRING"
+                      onClick={() => {}}
+                      isBig={true}
+                    />
+                  );
+                } else {
+                  return <p>No String Data Available</p>;
+                }
+
+              case "DATE_TIME":
+                const dateTimeBuckets =
+                  matchingMetadata?.table_column_metrics?.date_time_metrics
+                    ?.histogram?.buckets;
+
+                if (Array.isArray(dateTimeBuckets)) {
+                  return (
+                    <DateTimeChart
+                      data={dateTimeBuckets.map((bucket) => ({
+                        index: bucket.index,
+                        label: bucket.label,
+                        left_value: bucket.left_value,
+                        right_value: bucket.right_value,
+                        count: bucket.count,
+                      }))}
+                      name={selectedData.name || "Date Time Distribution"}
+                      isBig={true}
+                      onClick={({ category, name, value }) => {
+                        ({
+                          category,
+                          name,
+                          value,
+                        });
+                      }}
+                    />
+                  );
+                } else {
+                  return <p>No Date Time Data Available</p>;
+                }
+
+              case "BOOLEAN": {
+                const booleanMetrics =
+                  matchingMetadata?.table_column_metrics?.boolean_metrics;
+
+                if (booleanMetrics) {
+                  const booleanData = {
+                    true: booleanMetrics.true_count || 0,
+                    false: booleanMetrics.false_count || 0,
+                  };
+
+                  return (
+                    <Boolean
+                      data={booleanData}
+                      title={selectedData.type}
+                      isBig={true}
+                      onClick={({ category, type, value }) => {
+                        console.log({ category, type, value });
+                      }}
+                    />
+                  );
+                }
+                return <p>No Boolean Data Available</p>;
+              }
+
+              default:
+                return <p>Unsupported Chart Type</p>;
+            }
+          })()}
+        </div>
       </div>
-
-     {/* Distribution Bar Chart */}
-
-   {/* Distribution Bar Chart */}
-<div className="mt-5">
-  <h3 className="text-lg font-medium mb-3">Distribution</h3>
-  <div className=" rounded-lg flex items-center justify-center">
-    {(() => {
-      // Determine the chart type dynamically
-      switch (selectedData?.type) {
-        case "NUMERIC":
-          const histogram =
-          matchingMetadata?.table_column_metrics?.numeric_metrics?.histogram?.buckets;
-
-          if (Array.isArray(histogram)) {
-            return (
-              <Number
-              data={histogram.map((bucket) => bucket.count)}
-              labels={histogram.map((bucket) => bucket.label)}
-              name={selectedData.name || "Numeric Distribution"}
-              type="NUMERIC"
-              onClick={() => {}}
-              isAnalysisView={true} 
-            />
-            );
-          } else {
-            return <p>No Numeric Data Available</p>;
-          }
-        case "STRING":
-          const stringCounts =
-            matchingMetadata?.table_column_metrics?.string_metrics?.counts;
-
-          if (Array.isArray(stringCounts)) {
-            return (
-              <Category
-                data={stringCounts.map((item) => ({
-                  category: item.key,
-                  value: item.value,
-                }))}
-                name={selectedData.name || "Category Distribution"}
-                type="STRING"
-                onClick={() => {}}
-                isBig={true} 
-              />
-            );
-          } else {
-            return <p>No String Data Available</p>;
-          }
-        default:
-          return <p>Unsupported Chart Type</p>;
-      }
-    })()}
-  </div>
-</div>
-
-
-    
-
-
     </div>
   );
 };

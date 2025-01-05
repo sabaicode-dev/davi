@@ -16,15 +16,16 @@ export interface ChartSelectionData {
   category: string;
   percentage: number;
   type: string;
-  name?: string;
+  name?: string ;
 }
+
 
 export interface ChartMetadata {
   key: string;
-  name: string;
+  name?: string;
   description?: string;
   table_column_info: {
-    type: "STRING" | "NUMERIC" | "BOOLEAN";
+    type: "STRING" | "NUMERIC" | "BOOLEAN" | "DATE_TIME";
     order?: number;
     original_type?: string;
     extended_type: string;
@@ -48,7 +49,6 @@ export interface ChartMetadata {
     };
   };
 }
-
 
 interface ApiResponse {
   count: number;
@@ -99,9 +99,9 @@ const FinalScreen: React.FC = () => {
     Record<string, any>[] | null
   >(null);
 
-  const [descriptionMap, setDescriptionMap] = useState<{ [key: string]: string }>(
-    {}
-  );
+  const [descriptionMap, setDescriptionMap] = useState<{
+    [key: string]: string;
+  }>({});
 
   const [showPopup, setShowPopup] = useState(false); // Tracks popup visibility
   const { projectId, fileId } = useParams();
@@ -121,6 +121,7 @@ const FinalScreen: React.FC = () => {
     category: string;
     percentage: number;
     type: string;
+    name:string
   } | null>(null);
 
   console.log(" selectedAnalysis::: ", selectedAnalysis);
@@ -143,7 +144,7 @@ const FinalScreen: React.FC = () => {
 
       // Fetch table data
       const tableResponse = await fetch(
-        `http://3.24.110.41:8000/api/v1/project/${projectId}/file/${fileId}/details/`
+        `http://127.0.0.1:8000/api/v1/project/${projectId}/file/${fileId}/details/`
       );
 
       if (!tableResponse.ok) {
@@ -176,7 +177,7 @@ const FinalScreen: React.FC = () => {
       // Fetch metadata
       console.log("Fetching metadata...");
       const metadataResponse = await fetch(
-        `http://127.0.0.1:8000/api/v1/metadata/67691e3ebe7479aa09da151d/`
+        `http://127.0.0.1:8000/api/v1/metadata/6779ad0e491cafefd5cff09c/`
       );
 
       if (!metadataResponse.ok) {
@@ -190,10 +191,12 @@ const FinalScreen: React.FC = () => {
       if (metadataJson && Array.isArray(metadataJson.metadata)) {
         setMetadata(metadataJson.metadata); // Ensure metadata is an array
       } else {
-        console.error("Metadata is not properly formatted:", metadataJson.metadata);
+        console.error(
+          "Metadata is not properly formatted:",
+          metadataJson.metadata
+        );
         setMetadata([]); // Set an empty array as a fallback
       }
-      
     } catch (error) {
       // Handle errors
       setError(
@@ -205,40 +208,43 @@ const FinalScreen: React.FC = () => {
     }
   };
 
-  
   const handleChartSelect = (
     metadata: ChartMetadata | ChartMetadata[],
     chartData: ChartSelectionData
   ) => {
     console.log("Chart Data:", chartData); // Debug chart data
-    console.log("Metadata:", metadata);   // Debug metadata
-  
+    console.log("Metadata:", metadata); // Debug metadata
+
     // Ensure metadata is always treated as an array
     const metadataArray = Array.isArray(metadata) ? metadata : [metadata];
-  
+
     // Find the matching metadata by key
     const matchedMetadata = metadataArray.find(
       (meta) => meta.key === chartData.category
     );
-  
+
     console.log("Matched Metadata:", matchedMetadata); // Debug matched metadata
-  
-    // Update the selected analysis state
-    setSelectedAnalysis(
-      matchedMetadata
-        ? { ...chartData, name: matchedMetadata.name }
-        : null
-    );
-  
+
+    if (matchedMetadata) {
+      const updatedAnalysis = {
+        name: matchedMetadata.name || "Default Name", // Fallback to a default name
+        category: chartData.category,
+        percentage: chartData.percentage,
+        type: chartData.type,
+      };
+    
+      setSelectedAnalysis(updatedAnalysis);
+    } else {
+      setSelectedAnalysis(null);
+    }
+    
+
     if (!matchedMetadata) {
       console.warn(
         `No matching metadata found for category: ${chartData.category}`
       );
     }
   };
-  
-  
-  
 
   const handleColumnSelection = (columns: string[], columnData: any[]) => {
     if (JSON.stringify(selectedColumns) !== JSON.stringify(columns)) {
@@ -358,7 +364,6 @@ const FinalScreen: React.FC = () => {
     }
     setVisibleHeaders(updatedHeaders);
   };
-
 
   const handleCloseAnalysis = () => {
     setSelectedAnalysis(null);
@@ -496,10 +501,14 @@ const FinalScreen: React.FC = () => {
       {/* Analysis sidebar */}
       {selectedAnalysis && (
         <Analysis
-        selectedData={selectedAnalysis}
+        selectedData={{
+          ...selectedAnalysis as ChartSelectionData, // Assert the type explicitly
+          name: selectedAnalysis.name || "Default Name", // Provide fallback value
+        }}
         onClose={() => setSelectedAnalysis(null)}
         metadata={metadata}
-      />  
+      />
+      
       )}
 
       {showRightSide && (

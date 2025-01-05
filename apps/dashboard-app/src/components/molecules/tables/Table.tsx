@@ -187,7 +187,7 @@ const Table: React.FC<TableProps> = ({
 
   return (
     <div
-      className="overflow-auto w-full border-[1px] border-gray-400 "
+      className="overflow-auto w-full border-[1px] border-gray-400"
       style={{ height: isFullHeight ? "100%" : "95%" }}
     >
       <table
@@ -227,7 +227,9 @@ const Table: React.FC<TableProps> = ({
                   >
                     {columnMetadata
                       ? renderChart(columnMetadata, onChartSelect) // Dynamically render chart for this column
-                      : "No Chart"}
+                      : <div className="w-[209px] h-[149px] bg-red-50 flex items-center justify-center">
+                              No chart Thanks!!
+                            </div>}
                   </td>
                 );
               })}
