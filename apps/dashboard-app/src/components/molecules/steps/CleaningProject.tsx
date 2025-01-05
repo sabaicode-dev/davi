@@ -12,7 +12,7 @@ import { AutoCleaningModal } from "../modals/AutoCleaningModal";
 import axios from "axios";
 import download from "downloadjs";
 import { API_ENDPOINTS } from "@/src/utils/const/apiEndpoint";
-import DeleteProjectModal from "../modals/DeleteProjectModal";
+import { useLocation } from "react-router-dom";
 // Prop descripe the data response from api
 interface ApiResponse {
   count: number;
@@ -100,6 +100,10 @@ const CleaningProject: React.FC = () => {
     }
   };
   const { projectId, fileId } = useParams();
+  const location = useLocation();
+  const [metadataId, setMetadataId] = useState<string | null>(null);
+  const [metadata, setMetadata] = useState<any>(null);
+
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [dataIssuesDetails, setDataIssuesDetails] = useState({
@@ -107,8 +111,51 @@ const CleaningProject: React.FC = () => {
     duplicateRows: [],
     outliers: {},
   });
-  const [filename, setFilename] = useState();
+ 
+
+
+
+  useEffect(() => {
+    const currentUrl = window.location.href;
+    console.log("Current URL in CleaningProject:", currentUrl);
+  
+    const queryParams = new URLSearchParams(window.location.search);
+    const extractedMetadataId = queryParams.get("metadataId");
+    console.log("Extracted Metadata ID from URL:", extractedMetadataId);
+  
+    if (extractedMetadataId) {
+      setMetadataId(extractedMetadataId);
+    } else {
+      console.warn("Metadata ID is missing in query parameters.");
+    }
+  }, []);
+  
+
+  
+  
+  useEffect(() => {
+    if (metadataId) {
+      console.log("Metadata ID available for fetching:", metadataId);
+      fetchMetadata(metadataId);
+    } else {
+      console.warn("Metadata ID is not set. Skipping metadata fetch.");
+    }
+  }, [metadataId]);
+  
+  
+  
+  
+  
+  const [filename, setFilename] = useState<string | undefined>();
   // Handle useEffect to fetch data to table before take it to cleaning.
+
+
+  
+  
+  console.log("Current URL:", window.location.href);
+
+
+  
   useEffect(() => {
     fetchData();
   }, [projectId, fileId]);
@@ -118,17 +165,22 @@ const CleaningProject: React.FC = () => {
       setIsLoading(false);
       return;
     }
-
+  
     try {
       setIsLoading(true);
+  
       const response = await request({
         url: `${API_ENDPOINTS.API_URL}/project/${projectId}/file/${fileId}/details/`,
         method: "GET",
       });
-
-      // Check if the request was successful
+  
+      // Log the full response to debug structure
+      console.log("Full response:", response);
+  
       if (response.success) {
         const jsonData: ApiResponse = response.data;
+  
+        // Existing logic for setting table data and filename
         setTableData({
           headers: jsonData.headers,
           data: jsonData.results,
@@ -136,20 +188,9 @@ const CleaningProject: React.FC = () => {
           total_column: jsonData.dataset_summary?.total_columns,
           filename: jsonData.filename,
         });
-        setFilename(response.data.filename);
-        // Debug data
-        console.log(response.data.headers);
-        console.log(response.data.filename);
-
-        if (handleFileDetailsUpdate) {
-          handleFileDetailsUpdate({
-            filename: jsonData.filename || "",
-            totalRows: jsonData.dataset_summary?.total_rows || 0,
-            totalColumns: jsonData.dataset_summary?.total_columns || 0,
-          });
-        }
+        setFilename(jsonData.filename);
+  
       } else {
-        // Handle unsuccessful request
         setError(response.message || "Failed to fetch data");
       }
     } catch (error) {
@@ -159,6 +200,32 @@ const CleaningProject: React.FC = () => {
       setIsLoading(false);
     }
   };
+
+  
+  const fetchMetadata = async (metadataId: string) => {
+    try {
+      const response = await fetch(
+        `${API_ENDPOINTS.API_URL}/metadata/${metadataId}/`,
+        { method: "GET" }
+      );
+  
+      if (!response.ok) {
+        throw new Error(`Failed to fetch metadata. Status: ${response.status}`);
+      }
+  
+      const metadata = await response.json();
+      console.log("Metadata fetched successfully:", metadata);
+  
+      // Save metadata in the state
+      setMetadata(metadata);
+    } catch (error) {
+      console.error("Error fetching metadata:", error);
+    }
+  };
+  
+  
+
+
   const HandleDownLoadFile = async () => {
     try {
       const res = await axios.get(

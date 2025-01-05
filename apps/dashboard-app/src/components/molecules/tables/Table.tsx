@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { renderChart } from "@/src/utils/renderChart";
-import Category from "../charts/Catagory";
 
 interface TableProps {
   headers: string[];
@@ -24,7 +23,6 @@ interface TableProps {
     type: string;
   }) => void; // Add this property
 }
-
 
 interface ChartMetadata {
   key: string;
@@ -64,6 +62,7 @@ const Table: React.FC<TableProps> = ({
   showChart = false,
   onSaveCell,
   onColumnSelect,
+  onChartSelect,
   isFullHeight = false,
 }) => {
   const [tableData, setTableData] = useState<Array<Record<string, any>>>(data);
@@ -186,10 +185,9 @@ const Table: React.FC<TableProps> = ({
     new Map(metadata.map((item) => [item.key, item])).values()
   );
 
-
   return (
     <div
-      className="overflow-auto w-full border-[1px] border-gray-400 "
+      className="overflow-auto w-full border-[1px] border-gray-400"
       style={{ height: isFullHeight ? "100%" : "95%" }}
     >
       <table
@@ -218,18 +216,20 @@ const Table: React.FC<TableProps> = ({
           {showChart && (
             <tr className="bg-[#F7FAFF] ">
               {headers.map((header, index) => {
-                const columnMetadata = uniqueMetadata.find(
-                  (col) => col.name === header
-                ) as any;
-                
+                const columnMetadata = Array.isArray(uniqueMetadata)
+                  ? uniqueMetadata.find((col) => col.name === header)
+                  : (null as any);
+
                 return (
                   <td
                     key={`${header}-${index}`}
-                    className="border-gray-500 border-[1px] w-[210px] h-[149px] "
+                    className="border-gray-500 border-[1px] w-[210px] h-[149px]"
                   >
                     {columnMetadata
-                      ? renderChart(columnMetadata) // Dynamically render chart for this column
-                      : "No Chart"}
+                      ? renderChart(columnMetadata, onChartSelect) // Dynamically render chart for this column
+                      : <div className="w-[209px] h-[149px] bg-red-50 flex items-center justify-center">
+                              No chart Thanks!!
+                            </div>}
                   </td>
                 );
               })}
