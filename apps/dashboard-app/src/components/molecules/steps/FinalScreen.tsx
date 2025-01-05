@@ -183,9 +183,9 @@ const FinalScreen: React.FC = () => {
       const newChartData: Array<{ chartType: string; img: string }> = [];
       const chartTypes = [
         "pie_chart",
-        "bar_chart",
+        "donut_chart",
         "area_chart",
-        "column_chart",
+        "map_chart",
       ];
 
       for (const chartType of chartTypes) {
