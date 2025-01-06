@@ -226,7 +226,7 @@ const RightSide: React.FC<RightSideProps> = ({
     }
   };
   return (
-    <div className="flex flex-col w-[400px] h-full fixed top-16 right-0 bg-white shadow-2xl z-50 overflow-y-scroll">
+    <div className="flex flex-col w-[450px] h-full fixed top-16 right-0 bg-white shadow-2xl z-50 overflow-y-scroll">
       {/* Header */}
       <div className="flex flex-row justify-between items-center px-6 py-4 border-b">
         <h1 className="text-[16px] font-bold">Recommend Chart</h1>
