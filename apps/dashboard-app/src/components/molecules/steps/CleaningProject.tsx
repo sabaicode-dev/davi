@@ -12,7 +12,6 @@ import { AutoCleaningModal } from "../modals/AutoCleaningModal";
 import axios from "axios";
 import download from "downloadjs";
 import { API_ENDPOINTS } from "@/src/utils/const/apiEndpoint";
-import { useLocation } from "react-router-dom";
 // Prop descripe the data response from api
 interface ApiResponse {
   count: number;
@@ -133,14 +132,10 @@ const CleaningProject: React.FC = () => {
     try {
       setIsLoading(true);
 
-      console.log("Metadata", metadataId);
       const response = await request({
         url: `${API_ENDPOINTS.API_URL}/project/${projectId}/file/${fileId}/details/`,
         method: "GET",
       });
-
-      // Log the full response to debug structure
-      console.log("Full response:", response);
 
       if (response.success) {
         const jsonData: ApiResponse = response.data;
