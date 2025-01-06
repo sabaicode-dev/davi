@@ -91,18 +91,23 @@ const CleaningProject: React.FC = () => {
   };
 
   const handleNextClick = () => {
-    try {
-      console.log("Attempting to navigate");
-      navigate(`/project/${projectId}/file/${fileId}/finalscreen`);
-      console.log("Navigation successful");
-    } catch (error) {
-      console.error("Navigation error:", error);
+    if (!metadataId || !fileId || !projectId) {
+      console.error(
+        "Missing required parameters (metadataId, fileId, or projectId)."
+      );
+      return;
     }
+  
+    console.log("Navigating to FinalScreen with metadataId:", metadataId);
+    navigate(`/project/${projectId}/file/${fileId}/finalscreen`, {
+      state: { metadataId }, // Pass metadataId in navigation state
+    });
   };
+  
+
   const { projectId, fileId } = useParams();
-  const location = useLocation();
   const [metadataId, setMetadataId] = useState<string | null>(null);
-  const [metadata, setMetadata] = useState<any>(null);
+  const [metadata, setMetadata] = useState(null);
 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -111,51 +116,10 @@ const CleaningProject: React.FC = () => {
     duplicateRows: [],
     outliers: {},
   });
- 
 
-
-
-  useEffect(() => {
-    const currentUrl = window.location.href;
-    console.log("Current URL in CleaningProject:", currentUrl);
-  
-    const queryParams = new URLSearchParams(window.location.search);
-    const extractedMetadataId = queryParams.get("metadataId");
-    console.log("Extracted Metadata ID from URL:", extractedMetadataId);
-  
-    if (extractedMetadataId) {
-      setMetadataId(extractedMetadataId);
-    } else {
-      console.warn("Metadata ID is missing in query parameters.");
-    }
-  }, []);
-  
-
-  
-  
-  useEffect(() => {
-    if (metadataId) {
-      console.log("Metadata ID available for fetching:", metadataId);
-      fetchMetadata(metadataId);
-    } else {
-      console.warn("Metadata ID is not set. Skipping metadata fetch.");
-    }
-  }, [metadataId]);
-  
-  
-  
-  
-  
   const [filename, setFilename] = useState<string | undefined>();
   // Handle useEffect to fetch data to table before take it to cleaning.
 
-
-  
-  
-  console.log("Current URL:", window.location.href);
-
-
-  
   useEffect(() => {
     fetchData();
   }, [projectId, fileId]);
@@ -165,21 +129,22 @@ const CleaningProject: React.FC = () => {
       setIsLoading(false);
       return;
     }
-  
+
     try {
       setIsLoading(true);
-  
+
+      console.log("Metadata", metadataId);
       const response = await request({
         url: `${API_ENDPOINTS.API_URL}/project/${projectId}/file/${fileId}/details/`,
         method: "GET",
       });
-  
+
       // Log the full response to debug structure
       console.log("Full response:", response);
-  
+
       if (response.success) {
         const jsonData: ApiResponse = response.data;
-  
+
         // Existing logic for setting table data and filename
         setTableData({
           headers: jsonData.headers,
@@ -189,7 +154,6 @@ const CleaningProject: React.FC = () => {
           filename: jsonData.filename,
         });
         setFilename(jsonData.filename);
-  
       } else {
         setError(response.message || "Failed to fetch data");
       }
@@ -201,9 +165,21 @@ const CleaningProject: React.FC = () => {
     }
   };
 
-  
+  useEffect(() => {
+    // Retrieve metadataId from localStorage
+    const storedMetadataId = localStorage.getItem("metadataId");
+    if (storedMetadataId) {
+      console.log("Retrieved metadataId from localStorage:", storedMetadataId);
+      setMetadataId(storedMetadataId);
+      fetchMetadata(storedMetadataId);
+    } else {
+      console.error("No metadataId found in localStorage.");
+    }
+  }, []);
+
   const fetchMetadata = async (metadataId: string) => {
     try {
+      console.log("Fetching metadata for metadataId:", metadataId);
       const response = await fetch(
         `${API_ENDPOINTS.API_URL}/metadata/${metadataId}/`,
         { method: "GET" }
@@ -215,16 +191,13 @@ const CleaningProject: React.FC = () => {
   
       const metadata = await response.json();
       console.log("Metadata fetched successfully:", metadata);
-  
-      // Save metadata in the state
       setMetadata(metadata);
     } catch (error) {
       console.error("Error fetching metadata:", error);
+      setMetadata(null);
     }
   };
   
-  
-
 
   const HandleDownLoadFile = async () => {
     try {
@@ -410,6 +383,7 @@ const CleaningProject: React.FC = () => {
             color="primary"
             className="absolute right-0 bottom-0 border-blue-500 w-20"
             onClick={handleNextClick}
+            isDisabled={!metadataId} // Disable if metadataId is not available
           />
         </div>
         {/* Modal - Show Cleaning */}

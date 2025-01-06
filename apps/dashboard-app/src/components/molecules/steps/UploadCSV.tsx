@@ -129,10 +129,10 @@ const UploadCsv: React.FC<IUploadCSV> = ({ defaultProjectId }) => {
   
       if (response.status === 201 || response.status === 200) {
         const uploadedFileId = response.data.data?._id;
-        const extractedMetadataId = response.data.data?.metadata_id;
+        const metadataId = response.data.data?.metadata_id;
   
         console.log("FileDetails", uploadedFileId);
-        console.log("Metadata", extractedMetadataId);
+        console.log("Metadata",metadataId);
         
   
         if (uploadedFileId) {
@@ -140,11 +140,13 @@ const UploadCsv: React.FC<IUploadCSV> = ({ defaultProjectId }) => {
           setFileId(uploadedFileId);
         }
   
-        if (extractedMetadataId) {
-          setMetadataId(extractedMetadataId); // Save metadataId to state
+        if (metadataId) {
+          setMetadataId(metadataId); // Save to state
+          localStorage.setItem("metadataId", metadataId); // Save to localStorage
         } else {
           console.warn("Metadata ID not found in response.");
         }
+        
       } else {
         setError("Failed to upload file. Please try again.");
       }
@@ -168,18 +170,11 @@ const UploadCsv: React.FC<IUploadCSV> = ({ defaultProjectId }) => {
   };
 
   const handleNext = () => {
-    if (uploadSuccess && fileId && metadataId) {
-      const cleaningUrl = `/project/${projectId}/file/${fileId}/cleaning?metadataId=${metadataId}`;
-      console.log("Navigating to URL:", cleaningUrl); // Debugging log
-      window.location.href = cleaningUrl; // Use window.location.href to navigate
-    } else if (uploadSuccess && fileId) {
-      const cleaningUrl = `/project/${projectId}/file/${fileId}/cleaning`;
-      console.log("Navigating to URL without metadata ID:", cleaningUrl); // Debugging log
-      window.location.href = cleaningUrl;
-    } else {
-      console.error("Upload was not successful or fileId/metadataId is missing.");
+    if (uploadSuccess && fileId) {
+      window.location.href = `/project/${projectId}/file/${fileId}/cleaning`;
     }
   };
+  
   
   
 

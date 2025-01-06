@@ -5,7 +5,7 @@ import { DeleteIcon, DownloadIcon, V } from "../../atoms/icons/Icon";
 import Input from "../../atoms/Input";
 import { CiFilter } from "react-icons/ci";
 import Table from "../tables/Table";
-import { useParams } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import Spinner from "../loading/Spinner";
 import RightSide from "@/src/components/molecules/right-side/RightSide";
 import axios from "axios";
@@ -124,28 +124,26 @@ const FinalScreen: React.FC = () => {
     type: string;
     name:string
   } | null>(null);
+  const location = useLocation(); // Access state passed from CleaningProject
+  const metadataId = location.state?.metadataId; // Retrieve metadataId from navigation state
 
-  console.log(" selectedAnalysis::: ", selectedAnalysis);
 
-  console.log(" selectedAnalysis::: ", selectedAnalysis);
-
-  // Fetch data when component mounts or when params change
   useEffect(() => {
-    if (projectId && fileId) {
-      fetchData();
-    } else {
-      setError("Project ID or File ID is missing");
-      setIsLoading(false);
+    if (!metadataId || !projectId || !fileId) {
+      setError("Missing required parameters (metadataId, projectId, or fileId).");
+      return;
     }
-  }, [projectId, fileId]);
+    fetchData();
+  }, [metadataId, projectId, fileId]);
 
+  // Fetch Table Data and Metadata
   const fetchData = async () => {
     try {
       setIsLoading(true);
 
       // Fetch table data
       const tableResponse = await fetch(
-        `${API_ENDPOINTS.API_URL}/project/${projectId}/file/${fileId}/details/`
+        `http://127.0.0.1:8000/api/v1/project/${projectId}/file/${fileId}/details/`
       );
 
       if (!tableResponse.ok) {
@@ -174,40 +172,31 @@ const FinalScreen: React.FC = () => {
           totalColumns: tableJsonData.dataset_summary.total_columns || 0,
         });
       }
-
-      // Fetch metadata
-      console.log("Fetching metadata...");
+      // Fetch Metadata
       const metadataResponse = await fetch(
-        `${API_ENDPOINTS.API_URL}/metadata/677a986a214aa68867c066cf/`
+        `${API_ENDPOINTS.API_URL}/metadata/${metadataId}/`
       );
-
+  
       if (!metadataResponse.ok) {
-        throw new Error(`HTTP error! status: ${metadataResponse.status}`);
+        throw new Error(`Failed to fetch metadata. Status: ${metadataResponse.status}`);
       }
-
+  
       const metadataJson = await metadataResponse.json();
-      setMetadata(metadataJson.metadata || []);
       console.log("Fetched metadata:", metadataJson);
-
-      if (metadataJson && Array.isArray(metadataJson.metadata)) {
-        setMetadata(metadataJson.metadata); // Ensure metadata is an array
+  
+      if (metadataJson.metadata) {
+        setMetadata(metadataJson.metadata);
       } else {
-        console.error(
-          "Metadata is not properly formatted:",
-          metadataJson.metadata
-        );
-        setMetadata([]); // Set an empty array as a fallback
+        setError("No metadata available.");
       }
     } catch (error) {
-      // Handle errors
-      setError(
-        error instanceof Error ? error.message : "An unexpected error occurred"
-      );
+      setError(error instanceof Error ? error.message : "An unexpected error occurred");
       console.error("Error fetching data:", error);
     } finally {
       setIsLoading(false);
     }
   };
+  
 
   const handleChartSelect = (
     metadata: ChartMetadata | ChartMetadata[],
