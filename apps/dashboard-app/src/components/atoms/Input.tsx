@@ -1,12 +1,13 @@
 import { FC } from "react";
 import classNames from "classnames";
-import { AIIcon } from "./icons/Icon";
 
 export interface InputProps {
   type?: string;
   label?: string;
   placeholder?: string;
+  value?: string;
   defaultValue?: string;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   size?: "sm" | "md" | "lg";
   color?:
     | "default"
@@ -30,7 +31,9 @@ const Input: FC<InputProps> = ({
   type = "text",
   label,
   placeholder = "",
+  value,
   defaultValue = "",
+  onChange,
   size = "md",
   color = "default",
   variant = "flat",
@@ -89,15 +92,13 @@ const Input: FC<InputProps> = ({
       )}
       <div className="flex justify-start items-center border-2 rounded-[10px]">
         {/* Conditionally render the AIIcon based on isIconLeft prop */}
-        {isIconLeft && (
-          <div className="pl-3">
-            <AIIcon />
-          </div>
-        )}
+        {isIconLeft && <div className="pl-3">{/* <AIIcon /> */}</div>}
         <input
           type={type}
           placeholder={labelInside ? label : placeholder}
+          value={value}
           defaultValue={defaultValue}
+          onChange={onChange}
           disabled={isDisabled}
           readOnly={isReadOnly}
           required={isRequired}

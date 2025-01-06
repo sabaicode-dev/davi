@@ -7,9 +7,6 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/src/contexts/AuthContext";
 import { API_ENDPOINTS } from "@/src/utils/const/apiEndpoint";
 
-// const profile =
-//   "https://lh3.googleusercontent.com/a/ACg8ocL_Lr7sprv6IR1-anI0qaEiqeT9p5x5SWA2WVB-c9eBVY0Gu-g=s96-c";
-
 const Header: React.FC = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
@@ -25,17 +22,6 @@ const Header: React.FC = () => {
 
   const handleLogout = async () => {
     try {
-      // Retrieve tokens from localStorage
-      // const authToken = localStorage.getItem("authToken");
-      // const refreshToken = localStorage.getItem("refreshToken"); // Replace "dummyRefreshToken" with the real token
-
-      // Check if tokens are available
-      // if (!authToken || !refreshToken) {
-      //   console.warn("No tokens found. Redirecting to login...");
-      //   window.location.href = "http://localhost:3000/login";
-      //   return;
-      // }
-
       // Call the logout API with the refresh token
       const response = await fetch(API_ENDPOINTS.SIGN_OUT, {
         method: "PUT",
@@ -43,29 +29,15 @@ const Header: React.FC = () => {
           "Content-Type": "application/json",
         },
         credentials: "include",
-        // headers: {
-        //   "Content-Type": "application/json",
-        //   Authorization: `Bearer ${authToken}`, // Include authToken in the header
-        // },
-        // body: JSON.stringify({
-        //   refreshToken, // Send the refreshToken in the body
-        // }),
       });
 
       if (response.ok) {
         console.log("User logged out successfully");
 
-        // Clear tokens and user state from the frontend
-        // localStorage.removeItem("authToken");
-        // localStorage.removeItem("refreshToken");
-
         // Clear any additional user-related state (if necessary)
         setUsername && setUsername(null);
         setEmail && setEmail(null);
         setProfile && setProfile(null);
-
-        // Redirect to the login or signup page
-        // window.location.href = "http://localhost:3000/login";
       } else {
         const errorData = await response.json();
         console.error("Failed to log out:", errorData);

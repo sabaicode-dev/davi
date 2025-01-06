@@ -1,32 +1,38 @@
 const SkeletonLoader = () => {
   return (
-    <div className="flex flex-col space-y-5 overflow-auto mt-4 h-full p-2 border-1 pb-12 w-full">
-      <div className="flex justify-end">
-        <div className="w-32 h-10 bg-gray-300 rounded-lg animate-pulse"></div>
-      </div>
-      {[...Array(5)].map((_, _index) => (
-        <div className="flex justify-between items-center p-5 border-2 border-gray-200 shadow-xl rounded-xl cursor-pointer transition-all bg-white">
-          <div className="flex flex-row space-x-4">
-            {/* Placeholder for the image */}
-            <div className="w-12 h-12 bg-gray-300 animate-pulse rounded-full"></div>
-            <div className="flex flex-col space-y-2">
-              {/* Placeholder for the title */}
-              <div className="w-64 h-4 bg-gray-300 rounded-md animate-pulse"></div>
-              {/* Placeholder for the description */}
-              <div className="w-80 h-4 bg-gray-300 rounded-md animate-pulse"></div>
-              {/* Placeholder for the date */}
-              <div className="w-56 h-4 bg-gray-300 rounded-md animate-pulse"></div>
-            </div>
-          </div>
-          <div className="flex flex-row space-x-4">
-            {/* Placeholder for Delete and Edit buttons */}
-            <div className="w-10 h-10 bg-gray-300 rounded-lg animate-pulse"></div>
-            <div className="w-10 h-10 bg-gray-300 rounded-lg animate-pulse"></div>
-          </div>
+    <div className="flex flex-col space-y-3 w-full max-w-screen-xl mx-auto p-6">
+    {/* Header Skeleton */}
+    <div className="w-40 h-9 bg-gray-200 rounded animate-pulse mb-5"></div>
+    
+    {/* Skeleton Items */}
+    {[...Array(6)].map((_, index) => (
+      <div
+        key={index}
+        className="flex items-center px-7 py-5 bg-gray-50 rounded-lg hover:bg-gray-100"
+      >
+        {/* Left section with number and icon */}
+        <div className="flex items-center space-x-5 min-w-[130px]">
+          <span className="text-gray-200 text-lg animate-pulse">#{index + 1}</span>
+          <span className="text-gray-200 text-lg">|</span>
+          {/* Document icon placeholder */}
+          <div className="w-6 h-8 bg-gray-200 rounded animate-pulse"></div>
         </div>
-      ))}
-    </div>
-  );
+        
+        {/* Middle section with title and date */}
+        <div className="flex flex-col flex-grow gap-2">
+          {/* Title placeholder */}
+          <div className="w-72 h-6 bg-gray-200 rounded animate-pulse"></div>
+          {/* Date placeholder */}
+          <div className="w-56 h-5 bg-gray-200 rounded animate-pulse"></div>
+        </div>
+        
+        {/* Right section with delete icon */}
+        <div className="w-7 h-7 bg-gray-200 rounded animate-pulse mr-3"></div>
+      </div>
+    ))}
+  </div>
+    
+);
 };
 
 export default SkeletonLoader;

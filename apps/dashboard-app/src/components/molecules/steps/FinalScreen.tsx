@@ -11,6 +11,45 @@ import RightSide from "@/src/components/molecules/right-side/RightSide";
 import axios from "axios";
 import download from "downloadjs";
 import Analysis from "../descraptive/Analysis";
+import { API_ENDPOINTS } from "@/src/utils/const/apiEndpoint";
+
+export interface ChartSelectionData {
+  category: string;
+  percentage: number;
+  type: string;
+  name?: string ;
+}
+
+
+export interface ChartMetadata {
+  key: string;
+  name?: string;
+  description?: string;
+  table_column_info: {
+    type: "STRING" | "NUMERIC" | "BOOLEAN" | "DATE_TIME";
+    order?: number;
+    original_type?: string;
+    extended_type: string;
+  };
+  table_column_metrics: {
+    total_count?: number;
+    non_null_count?: number;
+    valid_count?: number;
+    string_metrics?: {
+      counts: { key: string; value: number }[];
+      most_common_value?: string;
+      most_common_value_count?: number;
+      unique_value_count?: number;
+    };
+    numeric_metrics?: {
+      histogram: { range: string; count: number }[];
+    };
+    boolean_metrics?: {
+      true_count: number;
+      false_count: number;
+    };
+  };
+}
 
 interface ApiResponse {
   count: number;
@@ -49,6 +88,7 @@ const FinalScreen: React.FC = () => {
     data: [],
   });
   const [visibleHeaders, setVisibleHeaders] = useState<Set<string>>(new Set()); // Tracks visible headers
+  const [metadata, setMetadata] = useState<any[]>([]);
   const [selectedColumns, setSelectedColumns] = useState<string[]>([]);
   const [selectedChartType, setSelectedChartType] =
     useState<string>("pie_chart");
@@ -60,8 +100,11 @@ const FinalScreen: React.FC = () => {
     Record<string, any>[] | null
   >(null);
 
+  const [descriptionMap, setDescriptionMap] = useState<{
+    [key: string]: string;
+  }>({});
+
   const [showPopup, setShowPopup] = useState(false); // Tracks popup visibility
-  const [metadata, setMetadata] = useState<any[]>([]);
   const { projectId, fileId } = useParams();
   const [isLoadingVisualize, setIsLoadingVisualize] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -75,12 +118,16 @@ const FinalScreen: React.FC = () => {
     setFileDetails(details);
   };
 
-
   const [selectedAnalysis, setSelectedAnalysis] = useState<{
     category: string;
     percentage: number;
     type: string;
+    name:string
   } | null>(null);
+
+  console.log(" selectedAnalysis::: ", selectedAnalysis);
+
+  console.log(" selectedAnalysis::: ", selectedAnalysis);
 
   // Fetch data when component mounts or when params change
   useEffect(() => {
@@ -98,7 +145,7 @@ const FinalScreen: React.FC = () => {
 
       // Fetch table data
       const tableResponse = await fetch(
-        `http://3.24.110.41:8000/api/v1/project/${projectId}/file/${fileId}/details/`
+        `${API_ENDPOINTS.API_URL}/project/${projectId}/file/${fileId}/details/`
       );
 
       if (!tableResponse.ok) {
@@ -131,7 +178,7 @@ const FinalScreen: React.FC = () => {
       // Fetch metadata
       console.log("Fetching metadata...");
       const metadataResponse = await fetch(
-        `http://127.0.0.1:8000/api/v1/metadata/6769151fc9996c016a4722a0/`
+        `${API_ENDPOINTS.API_URL}/metadata/677a986a214aa68867c066cf/`
       );
 
       if (!metadataResponse.ok) {
@@ -139,14 +186,17 @@ const FinalScreen: React.FC = () => {
       }
 
       const metadataJson = await metadataResponse.json();
+      setMetadata(metadataJson.metadata || []);
       console.log("Fetched metadata:", metadataJson);
 
-      // Validate and update metadata state
       if (metadataJson && Array.isArray(metadataJson.metadata)) {
-        setMetadata(metadataJson.metadata); // Use the metadata array
+        setMetadata(metadataJson.metadata); // Ensure metadata is an array
       } else {
-        console.error("Invalid metadata format:", metadataJson);
-        setMetadata([]); // Fallback to an empty array
+        console.error(
+          "Metadata is not properly formatted:",
+          metadataJson.metadata
+        );
+        setMetadata([]); // Set an empty array as a fallback
       }
     } catch (error) {
       // Handle errors
@@ -156,6 +206,44 @@ const FinalScreen: React.FC = () => {
       console.error("Error fetching data:", error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleChartSelect = (
+    metadata: ChartMetadata | ChartMetadata[],
+    chartData: ChartSelectionData
+  ) => {
+    console.log("Chart Data:", chartData); // Debug chart data
+    console.log("Metadata:", metadata); // Debug metadata
+
+    // Ensure metadata is always treated as an array
+    const metadataArray = Array.isArray(metadata) ? metadata : [metadata];
+
+    // Find the matching metadata by key
+    const matchedMetadata = metadataArray.find(
+      (meta) => meta.key === chartData.category
+    );
+
+    console.log("Matched Metadata:", matchedMetadata); // Debug matched metadata
+
+    if (matchedMetadata) {
+      const updatedAnalysis = {
+        name: matchedMetadata.name || "Default Name", // Fallback to a default name
+        category: chartData.category,
+        percentage: chartData.percentage,
+        type: chartData.type,
+      };
+    
+      setSelectedAnalysis(updatedAnalysis);
+    } else {
+      setSelectedAnalysis(null);
+    }
+    
+
+    if (!matchedMetadata) {
+      console.warn(
+        `No matching metadata found for category: ${chartData.category}`
+      );
     }
   };
 
@@ -194,7 +282,7 @@ const FinalScreen: React.FC = () => {
           file_id: fileId,
         };
 
-        const response = await fetch("http://127.0.0.1:8000/api/v1/", {
+        const response = await fetch(`${API_ENDPOINTS.API_URL}/`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
@@ -231,7 +319,7 @@ const FinalScreen: React.FC = () => {
 
     try {
       const res = await axios.get(
-        `http://3.24.110.41:8000/api/v1/project/${projectId}/file/download/${fileDetails.filename}/`,
+        `${API_ENDPOINTS.API_URL}/project/${projectId}/file/download/${fileDetails.filename}/`,
         {
           responseType: "blob", // To ensure the response is treated as a binary blob
           onDownloadProgress: (progressEvent) => {
@@ -278,6 +366,10 @@ const FinalScreen: React.FC = () => {
     setVisibleHeaders(updatedHeaders);
   };
 
+  const handleCloseAnalysis = () => {
+    setSelectedAnalysis(null);
+  };
+
   if (isLoading)
     return (
       <div className="flex w-full justify-center items-center h-full">
@@ -286,20 +378,14 @@ const FinalScreen: React.FC = () => {
     );
 
   if (error) return <div className="p-4 text-red-500">Error: {error}</div>;
+  if (isLoading)
+    return (
+      <div className="flex w-full justify-center items-center h-full">
+        <Spinner />
+      </div>
+    );
 
-  const handleChartSelection = (columnMetadata: any, chartData: any) => {
-    setSelectedAnalysis({
-      category: columnMetadata.name,
-      percentage: chartData.percentage || 0,
-      type: columnMetadata.type
-    });
-  };
-
-  // Add handler for closing analysis
-  const handleCloseAnalysis = () => {
-    setSelectedAnalysis(null);
-  };
-
+  if (error) return <div className="p-4 text-red-500">Error: {error}</div>;
 
   return (
     <div
@@ -408,19 +494,23 @@ const FinalScreen: React.FC = () => {
             onColumnSelect={handleColumnSelection}
             isFullHeight={true}
             showChart={true}
-            onChartSelect={handleChartSelection}
+            onChartSelect={handleChartSelect}
           />
         </div>
       </div>
 
       {/* Analysis sidebar */}
       {selectedAnalysis && (
-          <Analysis
-            selectedData={selectedAnalysis}
-            onClose={handleCloseAnalysis}
-            metadata={metadata}
-          />
-        )}
+        <Analysis
+        selectedData={{
+          ...selectedAnalysis as ChartSelectionData, // Assert the type explicitly
+          name: selectedAnalysis.name || "Default Name", // Provide fallback value
+        }}
+        onClose={() => setSelectedAnalysis(null)}
+        metadata={metadata}
+      />
+      
+      )}
 
       {showRightSide && (
         <RightSide
@@ -431,7 +521,6 @@ const FinalScreen: React.FC = () => {
         />
       )}
 
-  
       {/* Popup */}
       {showPopup && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
@@ -465,9 +554,7 @@ const FinalScreen: React.FC = () => {
           </div>
         </div>
       )}
-      
     </div>
-    
   );
 };
 
