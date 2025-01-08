@@ -153,7 +153,7 @@ const Header: React.FC = () => {
 
         {/* Notification Dropdown */}
         {isDropdownOpen && (
-          <div className="absolute right-4 mt-[500px] w-80 bg-white shadow-lg rounded-md z-50 p-4">
+          <div className="absolute right-4 mt-[250px] w-80 bg-white shadow-lg rounded-md z-50 p-4">
             <div className="flex justify-between items-center">
               <span className="text-lg font-semibold">Notification</span>
               <button
