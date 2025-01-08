@@ -11,8 +11,12 @@ type ChartSelectionData = {
   category: string;
   percentage: number;
   type?: string;
-   
 };
+
+interface SaveDescriptionPayload {
+  metadata_key: string;
+  description: string;
+}
 
 type ChartMetadata = {
   key: string;
@@ -72,16 +76,64 @@ const Analysis: React.FC<AnalysisProps> = ({
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [description, setDescription] = useState("");
+  const [selectedKey, setSelectedKey] = useState(""); // Tracks the selected metadata key
+  const [localMetadata, setLocalMetadata] = useState(metadata); // Local state for metadata
   const sidebarRef = useRef<HTMLDivElement>(null);
 
   if (!selectedData) return null;
 
-  const matchingMetadata = metadata.find(
+  // Match the metadata for the selected data
+  const matchingMetadata = localMetadata.find(
     (meta) => meta.key === selectedData.category
   );
 
-  const chartName =
-    selectedData?.name || matchingMetadata?.name || "Unknown Header";
+  useEffect(() => {
+    if (matchingMetadata) {
+      setSelectedKey(matchingMetadata.key);
+      setDescription(matchingMetadata.description || "");
+    }
+  }, [matchingMetadata]);
+
+  const saveDescription = async (): Promise<void> => {
+    if (!selectedKey) {
+      console.error("Metadata key is not provided.");
+      return;
+    }
+
+    const payload: SaveDescriptionPayload = {
+      metadata_key: selectedKey,
+      description,
+    };
+
+    try {
+      const response = await fetch(
+        "http://127.0.0.1:8000/api/v1/metafile/update-description/",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        }
+      );
+
+      const data = await response.json();
+      console.log("Response:", data);
+
+      if (data.message === "Description updated successfully") {
+        // Update local metadata with the new description
+        setLocalMetadata((prevMetadata) =>
+          prevMetadata.map((meta) =>
+            meta.key === selectedKey ? { ...meta, description } : meta
+          )
+        );
+
+        setIsEditing(false);
+      }
+    } catch (error) {
+      console.error("Error updating description:", error);
+    }
+  };
 
   // Close the sidebar when clicking outside
   useEffect(() => {
@@ -98,44 +150,8 @@ const Analysis: React.FC<AnalysisProps> = ({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [onClose]);
 
-  // Load description for the selected chart
-  useEffect(() => {
-    if (selectedData) {
-      setDescription(
-        matchingMetadata?.description || "Input Guidelines and Descriptions"
-      );
-    }
-  }, [selectedData, matchingMetadata]);
-
-  // Save description to the backend
-  const saveDescription = async () => {
-    try {
-      const response = await fetch(
-        "http://127.0.0.1:8000/api/v1/update-description/",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            name: matchingMetadata?.key,
-            description,
-          }),
-        }
-      );
-
-      const result = await response.json();
-
-      if (result.status === "success") {
-        console.log("Description updated successfully");
-        setIsEditing(false); // Exit edit mode on success
-      } else {
-        console.error("Failed to update description:", result.message);
-      }
-    } catch (error) {
-      console.error("Failed to save description:", error);
-    }
-  };
+  const chartName =
+    selectedData?.name || matchingMetadata?.name || "Unknown Header";
 
   return (
     <div
@@ -163,7 +179,10 @@ const Analysis: React.FC<AnalysisProps> = ({
         </div>
         <div className="bg-orange-400 rounded-lg p-3 text-center flex-1">
           <p className="text-sm text-gray-700">Empty Values</p>
-          <p className="text-lg font-bold">{0 || 0}</p>
+          <p className="text-lg font-bold">
+            {(matchingMetadata?.table_column_metrics?.total_count || 0) -
+              (matchingMetadata?.table_column_metrics?.non_null_count || 0)}
+          </p>
         </div>
         <div className="bg-purple-300 rounded-lg p-3 text-center flex-1">
           <p className="text-sm text-gray-700">Unique Values</p>
@@ -190,13 +209,16 @@ const Analysis: React.FC<AnalysisProps> = ({
               className="text-gray-700 whitespace-pre-wrap flex-grow overflow-hidden break-words max-w-full"
               style={{ wordWrap: "break-word" }}
             >
-              {description}
+              {description || "No description available."}
             </p>
           )}
           <button
             onClick={() => {
-              if (isEditing) saveDescription();
-              else setIsEditing(true);
+              if (isEditing) {
+                saveDescription(); // Save the description when editing is done
+              } else {
+                setIsEditing(true);
+              }
             }}
             className="ml-2 text-gray-500 hover:text-gray-700"
           >
