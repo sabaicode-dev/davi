@@ -148,85 +148,140 @@ const RightSide: React.FC<RightSideProps> = ({
     fetchDescription();
   }, [selectedColumns, selectedChart]);
 
-  useEffect(() => {
-    // Load saved visualizations from localStorage
-    const savedData = JSON.parse(
-      localStorage.getItem("savedVisualizations") || "[]"
-    );
-    setSavedVisualizations(savedData);
-  }, []);
+  const handleSaveButtonClick = () => {
+    // Show SaveDialog if no saved visualizations exist
+    if (savedVisualizations.length === 0) {
+      setIsDialogOpen(true);
+    } else {
+      // Show Modal if there are existing saved visualizations
+      setIsModalOpen(true);
+    }
+  };
 
-  const handleSaveNew = (
+  const handleSaveNew = async (
     name: string,
     chartType: string | null,
     description: string | null
   ) => {
-    const selectedChartData = chartData.find(
-      (chart) => chart.chartType === chartType
-    );
-
-    const visualizationData = {
-      name,
-      charts: [
+    try {
+      const selectedChartData = chartData.find(
+        (chart) => chart.chartType === chartType
+      );
+  
+      const visualizationData = {
+        name: name,
+        charts: [
+          {
+            chart_type: chartType,
+            chart_image: selectedChartData?.img,
+            description,
+            selectedColumns,
+          },
+        ],
+      };
+  
+      console.log("Visualization data:", visualizationData); // Debug log
+  
+      const response = await axios.post(
+        `${API_ENDPOINTS.API_URL}/visualizations/`,
+        visualizationData,
         {
-          chartType,
-          chartImage: selectedChartData?.img,
-          description,
-          selectedColumns,
-          date: new Date().toISOString(),
-        },
-      ],
-      date: new Date().toISOString(),
-    };
-
-    const updatedVisualizations = [...savedVisualizations, visualizationData];
-    localStorage.setItem(
-      "savedVisualizations",
-      JSON.stringify(updatedVisualizations)
-    );
-    setSavedVisualizations(updatedVisualizations);
-    setIsDialogOpen(false); // Close the dialog
-    setIsModalOpen(false); // Close the modal if open
-  };
-
-  const handleSaveExisting = (name: string) => {
-    const updatedVisualizations = savedVisualizations.map((viz) =>
-      viz.name === name
-        ? {
-            ...viz,
-            charts: [
-              ...(viz.charts || []),
-              {
-                chartType: selectedChart,
-                chartImage: chartData.find(
-                  (chart) => chart.chartType === selectedChart
-                )?.img,
-                description,
-                selectedColumns,
-                date: new Date().toISOString(),
-              },
-            ],
-          }
-        : viz
-    );
-
-    localStorage.setItem(
-      "savedVisualizations",
-      JSON.stringify(updatedVisualizations)
-    );
-    setSavedVisualizations(updatedVisualizations);
-    setIsModalOpen(false); // Close the modal
-  };
-
-  const handleSaveButtonClick = () => {
-    if (savedVisualizations.length === 0) {
-      setIsDialogOpen(true);
-    } else {
-      setIsModalOpen(true);
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+  
+      if (response.status === 201) {
+        setSavedVisualizations((prev) => [...prev, response.data]);
+        setIsDialogOpen(false); // Close SaveDialog
+        setIsModalOpen(false); // Close Modal if open
+  
+        console.log("Visualization saved successfully:", response.data);
+  
+        // Create a notification for the saved visualization
+        await createNotification(response.data.name);
+      }
+    } catch (error) {
+      console.error("Error saving visualization:", error);
     }
   };
+  
+  const handleSaveExisting = async (name: string) => {
+    try {
+      const existingViz = savedVisualizations.find((viz) => viz.name === name);
+  
+      if (!existingViz) {
+        console.error("Visualization not found:", name);
+        return;
+      }
+  
+      const updatedCharts = [
+        {
+          chart_type: selectedChart,
+          chart_image: chartData.find((chart) => chart.chartType === selectedChart)?.img,
+          description,
+          selectedColumns,
+        },
+      ];
+  
+      const response = await axios.put(
+        `${API_ENDPOINTS.API_URL}/visualizations/${existingViz.id}/`,
+        {
+          name: existingViz.name,
+          charts: updatedCharts,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+  
+      if (response.status === 200) {
+        setSavedVisualizations((prev) =>
+          prev.map((viz) => (viz.id === existingViz.id ? response.data : viz))
+        );
+        setIsModalOpen(false);
+  
+        console.log("Visualization updated successfully:", response.data);
+  
+        // Create a notification for the updated visualization
+        await createNotification(response.data.name);
+      }
+    } catch (error) {
+      console.error("Error updating visualization:", error);
+    }
+  };
+  
+  // Function to create a notification
+  const createNotification = async (fileName: string) => {
+    try {
+      const payload = { file_name: fileName };
+      const response = await axios.post(`${API_ENDPOINTS.API_URL}/notifications/create/`, payload, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+  
+      if (response.status === 201) {
+        console.log("Notification created successfully:", response.data);
+      }
+    } catch (error) {
+      console.error("Error creating notification:", error);
+    }
+  };
+  
+  
+  
+  const handleModalSaveNew = () => {
+    // Close Modal and open SaveDialog for creating a new visualization
+    setIsModalOpen(false);
+    setTimeout(() => setIsDialogOpen(true), 100); // Delay to ensure smooth UI transition
+  };
+  
   return (
-    <div className="flex flex-col w-[450px] h-full fixed top-16 right-0 bg-white shadow-2xl z-50 overflow-y-scroll">
+    <div className="flex flex-col w-[450px] h-full fixed top-16 right-0 bg-white shadow-2xl z-40 overflow-y-scroll">
       {/* Header */}
       <div className="flex flex-row justify-between items-center px-6 py-4 border-b">
         <h1 className="text-[16px] font-bold">Recommend Chart</h1>
@@ -341,10 +396,7 @@ const RightSide: React.FC<RightSideProps> = ({
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSave={(name) => handleSaveExisting(name)}
-        onSaveNew={() => {
-          setIsModalOpen(false); // Close Modal
-          setTimeout(() => setIsDialogOpen(true), 100); // Open SaveDialog after delay
-        }}
+        onSaveNew={handleModalSaveNew} // Transition to SaveDialog
         savedVisualizations={savedVisualizations}
       />
     </div>
