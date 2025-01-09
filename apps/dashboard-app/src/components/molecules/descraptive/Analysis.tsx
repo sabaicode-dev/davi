@@ -112,7 +112,7 @@ const Analysis: React.FC<AnalysisProps> = ({
 
     try {
       const response = await fetch(
-        "http://127.0.0.1:8000/api/v1/metafile/update-description/",
+        "http://127.0.0.1:8000/metafile/update-description/",
         {
           method: "POST",
           headers: {

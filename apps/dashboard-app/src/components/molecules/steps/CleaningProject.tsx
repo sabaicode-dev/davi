@@ -96,13 +96,12 @@ const CleaningProject: React.FC = () => {
       );
       return;
     }
-  
+
     console.log("Navigating to FinalScreen with metadataId:", metadataId);
     navigate(`/project/${projectId}/file/${fileId}/finalscreen`, {
       state: { metadataId }, // Pass metadataId in navigation state
     });
   };
-  
 
   const { projectId, fileId } = useParams();
   const [metadataId, setMetadataId] = useState<string | null>(null);
@@ -148,7 +147,13 @@ const CleaningProject: React.FC = () => {
           total_column: jsonData.dataset_summary?.total_columns,
           filename: jsonData.filename,
         });
-        setFilename(jsonData.filename);
+
+        // Update file details
+        setFileDetails({
+          filename: jsonData.filename,
+          totalRows: jsonData.dataset_summary?.total_rows || 0,
+          totalColumns: jsonData.dataset_summary?.total_columns || 0,
+        });
       } else {
         setError(response.message || "Failed to fetch data");
       }
@@ -179,11 +184,11 @@ const CleaningProject: React.FC = () => {
         `${API_ENDPOINTS.API_URL}/metadata/${metadataId}/`,
         { method: "GET" }
       );
-  
+
       if (!response.ok) {
         throw new Error(`Failed to fetch metadata. Status: ${response.status}`);
       }
-  
+
       const metadata = await response.json();
       console.log("Metadata fetched successfully:", metadata);
       setMetadata(metadata);
@@ -192,7 +197,6 @@ const CleaningProject: React.FC = () => {
       setMetadata(null);
     }
   };
-  
 
   const HandleDownLoadFile = async () => {
     try {
