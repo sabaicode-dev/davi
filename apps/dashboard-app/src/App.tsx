@@ -107,7 +107,7 @@ export const App = () => {
   return (
     <AuthProvider>
       <BrowserRouter>
-        {/* <PrivateRoute> */}
+        <PrivateRoute>
           <Layout>
             <Routes>
               {routes.map((route) => (
@@ -119,7 +119,7 @@ export const App = () => {
               ))}
             </Routes>
           </Layout>
-        {/* </PrivateRoute> */}
+        </PrivateRoute>
       </BrowserRouter>
     </AuthProvider>
   );
