@@ -15,6 +15,7 @@ const ProjectDetail: React.FC = () => {
     navigate(`/project/create/pick-datasource?projectId=${projectId}`, {
       state: { projectId },
     });
+    console.log(`Clicked on button to Pick-DataSource.`)
   };
   return (
     <div className="flex flex-col p-6 px-40 ">
