@@ -80,19 +80,24 @@ const Analysis: React.FC<AnalysisProps> = ({
   const [localMetadata, setLocalMetadata] = useState(metadata); // Local state for metadata
   const sidebarRef = useRef<HTMLDivElement>(null);
 
-  if (!selectedData) return null;
-
-  // Match the metadata for the selected data
-  const matchingMetadata = localMetadata.find(
-    (meta) => meta.key === selectedData.category
-  );
-
   useEffect(() => {
-    if (matchingMetadata) {
-      setSelectedKey(matchingMetadata.key);
-      setDescription(matchingMetadata.description || "");
+    if (selectedData) {
+      const matchingMetadata = metadata.find(
+        (meta) => meta.key === selectedData.category
+      );
+
+      if (matchingMetadata) {
+        setSelectedKey(matchingMetadata.key);
+
+        // Load description from localStorage
+        const storedDescriptions =
+          JSON.parse(localStorage.getItem("descriptions") || "{}");
+        const savedDescription = storedDescriptions[matchingMetadata.key];
+
+        setDescription(savedDescription || matchingMetadata.description || "");
+      }
     }
-  }, [matchingMetadata]);
+  }, [selectedData, metadata]);
 
   const saveDescription = async (): Promise<void> => {
     if (!selectedKey) {
@@ -118,24 +123,30 @@ const Analysis: React.FC<AnalysisProps> = ({
       );
 
       const data = await response.json();
-      console.log("Response:", data);
 
       if (data.message === "Description updated successfully") {
-        // Update local metadata with the new description
+        // Update local metadata
         setLocalMetadata((prevMetadata) =>
           prevMetadata.map((meta) =>
             meta.key === selectedKey ? { ...meta, description } : meta
           )
         );
 
+        // Save description to localStorage
+        const storedDescriptions =
+          JSON.parse(localStorage.getItem("descriptions") || "{}");
+        storedDescriptions[selectedKey] = description;
+        localStorage.setItem("descriptions", JSON.stringify(storedDescriptions));
+
         setIsEditing(false);
+      } else {
+        console.error("Failed to update description on the server.");
       }
     } catch (error) {
       console.error("Error updating description:", error);
     }
   };
 
-  // Close the sidebar when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -147,18 +158,24 @@ const Analysis: React.FC<AnalysisProps> = ({
     };
 
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    return () =>
+      document.removeEventListener("mousedown", handleClickOutside);
   }, [onClose]);
 
   const chartName =
-    selectedData?.name || matchingMetadata?.name || "Unknown Header";
+    selectedData?.name ||
+    localMetadata.find((meta) => meta.key === selectedData?.category)?.name ||
+    "Unknown Header";
+
+  const matchingMetadata = localMetadata.find(
+    (meta) => meta.key === selectedKey
+  );
 
   return (
     <div
       ref={sidebarRef}
       className="fixed right-5 top-16 bottom-0 w-[428px] h-screen bg-white p-5 shadow-2xl overflow-y-auto z-20"
     >
-      {/* Close Button */}
       <button
         onClick={onClose}
         className="float-right text-2xl text-gray-600 hover:text-gray-800 focus:outline-none"
@@ -166,10 +183,8 @@ const Analysis: React.FC<AnalysisProps> = ({
         <XIcon />
       </button>
 
-      {/* Header */}
       <h2 className="text-xl font-semibold mb-4">{chartName}</h2>
 
-      {/* Summary Section */}
       <div className="flex gap-3 mb-5">
         <div className="bg-blue-300 rounded-lg p-3 text-center flex-1">
           <p className="text-sm text-gray-700">Rows</p>
@@ -193,7 +208,6 @@ const Analysis: React.FC<AnalysisProps> = ({
         </div>
       </div>
 
-      {/* Description Section */}
       <div className="mb-5">
         <h3 className="text-lg font-medium mb-3">Description</h3>
         <div className="flex items-start px-1">
@@ -205,17 +219,14 @@ const Analysis: React.FC<AnalysisProps> = ({
               rows={3}
             />
           ) : (
-            <p
-              className="text-gray-700 whitespace-pre-wrap flex-grow overflow-hidden break-words max-w-full"
-              style={{ wordWrap: "break-word" }}
-            >
+            <p className="text-gray-700 whitespace-pre-wrap flex-grow overflow-hidden break-words max-w-full">
               {description || "No description available."}
             </p>
           )}
           <button
             onClick={() => {
               if (isEditing) {
-                saveDescription(); // Save the description when editing is done
+                saveDescription();
               } else {
                 setIsEditing(true);
               }
@@ -230,7 +241,6 @@ const Analysis: React.FC<AnalysisProps> = ({
           </button>
         </div>
       </div>
-
       {/* Distribution Bar Chart */}
       <div className="mt-5">
         <h3 className="text-lg font-medium mb-3">Distribution</h3>
