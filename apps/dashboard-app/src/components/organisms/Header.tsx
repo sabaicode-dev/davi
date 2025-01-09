@@ -55,14 +55,19 @@ const Header: React.FC = () => {
   };
 
   // Polling logic to fetch notifications every 1 second
-  useEffect(() => {
-    fetchNotifications(); // Initial fetch
-    const interval = setInterval(() => {
-      fetchNotifications();
-    }, 1000); // 1-second interval
+  // useEffect(() => {
+  //   fetchNotifications(); // Initial fetch
+  //   const interval = setInterval(() => {
+  //     fetchNotifications();
+  //   }, 1000); // 1-second interval
 
-    return () => clearInterval(interval); // Cleanup interval on unmount
-  }, []);
+  //   return () => clearInterval(interval); // Cleanup interval on unmount
+  // }, []);
+
+  // Fetch notifications on component mount
+  useEffect(() => {
+    fetchNotifications(); 
+  }, []); 
 
   const formatDate = (date: string) => {
     return formatDistanceToNow(new Date(date), { addSuffix: true });

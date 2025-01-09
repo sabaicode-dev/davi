@@ -272,8 +272,6 @@ const RightSide: React.FC<RightSideProps> = ({
     }
   };
   
-  
-  
   const handleModalSaveNew = () => {
     // Close Modal and open SaveDialog for creating a new visualization
     setIsModalOpen(false);
