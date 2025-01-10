@@ -412,6 +412,8 @@ const CleaningProject: React.FC = () => {
           onClose={handleCloseAutoCleaningModal}
           title="Auto Cleaning"
           filename={fileDetails.filename}
+          projectId={projectId!}
+          fileId={fileId!}
         />
       </div>
     </div>

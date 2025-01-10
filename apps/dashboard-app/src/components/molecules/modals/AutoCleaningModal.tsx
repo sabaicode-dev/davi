@@ -4,6 +4,7 @@ import { TranfromIcon } from "../../atoms/icons/Icon";
 import request from "@/src/utils/helper";
 import { SuccessMessage } from "../alert-messages/SuccessMessage";
 import { ErrorMessage } from "../alert-messages/ErrorMessage";
+import { API_ENDPOINTS } from "@/src/utils/const/apiEndpoint";
 
 interface ModalProps {
   isOpen?: boolean;
@@ -75,7 +76,7 @@ export function AutoCleaningModal({
     try {
       setIsLoading(true);
       // Construct the URL dynamically using projectId and fileId
-      const url = `http://3.24.110.41:8000/api/v1/project/${projectId}/file/${fileId}/processing-cleaning-file/`;
+      const url = `${API_ENDPOINTS.API_URL}/project/${projectId}/file/${fileId}/processing-cleaning-file/`;
 
       const response = await request({
         url: url,
