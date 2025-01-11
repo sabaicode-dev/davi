@@ -2,10 +2,18 @@ import React, { useState, useEffect, useRef } from "react";
 import Button from "@/src/components/atoms/Button";
 import Input from "@/src/components/atoms/Input";
 import { FaPlus } from "react-icons/fa6";
-import { DeleteIcon, FileVisualizeIcon, SortIcon } from "@/src/components/atoms/icons/Icon";
-import { IoIosSearch, IoMdTrash, IoMdCheckmark } from "react-icons/io";
+import {
+  DeleteIcon,
+  FileVisualizeIcon,
+  SortIcon,
+} from "@/src/components/atoms/icons/Icon";
+import { IoIosSearch, IoMdCheckmark } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
-import moment from "moment";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
+import axios from "axios";
+import { format, isToday, isThisWeek } from "date-fns";
+import { API_ENDPOINTS } from "@/src/utils/const/apiEndpoint";
 
 const VisualizeCreated: React.FC = () => {
   const [visualizations, setVisualizations] = useState<Array<any>>([]);
@@ -13,17 +21,62 @@ const VisualizeCreated: React.FC = () => {
   const [sortOption, setSortOption] = useState<"Recent" | "Alphabetical">(
     "Recent"
   );
+  const [isLoading, setIsLoading] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const navigate = useNavigate();
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Load saved visualizations from localStorage
-    const savedData = JSON.parse(
-      localStorage.getItem("savedVisualizations") || "[]"
-    );
-    setVisualizations(savedData);
+    const fetchVisualizations = async () => {
+      try {
+        setIsLoading(true); // Show skeleton while loading
+        const response = await axios.get(
+          `${API_ENDPOINTS.API_URL}/visualizations/`
+        );
+        if (response.status === 200) {
+          setVisualizations(response.data);
+        }
+      } catch (error) {
+        console.error("Error fetching visualizations:", error);
+      } finally {
+        setIsLoading(false); // Hide skeleton after loading
+      }
+    };
+
+    fetchVisualizations();
   }, []);
+
+  const handleDelete = async (id: string) => {
+    try {
+      const response = await axios.delete(
+        `${API_ENDPOINTS.API_URL}/visualizations/${id}/delete/`
+      );
+
+      if (response.status === 200) {
+        setVisualizations((prev) => prev.filter((viz) => viz.id !== id));
+        console.log("Visualization deleted successfully.");
+      }
+    } catch (error: any) {
+      const errorMessage =
+        error.response?.data?.error || "An error occurred while deleting.";
+      alert(errorMessage);
+      console.error("Error deleting visualization:", error);
+    }
+  };
+
+  const formatDate = (date: string) => {
+    const parsedDate = new Date(date);
+
+    if (isToday(parsedDate)) {
+      return format(parsedDate, "'Today at' p"); // e.g., "Today at 2:30 PM"
+    }
+
+    if (isThisWeek(parsedDate, { weekStartsOn: 1 })) {
+      return format(parsedDate, "'Last' EEEE 'at' p"); // e.g., "Last Tuesday at 2:30 PM"
+    }
+
+    return format(parsedDate, "PPP 'at' p"); // e.g., "Jan 7, 2025 at 2:30 PM"
+  };
 
   useEffect(() => {
     // Close dropdown when clicking outside
@@ -41,16 +94,6 @@ const VisualizeCreated: React.FC = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-
-  const handleDelete = (index: number) => {
-    const updatedVisualizations = [...visualizations];
-    updatedVisualizations.splice(index, 1);
-    setVisualizations(updatedVisualizations);
-    localStorage.setItem(
-      "savedVisualizations",
-      JSON.stringify(updatedVisualizations)
-    );
-  };
 
   const goToCreateProject = () => {
     navigate("/project/create");
@@ -159,8 +202,25 @@ const VisualizeCreated: React.FC = () => {
 
       {/* Visualizations Section */}
 
-      {/* No Results Message */}
-      {filteredVisualizations.length === 0 ? (
+      {/* Skeleton Loader */}
+      {isLoading ? (
+        <div className="flex flex-col mt-8 gap-y-4">
+          {[...Array(5)].map((_, index) => (
+            <div
+              key={index}
+              className="w-full p-5 flex space-x-6 border-2 border-gray-200 rounded-lg"
+            >
+              <div className="space-x-4 flex items-center text-center">
+                <Skeleton width={50} height={50} circle />
+              </div>
+              <div className="flex-1">
+                <Skeleton width="60%" height={20} />
+                <Skeleton width="40%" height={15} className="mt-2" />
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : filteredVisualizations.length === 0 ? (
         <div className="flex justify-center items-center h-full">
           <p className="text-gray-500 text-center mt-24">
             {visualizations.length > 0
@@ -174,11 +234,10 @@ const VisualizeCreated: React.FC = () => {
             <div
               key={index}
               onClick={() =>
-                navigate("/visualize/detail-visualize", { state: { viz } })
+                navigate(`/visualize/${viz.id}/detail`, { state: { viz } })
               }
               className="w-full p-5 flex space-x-6 border-2 border-blue-200 hover:border-blue-500 duration-300 rounded-lg"
             >
-              {/* Left Section */}
               <div className="space-x-4 flex justify-center items-center text-center text-[18px]">
                 <span className="text-lg">#{index + 1}</span>
                 <span className="text-lg">|</span>
@@ -186,22 +245,23 @@ const VisualizeCreated: React.FC = () => {
                   <FileVisualizeIcon />
                 </span>
               </div>
-
-              {/* Middle Section */}
               <div className="flex justify-between w-full">
                 <div className="font-medium text-[14px] cursor-pointer w-[95%]">
                   <h1 className="font-bold">{viz.name}</h1>
-                  <p className="text-gray-600">{moment(viz.date).fromNow()}</p>
+                  <p className="text-sm text-gray-500">
+                    {formatDate(viz.created_at)}
+                  </p>
                 </div>
                 <button
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleDelete(index);
+                    handleDelete(viz.id);
                   }}
                   className="text-red-500 !bg-transparent text-2xl"
                 >
-                  <DeleteIcon className="!text-red-500 bg-gray-200 hover:bg-gray-300 duration-150 p-2 w-10 h-10 rounded-xl" />        </button>
+                  <DeleteIcon className="!text-red-500 bg-gray-200 hover:bg-gray-300 duration-150 p-2 w-10 h-10 rounded-xl" />
+                </button>
               </div>
             </div>
           ))}

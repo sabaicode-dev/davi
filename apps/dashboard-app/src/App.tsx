@@ -79,7 +79,7 @@ const routes = [
   { path: "/project/*", element: <ProjectFlow /> },
   { path: "/project/create/pick-datasource", element: <PickDataSource /> },
   { path: "/visualize", element: <Visualize /> },
-  { path: "/dataset", element: <Dataset/> },
+  { path: "/dataset", element: <Dataset /> },
   { path: "/helps", element: <Helps /> },
   { path: "/accountsetting", element: <AccountSettings /> },
   { path: "/cleaning", element: <AccountSettings /> },
@@ -97,7 +97,10 @@ const routes = [
     path: "/project/:projectId/file/:fileId/finalscreen",
     element: <FinalScreen />,
   },
-  { path: "/visualize/detail-visualize", element: <DetailVisualize />},
+  {
+    path: "/visualize/:visualizationId/detail",
+    element: <DetailVisualize />,
+  },
 ];
 
 export const App = () => {

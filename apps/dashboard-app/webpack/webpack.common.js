@@ -45,7 +45,8 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, "..", "./build"), // Output directory
     filename: "bundle.js", // Output bundle
-    // publicPath: "/", // Ensure assets and routes are resolved relative to the root
+    publicPath: "/", // Ensure assets and routes are resolved relative to the root
+    clean: true
   },
 
   // Webpack mode

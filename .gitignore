@@ -17,7 +17,7 @@ lerna-debug.log*
 # Just testing
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
-
+apps/backend/ai-query/*
 # Runtime data
 pids
 *.pid

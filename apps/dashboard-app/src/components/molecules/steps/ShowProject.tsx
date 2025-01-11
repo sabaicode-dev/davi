@@ -80,7 +80,7 @@ const ShowProject: React.FC<SelectProjectProps> = ({
       setIsLoading(true);
       try {
         const response = await request({
-          url: `http://3.24.110.41:8000/api/v1/projects/`,
+          url: `http://127.0.0.1:8000/api/v1/project/`,
           method: "GET",
         });
 

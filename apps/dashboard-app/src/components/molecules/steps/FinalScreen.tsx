@@ -17,9 +17,8 @@ export interface ChartSelectionData {
   category: string;
   percentage: number;
   type: string;
-  name?: string ;
+  name?: string;
 }
-
 
 export interface ChartMetadata {
   key: string;
@@ -122,15 +121,26 @@ const FinalScreen: React.FC = () => {
     category: string;
     percentage: number;
     type: string;
-    name:string
+    name: string;
   } | null>(null);
   const location = useLocation(); // Access state passed from CleaningProject
-  const metadataId = location.state?.metadataId; // Retrieve metadataId from navigation state
+  // const metadataId = location.state?.metadataId; // Retrieve metadataId from navigation state
+  const metadataId =
+    location.state?.metadataId || localStorage.getItem("metadataId");
 
+  useEffect(() => {
+    if (!metadataId) {
+      console.error("metadataId is missing in FinalScreen.");
+    } else {
+      console.log("FinalScreen metadataId:", metadataId);
+    }
+  }, [metadataId]);
 
   useEffect(() => {
     if (!metadataId || !projectId || !fileId) {
-      setError("Missing required parameters (metadataId, projectId, or fileId).");
+      setError(
+        "Missing required parameters (metadataId, projectId, or fileId)."
+      );
       return;
     }
     fetchData();
@@ -176,27 +186,30 @@ const FinalScreen: React.FC = () => {
       const metadataResponse = await fetch(
         `${API_ENDPOINTS.API_URL}/metadata/${metadataId}/`
       );
-  
+
       if (!metadataResponse.ok) {
-        throw new Error(`Failed to fetch metadata. Status: ${metadataResponse.status}`);
+        throw new Error(
+          `Failed to fetch metadata. Status: ${metadataResponse.status}`
+        );
       }
-  
+
       const metadataJson = await metadataResponse.json();
       console.log("Fetched metadata:", metadataJson);
-  
+
       if (metadataJson.metadata) {
         setMetadata(metadataJson.metadata);
       } else {
         setError("No metadata available.");
       }
     } catch (error) {
-      setError(error instanceof Error ? error.message : "An unexpected error occurred");
+      setError(
+        error instanceof Error ? error.message : "An unexpected error occurred"
+      );
       console.error("Error fetching data:", error);
     } finally {
       setIsLoading(false);
     }
   };
-  
 
   const handleChartSelect = (
     metadata: ChartMetadata | ChartMetadata[],
@@ -222,12 +235,11 @@ const FinalScreen: React.FC = () => {
         percentage: chartData.percentage,
         type: chartData.type,
       };
-    
+
       setSelectedAnalysis(updatedAnalysis);
     } else {
       setSelectedAnalysis(null);
     }
-    
 
     if (!matchedMetadata) {
       console.warn(
@@ -258,9 +270,9 @@ const FinalScreen: React.FC = () => {
       const newChartData: Array<{ chartType: string; img: string }> = [];
       const chartTypes = [
         "pie_chart",
-        "bar_chart",
+        "donut_chart",
         "area_chart",
-        "column_chart",
+        "map_chart",
       ];
 
       for (const chartType of chartTypes) {
@@ -491,14 +503,13 @@ const FinalScreen: React.FC = () => {
       {/* Analysis sidebar */}
       {selectedAnalysis && (
         <Analysis
-        selectedData={{
-          ...selectedAnalysis as ChartSelectionData, // Assert the type explicitly
-          name: selectedAnalysis.name || "Default Name", // Provide fallback value
-        }}
-        onClose={() => setSelectedAnalysis(null)}
-        metadata={metadata}
-      />
-      
+          selectedData={{
+            ...(selectedAnalysis as ChartSelectionData), // Assert the type explicitly
+            name: selectedAnalysis.name || "Default Name", // Provide fallback value
+          }}
+          onClose={() => setSelectedAnalysis(null)}
+          metadata={metadata}
+        />
       )}
 
       {showRightSide && (
