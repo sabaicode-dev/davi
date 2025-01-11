@@ -97,10 +97,7 @@ const routes = [
     path: "/project/:projectId/file/:fileId/finalscreen",
     element: <FinalScreen />,
   },
-  {
-    path: "/visualize/:visualizationId/detail",
-    element: <DetailVisualize />,
-  },
+  { path: "/visualize/detail-visualize", element: <DetailVisualize />},
 ];
 
 export const App = () => {

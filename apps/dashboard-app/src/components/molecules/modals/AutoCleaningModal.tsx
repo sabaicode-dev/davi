@@ -16,10 +16,6 @@ interface ModalProps {
   fileId?: string;
 }
 
-interface DataTransformationModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
 export function AutoCleaningModal({
   isOpen,
   onClose,
@@ -29,6 +25,7 @@ export function AutoCleaningModal({
   fileId,
 }: ModalProps) {
   if (!isOpen) return null;
+
   const [isExpanded, setIsExpanded] = useState(false);
   const [selectedOption, setSelectedOption] = useState("");
   const [showError, setShowError] = useState(false);
@@ -38,31 +35,27 @@ export function AutoCleaningModal({
     deleteDuplicateRow: false,
   });
 
-  // Alert states
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const navigate = useNavigate();
   const [metadataId, setMetadataId] = useState<string | null>(null);
-  const [metadata, setMetadata] = useState(null);
+  const [metadata, setMetadata] = useState<any>(null);
 
   useEffect(() => {
-    // Retrieve metadataId from localStorage
-    const storedMetadataId = localStorage.getItem("metadataId");
-    if (storedMetadataId) {
-      console.log("Retrieved metadataId from localStorage:", storedMetadataId);
-      setMetadataId(storedMetadataId);
-      fetchMetadata(storedMetadataId);
-    } else {
-      console.error("No metadataId found in localStorage.");
+    // Retrieve metadataId from localStorage when the modal opens
+    if (isOpen) {
+      const storedMetadataId = localStorage.getItem("metadataId");
+      if (storedMetadataId) {
+        console.log("Retrieved metadataId from localStorage:", storedMetadataId);
+        setMetadataId(storedMetadataId);
+      } else {
+        console.error("No metadataId found in localStorage.");
+        setMetadataId(null);
+        setMetadata(null);
+      }
     }
-  }, []);
-
-  const missingRowOptions = [
-    { value: "delete_missing_row", label: "Delete Missing Row" },
-    { value: "imputeByMean", label: "Impute By Mean" },
-    { value: "imputeByMode", label: "Impute By Mode" },
-  ];
+  }, [isOpen]);
 
   const fetchMetadata = async (metadataId: string) => {
     try {
@@ -76,9 +69,9 @@ export function AutoCleaningModal({
         throw new Error(`Failed to fetch metadata. Status: ${response.status}`);
       }
 
-      const metadata = await response.json();
-      console.log("Metadata fetched successfully:", metadata);
-      setMetadata(metadata);
+      const fetchedMetadata = await response.json();
+      console.log("Metadata fetched successfully:", fetchedMetadata);
+      setMetadata(fetchedMetadata);
     } catch (error) {
       console.error("Error fetching metadata:", error);
       setMetadata(null);
@@ -99,64 +92,71 @@ export function AutoCleaningModal({
       return;
     }
 
-    // Prepare process array based on selected options
+    if (!projectId || !fileId || !filename) {
+      setErrorMessage("Missing required parameters for auto-cleaning.");
+      return;
+    }
+
     const processOptions = [selectedOption];
     if (checkboxes.deleteDuplicateRow) {
       processOptions.push("delete_duplicate_row");
     }
+    if (checkboxes.outlierValues) {
+      processOptions.push("handle_outliers");
+    }
 
-    // Prepare request body
     const requestBody = {
-      filename: filename || "",
+      filename,
       process: processOptions,
     };
 
     try {
       setIsLoading(true);
-      // Construct the URL dynamically using projectId and fileId
-      const url = `${API_ENDPOINTS.API_URL}/project/${projectId}/file/${fileId}/processing-cleaning-file/`;
 
       const response = await request({
-        url: url,
+        url: `${API_ENDPOINTS.API_URL}/project/${projectId}/file/${fileId}/processing-cleaning-file/`,
         method: "POST",
         data: requestBody,
       });
 
-      // Handle successful response
       if (response.success) {
-        setSuccessMessage(`Successfully cleaned file: ${filename}`);
+        setSuccessMessage(`File '${filename}' cleaned successfully!`);
 
-        // Extract the new fileId from the response
-        const newFileId = response.data.original_file;
+        const updatedMetadataId = response.data.metadata_id || metadataId;
 
-        // Fetch metadata before navigating
-        if (metadataId) {
-          await fetchMetadata(metadataId);
-          localStorage.setItem("metadataId", metadataId);
+        // Update metadataId in localStorage
+        if (updatedMetadataId) {
+          localStorage.setItem("metadataId", updatedMetadataId);
+          setMetadataId(updatedMetadataId);
 
-          // Navigate to the FinalScreen with the new fileId and metadataId
-          if (projectId && newFileId) {
-            navigate(`/project/${projectId}/file/${fileId}/finalscreen`, {
-              state: { metadataId }, // Pass metadataId in navigation state
-            });
-          } else {
-            throw new Error("Missing required parameters for navigation.");
-          }
+          // Fetch metadata before navigating
+          await fetchMetadata(updatedMetadataId);
+
+          // Navigate to the final screen with metadataId
+          navigate(`/project/${projectId}/file/${fileId}/finalscreen`, {
+            state: { metadataId: updatedMetadataId },
+          });
+        } else {
+          throw new Error("Metadata ID missing for navigation.");
         }
       } else {
-        setErrorMessage(`Failed to clean file: ${response.message}`);
+        setErrorMessage(response.message || "Failed to clean the file.");
       }
     } catch (error) {
-      console.error("Auto cleaning error:", error);
+      console.error("Error during auto-cleaning:", error);
       setErrorMessage(
-        `Error cleaning file: ${
-          error instanceof Error ? error.message : "Unknown error"
-        }`
+        error instanceof Error ? error.message : "Unknown error occurred."
       );
     } finally {
       setIsLoading(false);
     }
   };
+
+  const missingRowOptions = [
+    { value: "delete_missing_row", label: "Delete Missing Row" },
+    { value: "imputeByMean", label: "Impute By Mean" },
+    { value: "imputeByMode", label: "Impute By Mode" },
+  ];
 
   return (
     <>
@@ -167,7 +167,7 @@ export function AutoCleaningModal({
               <div className="rounded-lg">
                 <TranfromIcon />
               </div>
-              <div className="">
+              <div>
                 <h2 className="text-lg font-semibold pt-3">{title}</h2>
                 <h1 className="text-gray-600 mb-4">
                   After running the transformation, we found the following data
@@ -175,104 +175,94 @@ export function AutoCleaningModal({
                 </h1>
               </div>
             </div>
-            <div className="justify-start items-start">
-              <button
-                onClick={onClose}
-                className="flex text-gr ay-500 hover:text-gray-700 transition-colors justify-center items-center w-8 h-8 bg-gray-100 hover:bg-gray-200 duration-100 rounded-full"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
+            <button
+              onClick={onClose}
+              className="flex text-gray-500 hover:text-gray-700 transition-colors justify-center items-center w-8 h-8 bg-gray-100 hover:bg-gray-200 duration-100 rounded-full"
+            >
+              <X className="w-5 h-5" />
+            </button>
           </div>
           <div className="px-6 pt-4">
             <div className="space-y-4">
-              <div className="space-y-3">
-                <button
-                  onClick={() => handleCheckboxChange("outlierValues")}
-                  className="flex items-center space-x-2 w-full text-left"
-                >
-                  <div className="relative w-5 h-5">
-                    <div
-                      className={`absolute inset-0 ${
-                        checkboxes.outlierValues
-                          ? "bg-blue-600"
-                          : "border-2 border-gray-300"
-                      } rounded transition-colors`}
-                    ></div>
-                    {checkboxes.outlierValues && (
-                      <Check className="absolute inset-0 w-5 h-5 text-white p-1" />
-                    )}
-                  </div>
-                  <span className="text-gray-900 text-base">
-                    Outlier Values
-                  </span>
-                </button>
-
-                <button
-                  onClick={() => handleCheckboxChange("deleteDuplicateRow")}
-                  className="flex items-center space-x-2 w-full text-left"
-                >
-                  <div className="relative w-5 h-5">
-                    <div
-                      className={`absolute inset-0 ${
-                        checkboxes.deleteDuplicateRow
-                          ? "bg-blue-600"
-                          : "border-2 border-gray-300"
-                      } rounded transition-colors`}
-                    ></div>
-                    {checkboxes.deleteDuplicateRow && (
-                      <Check className="absolute inset-0 w-5 h-5 text-white p-1" />
-                    )}
-                  </div>
-                  <span className="text-gray-900 text-base">
-                    Delete Duplicate Row
-                  </span>
-                </button>
-
-                <div className="pt-4">
-                  <button
-                    onClick={() => setIsExpanded(!isExpanded)}
-                    className="flex space-x-3 items-center justify-between text-left font-medium text-gray-900"
-                  >
-                    <span>Missing Row</span>
-                    {isExpanded ? (
-                      <ChevronUp className="w-5 h-5 text-gray-500" />
-                    ) : (
-                      <ChevronDown className="w-5 h-5 text-gray-500" />
-                    )}
-                  </button>
-
-                  {showError && !selectedOption && (
-                    <p className="text-red-500 text-sm mt-1">
-                      Require Select Column!
-                    </p>
-                  )}
-
+              <button
+                onClick={() => handleCheckboxChange("outlierValues")}
+                className="flex items-center space-x-2 w-full text-left"
+              >
+                <div className="relative w-5 h-5">
                   <div
-                    className={`mt-2 space-y-2 ${
-                      isExpanded ? "block" : "hidden"
-                    }`}
-                  >
-                    {missingRowOptions.map((option) => (
-                      <label
-                        key={option.value}
-                        className="flex items-center space-x-3 py-2 px-1 cursor-pointer"
-                      >
-                        <input
-                          type="radio"
-                          name="missingRow"
-                          value={option.value}
-                          checked={selectedOption === option.value}
-                          onChange={(e) => {
-                            setSelectedOption(e.target.value);
-                            setShowError(false);
-                          }}
-                          className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
-                        />
-                        <span className="text-gray-900">{option.label}</span>
-                      </label>
-                    ))}
-                  </div>
+                    className={`absolute inset-0 ${
+                      checkboxes.outlierValues
+                        ? "bg-blue-600"
+                        : "border-2 border-gray-300"
+                    } rounded transition-colors`}
+                  ></div>
+                  {checkboxes.outlierValues && (
+                    <Check className="absolute inset-0 w-5 h-5 text-white p-1" />
+                  )}
+                </div>
+                <span className="text-gray-900 text-base">Outlier Values</span>
+              </button>
+              <button
+                onClick={() => handleCheckboxChange("deleteDuplicateRow")}
+                className="flex items-center space-x-2 w-full text-left"
+              >
+                <div className="relative w-5 h-5">
+                  <div
+                    className={`absolute inset-0 ${
+                      checkboxes.deleteDuplicateRow
+                        ? "bg-blue-600"
+                        : "border-2 border-gray-300"
+                    } rounded transition-colors`}
+                  ></div>
+                  {checkboxes.deleteDuplicateRow && (
+                    <Check className="absolute inset-0 w-5 h-5 text-white p-1" />
+                  )}
+                </div>
+                <span className="text-gray-900 text-base">
+                  Delete Duplicate Rows
+                </span>
+              </button>
+              <div className="pt-4">
+                <button
+                  onClick={() => setIsExpanded(!isExpanded)}
+                  className="flex space-x-3 items-center justify-between text-left font-medium text-gray-900"
+                >
+                  <span>Missing Row</span>
+                  {isExpanded ? (
+                    <ChevronUp className="w-5 h-5 text-gray-500" />
+                  ) : (
+                    <ChevronDown className="w-5 h-5 text-gray-500" />
+                  )}
+                </button>
+                {showError && !selectedOption && (
+                  <p className="text-red-500 text-sm mt-1">
+                    Please select a missing row option!
+                  </p>
+                )}
+                <div
+                  className={`mt-2 space-y-2 ${
+                    isExpanded ? "block" : "hidden"
+                  }`}
+                >
+                  {missingRowOptions.map((option) => (
+                    <label
+                      key={option.value}
+                      className="flex items-center space-x-3 py-2 px-1 cursor-pointer"
+                    >
+                      <input
+                        type="radio"
+                        name="missingRow"
+                        value={option.value}
+                        checked={selectedOption === option.value}
+                        onChange={(e) => {
+                          setSelectedOption(e.target.value);
+                          setShowError(false);
+                        }}
+                        className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                      />
+                      <span className="text-gray-900">{option.label}</span>
+                    </label>
+                  ))}
                 </div>
               </div>
             </div>
