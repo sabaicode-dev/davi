@@ -121,6 +121,7 @@ const CleaningProject: React.FC = () => {
   useEffect(() => {
     fetchData();
   }, [projectId, fileId]);
+  
   const fetchData = async () => {
     if (!projectId || !fileId) {
       setError("Project ID or File ID is missing");

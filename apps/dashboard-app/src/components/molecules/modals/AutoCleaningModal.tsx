@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Check, ChevronDown, ChevronUp, X } from "lucide-react";
 import { TranfromIcon } from "../../atoms/icons/Icon";
 import request from "@/src/utils/helper";
 import { SuccessMessage } from "../alert-messages/SuccessMessage";
 import { ErrorMessage } from "../alert-messages/ErrorMessage";
 import { API_ENDPOINTS } from "@/src/utils/const/apiEndpoint";
+import { useNavigate } from "react-router-dom";
 
 interface ModalProps {
   isOpen?: boolean;
@@ -41,11 +42,48 @@ export function AutoCleaningModal({
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+  const navigate = useNavigate();
+  const [metadataId, setMetadataId] = useState<string | null>(null);
+  const [metadata, setMetadata] = useState(null);
+
+  useEffect(() => {
+    // Retrieve metadataId from localStorage
+    const storedMetadataId = localStorage.getItem("metadataId");
+    if (storedMetadataId) {
+      console.log("Retrieved metadataId from localStorage:", storedMetadataId);
+      setMetadataId(storedMetadataId);
+      fetchMetadata(storedMetadataId);
+    } else {
+      console.error("No metadataId found in localStorage.");
+    }
+  }, []);
+
   const missingRowOptions = [
     { value: "delete_missing_row", label: "Delete Missing Row" },
     { value: "imputeByMean", label: "Impute By Mean" },
     { value: "imputeByMode", label: "Impute By Mode" },
   ];
+
+  const fetchMetadata = async (metadataId: string) => {
+    try {
+      console.log("Fetching metadata for metadataId:", metadataId);
+      const response = await fetch(
+        `${API_ENDPOINTS.API_URL}/metadata/${metadataId}/`,
+        { method: "GET" }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch metadata. Status: ${response.status}`);
+      }
+
+      const metadata = await response.json();
+      console.log("Metadata fetched successfully:", metadata);
+      setMetadata(metadata);
+    } catch (error) {
+      console.error("Error fetching metadata:", error);
+      setMetadata(null);
+    }
+  };
 
   const handleCheckboxChange = (name: keyof typeof checkboxes) => {
     setCheckboxes((prev) => ({
@@ -87,12 +125,28 @@ export function AutoCleaningModal({
       // Handle successful response
       if (response.success) {
         setSuccessMessage(`Successfully cleaned file: ${filename}`);
+
+        // Extract the new fileId from the response
+        const newFileId = response.data.original_file;
+
+        // Fetch metadata before navigating
+        if (metadataId) {
+          await fetchMetadata(metadataId);
+          localStorage.setItem("metadataId", metadataId);
+
+          // Navigate to the FinalScreen with the new fileId and metadataId
+          if (projectId && newFileId) {
+            navigate(`/project/${projectId}/file/${fileId}/finalscreen`, {
+              state: { metadataId }, // Pass metadataId in navigation state
+            });
+          } else {
+            throw new Error("Missing required parameters for navigation.");
+          }
+        }
       } else {
-        // Handle unsuccessful response
         setErrorMessage(`Failed to clean file: ${response.message}`);
       }
     } catch (error) {
-      // Handle network or other errors
       console.error("Auto cleaning error:", error);
       setErrorMessage(
         `Error cleaning file: ${
