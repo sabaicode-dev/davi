@@ -153,7 +153,7 @@ const FinalScreen: React.FC = () => {
 
       // Fetch table data
       const tableResponse = await fetch(
-        `http://127.0.0.1:8000/api/v1/project/${projectId}/file/${fileId}/details/`
+        `${API_ENDPOINTS.API_URL}/project/${projectId}/file/${fileId}/details/`
       );
 
       if (!tableResponse.ok) {

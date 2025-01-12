@@ -5,6 +5,7 @@ import Boolean from "../charts/Boolean";
 import Category from "../charts/Catagory";
 import Number from "../charts/Number";
 import DateTimeChart from "../charts/DateTimeChart";
+import { API_ENDPOINTS } from "@/src/utils/const/apiEndpoint";
 
 type ChartSelectionData = {
   name?: string;
@@ -112,7 +113,7 @@ const Analysis: React.FC<AnalysisProps> = ({
 
     try {
       const response = await fetch(
-        "http://127.0.0.1:8000/metafile/update-description/",
+        `${API_ENDPOINTS.BEST_URL}/metafile/update-description/`,
         {
           method: "POST",
           headers: {

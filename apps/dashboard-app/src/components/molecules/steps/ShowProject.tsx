@@ -14,6 +14,7 @@ import EditProject from "@/src/components/molecules/modals/EditProjectModal";
 import request from "@/src/utils/helper";
 import { IoIosSearch, IoMdCheckmark } from "react-icons/io";
 import Input from "../../atoms/Input";
+import { API_ENDPOINTS } from "@/src/utils/const/apiEndpoint";
 
 interface Project {
   _id: string;
@@ -80,7 +81,7 @@ const ShowProject: React.FC<SelectProjectProps> = ({
       setIsLoading(true);
       try {
         const response = await request({
-          url: `http://127.0.0.1:8000/api/v1/project/`,
+          url: `${API_ENDPOINTS.API_URL}/project/`,
           method: "GET",
         });
 
@@ -116,7 +117,7 @@ const ShowProject: React.FC<SelectProjectProps> = ({
 
     try {
       const response = await request({
-        url: `http://3.24.110.41:8000/api/v1/project/${projectId}/delete/`,
+        url: `${API_ENDPOINTS.API_URL}/project/${projectId}/delete/`,
         method: "DELETE",
         withCredentials: false,
       });

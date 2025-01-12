@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import Table from "./Table";
 import { useParams } from "react-router-dom";
 import Spinner from "../loading/Spinner";
+import { API_ENDPOINTS } from "@/src/utils/const/apiEndpoint";
 
 interface ApiResponse {
   count: number;
@@ -60,7 +61,7 @@ const TableProject: React.FC<TableProjectProps> = ({ onFileDetailsUpdate }) => {
       setIsLoading(true);
       const response = await fetch(
         // `http://3.24.110.41:8000/api/v1/project/${projectId}/file/${fileId}/details/`,
-        `http://3.24.110.41:8000/api/v1/project/${projectId}/file/${fileId}/details/`
+        `${API_ENDPOINTS.API_URL}/project/${projectId}/file/${fileId}/details/`
       );
 
       if (!response.ok) {

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { API_ENDPOINTS } from "@/src/utils/const/apiEndpoint";
 
 // Define the expected response structure
 interface MetadataColumn {
@@ -56,7 +57,7 @@ const FileUploadAndMetadata: React.FC = () => {
 
       // Send the file to the API endpoint
       const response = await axios.post<MetadataColumn[]>(
-        "http://3.24.110.41:8000/metafile/upload/", // Replace with your actual API endpoint
+        `${API_ENDPOINTS.BEST_URL}/metafile/upload/`, // Replace with your actual API endpoint
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },

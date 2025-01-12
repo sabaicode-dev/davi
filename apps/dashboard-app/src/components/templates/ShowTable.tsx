@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import ViewTable from "../molecules/tables/ViewTable";
+import { API_ENDPOINTS } from "@/src/utils/const/apiEndpoint";
+
 interface ApiResponse {
   count: number;
   next: boolean;
@@ -44,7 +46,7 @@ const ShowTable = ({ selectedItemId }: ShowTableProps) => {
     setLoading(true);
     setError(null); // Clear previous errors
     try {
-      const api = `http://127.0.0.1:8000/api/v1/project/${projectId}/scrape/view-dataset/${selectedItemId}`;
+      const api = `${API_ENDPOINTS.API_URL}/project/${projectId}/scrape/view-dataset/${selectedItemId}`;
       const response = await axios.get(api);
 
       // Assuming the response contains 'headers' and 'data'

@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import Button from "@/src/components/atoms/Button";
 import { CloseIcon } from "@/src/components/atoms/icons/Icon";
 import request from "@/src/utils/helper";
+import { API_ENDPOINTS } from "@/src/utils/const/apiEndpoint";
 
 interface ICreateProjectModalProps {
   onClose?: () => void;
@@ -135,7 +136,7 @@ const Modal: React.FC<ICreateProjectModalProps> = ({
 
     try {
       const response = await request({
-        url: `http://3.24.110.41:8000/api/v1/project/${projectId}/update/`,
+        url: `${API_ENDPOINTS.API_URL}/project/${projectId}/update/`,
         method: "PUT",
         withCredentials: false,
         data: {
