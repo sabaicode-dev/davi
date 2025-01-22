@@ -48,11 +48,9 @@ function loadConfig(): Config {
     AWS_COGNITO_USER_POOL_ID: Joi.string().required(),
     AWS_COGNITO_CLIENT_ID: Joi.string().required(),
     AWS_COGNITO_CLIENT_SECRET: Joi.string().required(),
-    AWS_COGNITO_IDENTITY_POOL_ID: Joi.string().required(),
     AWS_COGNITO_DOMAIN: Joi.string().required(),
     AWS_REDIRECT_URI: Joi.string().required(),
     CLIENT_URL: Joi.string().required(),
-    USER_SERVICE_URL: Joi.string().optional(), // Optional environment variable
     AWS_ACCESS_KEY_ID: Joi.string().required(),
     AWS_SECRET_ACCESS_KEY: Joi.string().required(),
     AWS_S3_BUCKET_NAME: Joi.string().required(),

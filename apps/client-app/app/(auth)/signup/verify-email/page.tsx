@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 
 import CryptoJS from "crypto-js";
 import "dotenv/config";
+import { API_ENDPOINT } from "@/app/utils/const/apiEndpoint";
 
 // require("dotenv").config();
 
@@ -118,7 +119,7 @@ export default function EmailVerification() {
     setSuccess(false);
 
     try {
-      const response = await axiosInstance.post("/confirm", {
+      const response = await axiosInstance.post(`${API_ENDPOINT.CONFIRM_CODE}`, {
         email, // Include email from localStorage
         confirmationCode: code, // 6-digit code entered by the user
         password, // Include password from localStorage
@@ -126,7 +127,7 @@ export default function EmailVerification() {
 
       if (response.status === 200) {
         setSuccess(true);
-        router.push (process.env.NEXT_PUBLIC_URL_PDASHBOARD || "")// Redirect to dashboard
+        router.push(process.env.NEXT_PUBLIC_URL_DASHBOARD || "")// Redirect to dashboard
       } else {
         setError("Verification failed. Please try again.");
       }
@@ -143,7 +144,7 @@ export default function EmailVerification() {
     setError(null);
 
     try {
-      await axiosInstance.post("/v1/auth/resend-code", { email });
+      await axiosInstance.post(`${API_ENDPOINT.RESEND_CODE}`, { email });
       setCountdown(60);
       setError("A new verification code has been sent to your email.");
     } catch (err) {
@@ -224,9 +225,8 @@ export default function EmailVerification() {
           {`Didn't receive the code? `}
           <button
             onClick={handleResendCode}
-            className={`text-blue-400 ${
-              isLoading || countdown > 0 ? "opacity-50 cursor-not-allowed" : ""
-            }`}
+            className={`text-blue-400 ${isLoading || countdown > 0 ? "opacity-50 cursor-not-allowed" : ""
+              }`}
             disabled={isLoading || countdown > 0}
           >
             Resend

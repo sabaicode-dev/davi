@@ -10,6 +10,7 @@ import Image from "next/image";
 import { RiEyeCloseFill, RiEyeCloseLine } from "react-icons/ri";
 import { BiArrowBack } from "react-icons/bi";
 import CryptoJS from "crypto-js";
+import { API_ENDPOINT } from "@/app/utils/const/apiEndpoint";
 
 const secretKey = process.env.NEXT_PUBLIC_SECRET_KEY || "";
 
@@ -48,7 +49,7 @@ export default function SignUpPage() {
 
     try {
       // Call the signup API
-      const response = await axiosInstance.post("/signup", {
+      const response = await axiosInstance.post(`${API_ENDPOINT.SIGN_UP}`, {
         email,
         password,
         username,
@@ -102,7 +103,7 @@ export default function SignUpPage() {
 
   const handleGoogleSignUp = async () => {
     try {
-      const response = await axiosInstance.get("/google");
+      const response = await axiosInstance.get(`${API_ENDPOINT.SIGN_IN_WITH_GOOGLE}`);
       //This endpoint is expected to initiate the Google OAuth flow 
       // and return a redirect URL for Google sign-in.
 

@@ -5,6 +5,7 @@ import axiosInstance from "@/app/utils/axios";
 import LoginForm from "@/app/(auth)/login/Components/LoginFrom";
 import Image from "next/image";
 import { BiArrowBack } from "react-icons/bi";
+import { API_ENDPOINT } from "@/app/utils/const/apiEndpoint";
 
 export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
@@ -14,7 +15,7 @@ export default function LoginPage() {
   const handleLogin = async (email: string, password: string) => {
     setError(null);
     try {
-      const response = await axiosInstance.post("/signin", {
+      const response = await axiosInstance.post(`${API_ENDPOINT.SIGN_IN}`, {
         email,
         password,
       });
@@ -27,7 +28,7 @@ export default function LoginPage() {
         // const { token } = response.data;
         // localStorage.setItem("authToken", token);
 
-        window.location.href =(process.env.NEXT_PUBLIC_URL_PDASHBOARD || "");
+        window.location.href = (process.env.NEXT_PUBLIC_URL_DASHBOARD || "");
       } else {
         setError("Login failed. Please try again.");
       }
@@ -39,7 +40,7 @@ export default function LoginPage() {
 
   const handleGoogleSignUp = async () => {
     try {
-      const response = await axiosInstance.get("/google");
+      const response = await axiosInstance.get(`${API_ENDPOINT.SIGN_IN_WITH_GOOGLE}`);
 
       // Check if the response contains the redirect URL
       if (response.data && response.data.url) {
@@ -80,13 +81,13 @@ export default function LoginPage() {
               {error}{" "}
               {error ===
                 "Account does not exist. Would you like to sign up?" && (
-                <button
-                  onClick={() => router.push("/signup")}
-                  className="text-blue-500 underline ml-2"
-                >
-                  Sign Up
-                </button>
-              )}
+                  <button
+                    onClick={() => router.push("/signup")}
+                    className="text-blue-500 underline ml-2"
+                  >
+                    Sign Up
+                  </button>
+                )}
             </div>
           )}
 
