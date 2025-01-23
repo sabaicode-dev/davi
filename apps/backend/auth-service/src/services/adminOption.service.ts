@@ -119,6 +119,18 @@ export const getUserById = async (id: string) => {
   }
 };
 
+// Service: Get user by ID from the database
+export const getUserByCognitoId = async (id: string) => {
+  try {
+    const user = await User.findOne({ cognitoUserId: id });
+    return user;
+  } catch (error: any) {
+    throw new Error(
+      `Error fetching user by ID from database: ${error.message}`
+    );
+  }
+};
+
 // Service: Create a new user in the database
 export const createUser = async (userData: Partial<IUser>) => {
   try {

@@ -422,7 +422,7 @@ export function RegisterRoutes(app: Router) {
         const argsCognitoController_signIn: Record<string, TsoaRoute.ParameterSchema> = {
                 requestBody: {"in":"body","name":"requestBody","required":true,"ref":"SignInRequest"},
                 successResponse: {"in":"res","name":"200","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"result":{"dataType":"any","required":true},"message":{"dataType":"string","required":true}}},
-                errorResponse: {"in":"res","name":"401","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"message":{"dataType":"string","required":true}}},
+                errorResponse: {"in":"res","name":"400","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"message":{"dataType":"string","required":true}}},
         };
         app.post('/v1/auth/signin',
             ...(fetchMiddlewares<RequestHandler>(CognitoController)),

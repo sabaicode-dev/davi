@@ -1,32 +1,18 @@
 import { URLSearchParams } from "url";
 import axios from "axios";
-import chalk from "chalk";
 import configs from "../config";
 
 const AWS_COGNITO_DOMAIN = configs.awsCognitoDomain;
 const AWS_COGNITO_CLIENT_ID = configs.awsCognitoClientId;
 const AWS_COGNITO_CLIENT_SECRET = configs.awsCognitoClientSecret;
 const AWS_REDIRECT_URI = configs.awsRedirectUri;
-const NODE_ENV = configs.env;
 
-console.log(chalk.red(`======== Using for ${NODE_ENV} Google==========`));
-
-console.log(`AWS_COGNITO_DOMAIN : ${AWS_COGNITO_DOMAIN}`);
-console.log(`AWS_COGNITO_CLIENT_ID : ${AWS_COGNITO_CLIENT_ID}`);
-console.log(`AWS_COGNITO_CLIENT_SECRET : ${AWS_COGNITO_CLIENT_SECRET}`);
-console.log(`AWS_REDIRECT_URI : ${AWS_REDIRECT_URI}`);
 
 /**
  * Generate the Google Sign-In URL.
  * @returns The Google Sign-In URL to redirect the user.
  */
 export const googleSignIn = (): string => {
-  if (!AWS_COGNITO_DOMAIN || !AWS_COGNITO_CLIENT_ID || !AWS_REDIRECT_URI) {
-    throw new Error(
-      "Missing environment variables: Ensure AWS_COGNITO_DOMAIN, AWS_COGNITO_CLIENT_ID, and AWS_REDIRECT_URI are defined"
-    );
-  }
-
   const state = Math.random().toString(36).substring(7); // Generate a random state
   const authorizeParams = new URLSearchParams({
     response_type: "code",
@@ -34,7 +20,7 @@ export const googleSignIn = (): string => {
     redirect_uri: AWS_REDIRECT_URI as string,
     state: state,
     identity_provider: "Google",
-    scope: "openid profile email aws.cognito.signin.user.admin",
+    scope: "aws.cognito.signin.user.admin email openid phone",
   });
 
   return `${AWS_COGNITO_DOMAIN}/oauth2/authorize?${authorizeParams.toString()}`;
@@ -49,7 +35,6 @@ export const exchangeCodeForTokens = async (code: string): Promise<any> => {
     grant_type: "authorization_code",
     client_id: AWS_COGNITO_CLIENT_ID as string,
     code: code,
-
     redirect_uri: AWS_REDIRECT_URI as string,
   });
 

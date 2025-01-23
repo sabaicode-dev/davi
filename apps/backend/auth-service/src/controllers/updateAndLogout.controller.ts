@@ -41,11 +41,7 @@ export class UpdateUserName extends Controller {
     @Res() errorResponse: TsoaResponse<500, { error: string }>
   ): Promise<{ message: string } | void> {
     try {
-      console.log("call in logout successfuly !");
-
       const { accessToken } = request.cookies;
-
-      // console.log("accessToken", accessToken);
 
       const response = (request as any).res as Response;
       const clearCookie = (name: string) => {
@@ -54,9 +50,6 @@ export class UpdateUserName extends Controller {
           httpOnly: true,
         });
       };
-
-      // Revoke the refresh token using the service function
-      // await logoutUser(refreshToken, accessToken, idToken, cognitoUserId);
 
       await logoutUser({ accessToken });
 

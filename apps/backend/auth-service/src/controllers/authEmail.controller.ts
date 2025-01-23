@@ -38,16 +38,12 @@ export class CognitoController extends Controller {
     } = requestBody;
 
     try {
-      // step save to db
-      console.log(`requestBody::::`, requestBody);
-      console.log("step 0");
       // Step 1: Check if the email exists in the database
       const dbExists = await checkIfUserExistsInDb(email); // Check the DB for existing user
       if (dbExists) {
-        console.log("1. User exists in the database");
         this.setStatus(409); // Conflict, because user exists in the DB
         return {
-          message: "2. User already exists. Please try logging in.",
+          message: "User already exists. Please try logging in.",
           result: {},
         };
       }
@@ -62,15 +58,13 @@ export class CognitoController extends Controller {
 
       const result = await signUpUser(username, email, password, profile);
 
-      console.log("step 5");
-
       this.setStatus(200); // Set the response status code to 201 (Created)
       return { message: result.message, result: result }; // Ensure we always return 'result' in case of success
     } catch (error: any) {
       console.error("Error during sign-up:", error.message || error);
 
       let result = {}; // Initialize result to be returned with the error message
-      let message = "An error occurred during sign-up."; // Default error message
+      let message = error.message || "An error occurred during sign-up."; // Default error message
 
       if (error.message === "User already exists. Please try logging in.") {
         // Handle user already exists error
@@ -98,14 +92,14 @@ export class CognitoController extends Controller {
       { "Set-Cookie": string[] }
     >,
     @Res()
-    errorResponse: TsoaResponse<401, { message: string }>
+    errorResponse: TsoaResponse<400, { message: string }>
   ): Promise<void> {
     const { email, password } = requestBody;
     try {
       const result = await signInUser(email, password);
 
       if (!result?.IdToken || !result?.RefreshToken || !result?.AccessToken) {
-        errorResponse(401, { message: "Authentication tokens are missing" });
+        errorResponse(400, { message: "Authentication tokens are missing" });
         return;
       }
 
@@ -114,7 +108,7 @@ export class CognitoController extends Controller {
       const cognitoUserId = decodedToken?.sub; // 'sub' is typically the user ID
 
       if (!cognitoUserId) {
-        errorResponse(401, { message: "Unable to retrieve user ID" });
+        errorResponse(400, { message: "Unable to retrieve user ID" });
         return;
       }
 
@@ -140,7 +134,7 @@ export class CognitoController extends Controller {
       );
     } catch (error: any) {
       console.error("Sign-in error:", error.message || error);
-      errorResponse(401, { message: error.message || "Sign-in failed." });
+      errorResponse(400, { message: error.message || "Sign-in failed." });
     }
   }
 
@@ -185,13 +179,7 @@ export class CognitoController extends Controller {
         errorResponse(401, { message: "Unable to retrieve user ID" });
         return;
       }
-      console.log(
-        `-----------------------> Sign-UP with Email <------------------------------`
-      );
-      console.log(`signInResult : ${signInResult}`);
-      console.log(`decodedToken : ${decodedToken}`);
-      console.log(`cognitoUserId : ${cognitoUserId}`);
-      console.log(`----------------------------------------------------------`);
+
       // Set cookies with authentication tokens
       const cookies = [
         `idToken=${signInResult.IdToken}; HttpOnly; Secure; Max-Age=86400; SameSite=Strict`,
@@ -235,29 +223,6 @@ export class CognitoController extends Controller {
       }
     }
   }
-
-  // @Post("confirm")
-  // public async confirmSignUp(
-  //   @Body() requestBody: ConfirmSignUpRequest
-  // ): Promise<{ message: string; result: any }> {
-  //   const { email, confirmationCode } = requestBody;
-  //   try {
-  //     const result = await confirmSignUp(email, confirmationCode);
-  //     return { message: "User confirmed successfully", result };
-  //   } catch (error: any) {
-  //     // Check for specific error codes
-  //     if (
-  //       error.message.includes("ExpiredCodeException") ||
-  //       error.message.includes("CodeMismatchException")
-  //     ) {
-  //       throw new Error(
-  //         "The confirmation code is invalid or has expired. Please request a new code and try again."
-  //       );
-  //     }
-  //     // Handle other errors
-  //     throw new Error(error.message);
-  //   }
-  // }
 
   /**
    * Resend the confirmation code to a user's email

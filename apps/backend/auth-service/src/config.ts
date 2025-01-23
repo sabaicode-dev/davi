@@ -1,9 +1,6 @@
-console.log("config.ts is running...!");
-
 import dotenv from "dotenv";
 import path from "path";
 import Joi from "joi";
-import chalk from "chalk";
 
 // Define a TypeScript type for the configuration
 type Config = {
@@ -17,7 +14,7 @@ type Config = {
   awsCognitoIdentityPoolId: string;
   awsCognitoDomain: string;
   awsRedirectUri: string;
-  clientUrl: string;
+  dashboardUrl: string;
   userServiceUrl?: string;
   awsAccessKeyId: string;
   awsSecretAccessKey: string;
@@ -36,9 +33,6 @@ function loadConfig(): Config {
     throw new Error(`Failed to load .env file at ${envPath}: ${result.error}`);
   }
 
-  // Debug log for confirmation
-  console.log(`Loaded environment variables from: ${envPath}`);
-
   // Define schema for environment variables validation using Joi
   const envVarsSchema = Joi.object({
     NODE_ENV: Joi.string().valid("development", "production").required(),
@@ -50,7 +44,7 @@ function loadConfig(): Config {
     AWS_COGNITO_CLIENT_SECRET: Joi.string().required(),
     AWS_COGNITO_DOMAIN: Joi.string().required(),
     AWS_REDIRECT_URI: Joi.string().required(),
-    CLIENT_URL: Joi.string().required(),
+    DASHBOARD_URL: Joi.string().required(),
     AWS_ACCESS_KEY_ID: Joi.string().required(),
     AWS_SECRET_ACCESS_KEY: Joi.string().required(),
     AWS_S3_BUCKET_NAME: Joi.string().required(),
@@ -62,42 +56,12 @@ function loadConfig(): Config {
   const { value: envVars, error } = envVarsSchema.validate(process.env, {
     abortEarly: false, // Show all validation errors at once
   });
-0
+
   // Handle validation errors
   if (error) {
     const errorMessages = error.details.map((err) => err.message).join(", ");
     throw new Error(`Config validation error: ${errorMessages}`);
   }
-
-  // Assign clientUrl based on NODE_ENV
-  const clientUrl =
-    envVars.NODE_ENV === "production"
-      ? envVars.CLIENT_URL
-      : "http://localhost:8080/";
-
-  const awsRedirectUri =
-    envVars.NODE_ENV === "production"
-      ? envVars.AWS_REDIRECT_URI
-      : "http://localhost:4001/v1/auth/google/callback/";
-
-  const userServiceUrl =
-    envVars.NODE_ENV === "production"
-      ? envVars.USER_SERVICE_URL
-      : "http://localhost:3000/";
-
-  console.log(
-    chalk.blue("== ENV & clientUrl & awsRedirectUri & userServiceUrl ==")
-  );
-  console.log("Environment:", chalk.greenBright(`${process.env.NODE_ENV}`));
-  console.log(`clientUrl : ${clientUrl} `, chalk.redBright("=>(dashboard)"));
-  console.log(
-    `awsRedirectUri : ${awsRedirectUri}`,
-    chalk.redBright("=>(back-end-auth)")
-  );
-  console.log(
-    `userServiceUrl : ${userServiceUrl}`,
-    chalk.redBright("=>(client-app)")
-  );
 
   return {
     env: envVars.NODE_ENV,
@@ -109,9 +73,8 @@ function loadConfig(): Config {
     awsCognitoClientSecret: envVars.AWS_COGNITO_CLIENT_SECRET,
     awsCognitoIdentityPoolId: envVars.AWS_COGNITO_IDENTITY_POOL_ID,
     awsCognitoDomain: envVars.AWS_COGNITO_DOMAIN,
-    clientUrl, // Dynamically assigned clientUrl
-    awsRedirectUri, // Dynamically
-    userServiceUrl, // Dynamically
+    dashboardUrl: envVars.DASHBOARD_URL, // Dynamically assigned clientUrl
+    awsRedirectUri: envVars.AWS_REDIRECT_URI, // Dynamically
     awsAccessKeyId: envVars.AWS_ACCESS_KEY_ID,
     awsSecretAccessKey: envVars.AWS_SECRET_ACCESS_KEY,
     awsS3BucketName: envVars.AWS_S3_BUCKET_NAME,
@@ -120,4 +83,5 @@ function loadConfig(): Config {
 
 // Export the loaded configuration
 const configs = loadConfig();
+
 export default configs;

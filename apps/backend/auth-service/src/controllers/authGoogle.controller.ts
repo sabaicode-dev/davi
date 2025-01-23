@@ -20,10 +20,7 @@ import { setCookie } from "@/src/utils/cookie";
 import { jwtDecode } from "jwt-decode";
 import { saveUserToDB } from "../database/services/user.service"; // MongoDB service function to save user data
 import configs from "../config";
-import {
-  checkEmailExists,
-  checkIfUserExistsInDb,
-} from "../utils/constants/checkGmailCognito";
+import { getUserByCognitoId } from "@/src/services/adminOption.service";
 
 /**
  * Controller for handling Google authentication.
@@ -42,7 +39,6 @@ export class GoogleAuthController extends Controller {
   ): Promise<void> {
     try {
       const signInUrl = googleSignIn();
-      console.log("Redirecting to Google Sign-In URL:", signInUrl);
       // Send a 302 redirect to the frontend with the URL
       redirect(200, { url: signInUrl });
     } catch (error: any) {
@@ -84,60 +80,32 @@ export class GoogleAuthController extends Controller {
 
       const email = decodedIdToken.email;
 
-      console.log("1. Checking email existence...");
-
-      // Step 1: Check if the email exists in Cognito
-      const cognitoExists = await checkEmailExists(email); // Check AWS Cognito for the email
-
-      console.log("Cognito user exists:", cognitoExists);
-
-      // if (cognitoExists) {
-      //   console.log("2. User exists in Cognito");
-      //   this.setStatus(409); // Conflict, because email exists in Cognito
-      //   return errorResponse(409, { error: "Email already exists in Cognito" });
-      // }
-
-      // // Step 2: Check if the email exists in the database
-      const dbExists = await checkIfUserExistsInDb(email); // Check the DB for existing user
-
-      console.log("Email user exists:", dbExists);
-      // if (dbExists) {
-      //   console.log("3. User exists in the database");
-      //   this.setStatus(409); // Conflict, because user exists in the DB
-      //   return errorResponse(409, {
-      //     error: "User already exists in the database",
-      //   });
-      // }
-
-      // console.log("4. User does not exist, proceeding with registration...");
-
       // Extract cognitoUserId from ID token
       const cognitoUserId = decodedIdToken.sub;
 
-      // Extract user's first and last name from the ID token
-      const profileUrl = decodedIdToken.profile || "No Profile Image";
-      const fullName = decodedIdToken.name || "Unknown";
+      const foundUser = await getUserByCognitoId(cognitoUserId)
 
-      const saveToDB = await saveUserToDB({
-        username: fullName,
-        email: email,
-        cognitoUserId,
-        prfile: profileUrl,
-        confirmed: true,
-      });
+      if (!foundUser) {
+        // Extract user's first and last name from the ID token
+        const profileUrl = decodedIdToken.profile || "https://img.freepik.com/premium-vector/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-vector-illustration_561158-3407.jpg";
+        const fullName = decodedIdToken.name || `user_${Math.random() < 0.5 ? Math.random().toString(36).substring(2, 8) : Math.floor(Math.random() * 1000)}`;;
 
-      console.log(`5. saveToDB ::::`, saveToDB);
+        await saveUserToDB({
+          username: fullName,
+          email: email,
+          cognitoUserId,
+          profile: profileUrl,
+          confirmed: true,
+        });
+      }
 
       // Set cookies securely for tokens and cognitoUserId
-
-      console.log("Setting cookies...");
       setCookie(response, "idToken", tokens.id_token);
       setCookie(response, "accessToken", tokens.access_token);
       setCookie(response, "refreshToken", tokens.refresh_token);
       setCookie(response, "cognitoUserId", cognitoUserId);
-      console.log("5 .sent cookies.....");
 
-      response.redirect(configs.clientUrl);
+      response.redirect(configs.dashboardUrl);
     } catch (error: any) {
       console.error("Error during Google callback:", error.message || error);
       errorResponse(500, { error: error.message || "Internal server error" });

@@ -11,7 +11,14 @@ interface CustomAxiosRequestConfig extends AxiosRequestConfig {
 interface FailedRequests {
   resolve: (value: AxiosResponse) => void;
   reject: (value: AxiosError) => void;
-  config: CustomAxiosRequestConfig; // Use CustomAxiosRequestConfig instead
+  config: CustomAxiosRequestConfig;
+}
+
+export interface AxiosErrorResponse {
+  response?: {
+    status: number;
+    data: { message: string };
+  };
 }
 
 // Flag to track token refresh
@@ -24,7 +31,6 @@ async function refreshToken(): Promise<{
 }> {
   try {
     const response = await axios.post(
-      // `${"http://localhost:4001"}/v1/auth/refresh-token`,
       `${process.env.NEXT_PUBLIC_AUTH_ENDPOINT}/refresh-token`,
       null,
       {

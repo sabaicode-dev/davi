@@ -57,8 +57,7 @@ const ProjectFlow = () => {
     </Routes>
   );
 };
-// project/projectId/pick-datasource/import/
-// http://localhost:8080/project/pick-datasource/import/6752655b6b20191452f44cb4
+
 const routes = [
   {
     path: "/",

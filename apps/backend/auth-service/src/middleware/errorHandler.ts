@@ -12,7 +12,7 @@ export const errorHandler = (
   res: Response,
   _next: NextFunction
 ) => {
-  console.error("Error stack:", err.stack); // Log the stack trace for debugging purposes
+  console.error("Error stack:", err); // Log the stack trace for debugging purposes
 
   // Set the status code to the error's status or default to 500 for internal errors
   const statusCode = err.status || 500;

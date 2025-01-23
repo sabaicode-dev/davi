@@ -807,7 +807,7 @@
 					"204": {
 						"description": "No content"
 					},
-					"401": {
+					"400": {
 						"description": "",
 						"content": {
 							"application/json": {

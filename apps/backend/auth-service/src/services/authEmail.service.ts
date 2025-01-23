@@ -18,21 +18,12 @@ const AWS_COGNITO_REGION = configs.awsCognitoRegion;
 const AWS_COGNITO_CLIENT_ID = configs.awsCognitoClientId;
 const AWS_COGNITO_CLIENT_SECRET = configs.awsCognitoClientSecret;
 const AWS_COGNITO_USER_POOL_ID = configs.awsCognitoUserPoolId;
-const NODE_ENV = configs.env;
-
-console.log(chalk.red(`======== Using for ${NODE_ENV} Email==========`));
-
-console.log(`AWS_COGNITO_REGION : ${AWS_COGNITO_REGION}`);
-console.log(`AWS_COGNITO_CLIENT_ID : ${AWS_COGNITO_CLIENT_ID}`);
-console.log(`AWS_COGNITO_CLIENT_SECRET : ${AWS_COGNITO_CLIENT_SECRET}`);
-console.log(`AWS_COGNITO_USER_POOL_ID : ${AWS_COGNITO_USER_POOL_ID}`);
 
 // Initialize Cognito client
 const cognitoClient = new CognitoIdentityProviderClient({
   region: AWS_COGNITO_REGION,
 });
 
-console.log(chalk.red(AWS_COGNITO_REGION));
 
 // Helper function to generate the secret hash
 const generateSecretHash = (
@@ -56,11 +47,6 @@ export const signUpUser = async (
     const clientId = AWS_COGNITO_CLIENT_ID!;
     const clientSecret = AWS_COGNITO_CLIENT_SECRET!;
     const secretHash = generateSecretHash(email, clientId, clientSecret);
-
-    console.log(chalk.red(`==== for signUpUser ====`));
-    console.log(`clientId ::: ${clientId}`);
-    console.log(`clientSecret ::: ${clientSecret}`);
-    console.log(`secretHash ::: ${secretHash}`);
 
     const command = new SignUpCommand({
       ClientId: clientId,
@@ -91,13 +77,14 @@ export const signUpUser = async (
         "User signed up successfully. Please check your email to confirm your account.",
     };
   } catch (error: any) {
+    const message = error.message || "An error occurred during sign-up."
     // Handle specific error for user already existing
     if (error.code === "UsernameExistsException") {
       throw new Error("User already exists. Please try logging in.");
     }
 
     console.error("Error signing up user:", error.message || error);
-    throw new Error("An error occurred during sign-up.");
+    throw new Error(message);
   }
 };
 
@@ -107,11 +94,6 @@ export const signInUser = async (email: string, password: string) => {
     const clientId = AWS_COGNITO_CLIENT_ID!;
     const clientSecret = AWS_COGNITO_CLIENT_SECRET!;
     const secretHash = generateSecretHash(email, clientId, clientSecret);
-
-    console.log(chalk.red(`==== for signInUser ====`));
-    console.log(`clientId ::: ${clientId}`);
-    console.log(`clientSecret ::: ${clientSecret}`);
-    console.log(`secretHash ::: ${secretHash}`);
 
     const command = new AdminInitiateAuthCommand({
       AuthFlow: "ADMIN_NO_SRP_AUTH",
@@ -184,11 +166,6 @@ export const resendConfirmationCode = async (email: string) => {
     // Generate the secret hash
     const secretHash = generateSecretHash(email, clientId, clientSecret);
 
-    console.log(chalk.red(`==== for resendConfirmationCode ====`));
-    console.log(`clientId ::: ${clientId}`);
-    console.log(`clientSecret ::: ${clientSecret}`);
-    console.log(`secretHash ::: ${secretHash}`);
-
     // Check cooldown period
     const lastSentAt = await UserRepository.getLastConfirmationTimestamp(email);
     const currentTime = Date.now();
@@ -200,7 +177,7 @@ export const resendConfirmationCode = async (email: string) => {
     const command = new ResendConfirmationCodeCommand({
       ClientId: clientId,
       Username: email,
-      SecretHash: secretHash, // Add this parameter
+      SecretHash: secretHash,
     });
 
     await cognitoClient.send(command);
@@ -223,37 +200,14 @@ export const logoutUser = async ({
   accessToken: string;
 }) => {
   try {
-    const clientId = AWS_COGNITO_CLIENT_ID!;
-    const clientSecret = AWS_COGNITO_CLIENT_SECRET!;
-
-    console.log(chalk.red(`==== for logoutUser ====`));
-    console.log(`clientId ::: ${clientId}`);
-    console.log(`clientSecret ::: ${clientSecret}`);
-    // console.log(`cognitoUserId ::: ${cognitoUserId}`);
-
-    // Revoke the refresh token
-    // const revokeRefreshTokenCommand = new RevokeTokenCommand({
-    //   ClientId: clientId,
-    //   Token: refreshToken,
-    //   ClientSecret: clientSecret,
-    // });
-
-    // const revokeResponse = await cognitoClient.send(revokeRefreshTokenCommand);
-
     const params: GlobalSignOutCommandInput = {
       AccessToken: accessToken,
     };
     const command = new GlobalSignOutCommand(params);
     await cognitoClient.send(command);
 
-    // Optionally, invalidate accessToken and idToken (if required)
-    // console.log(
-    //   `Revoked refresh token response: ${JSON.stringify(revokeResponse)}`
-    // );
-
     return {
       message: "All tokens cleared successfully",
-      // response: revokeResponse,
     };
   } catch (error: any) {
     console.error(
