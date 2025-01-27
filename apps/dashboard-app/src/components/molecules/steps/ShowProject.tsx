@@ -37,6 +37,9 @@ const ShowProject: React.FC<SelectProjectProps> = ({
   onDataFetch,
   onError,
 }) => {
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
+
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
   const [projects, setProjects] = useState<Project[]>([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -52,7 +55,6 @@ const ShowProject: React.FC<SelectProjectProps> = ({
     null
   );
 
-  const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -70,7 +72,6 @@ const ShowProject: React.FC<SelectProjectProps> = ({
     };
   }, []);
 
-  const navigate = useNavigate();
 
   useEffect(() => {
     let isMounted = true;
@@ -81,7 +82,7 @@ const ShowProject: React.FC<SelectProjectProps> = ({
       setIsLoading(true);
       try {
         const response = await request({
-          url: `${API_ENDPOINTS.API_URL}/project/`,
+          url: `${API_ENDPOINTS.API_URL}/projects/`,
           method: "GET",
         });
 
@@ -112,12 +113,21 @@ const ShowProject: React.FC<SelectProjectProps> = ({
     };
   }, []);
 
+  const handleProjectSelect = (project: Project) => {
+    navigate(`/projects/${project._id}`, {
+      state: {
+        projectName: project.project_name,
+        projectDescription: project.project_description,
+      },
+    });
+  };
+
   const handleDeleteProject = async (projectId: string) => {
     setIsDeleting(projectId);
 
     try {
       const response = await request({
-        url: `${API_ENDPOINTS.API_URL}/project/${projectId}/delete/`,
+        url: `${API_ENDPOINTS.API_URL}/projects/${projectId}/`,
         method: "DELETE",
         withCredentials: false,
       });
@@ -142,19 +152,6 @@ const ShowProject: React.FC<SelectProjectProps> = ({
     }
   };
 
-  if (children) {
-    return <>{children}</>;
-  }
-
-  const handleProjectSelect = (project: Project) => {
-    navigate(`/project/${project._id}`, {
-      state: {
-        projectName: project.project_name,
-        projectDescription: project.project_description,
-      },
-    });
-  };
-
   const handleEditClick = (projectId: string) => {
     setSelectedProjectId(projectId);
     setIsModalOpen(true);
@@ -169,17 +166,17 @@ const ShowProject: React.FC<SelectProjectProps> = ({
       prevProjects.map((project) =>
         project._id === projectId
           ? {
-              ...project,
-              project_name: newName,
-              project_description: newDescription,
-            }
+            ...project,
+            project_name: newName,
+            project_description: newDescription,
+          }
           : project
       )
     );
   };
 
   const newProject = () => {
-    navigate("/project/create", {
+    navigate("/new-project", {
       state: { from: "showProject" },
     });
   };
@@ -217,6 +214,10 @@ const ShowProject: React.FC<SelectProjectProps> = ({
 
   if (error) {
     return <p className="text-red-500">Error: {error}</p>;
+  }
+
+  if (children) {
+    return <>{children}</>;
   }
 
   return (
@@ -275,9 +276,8 @@ const ShowProject: React.FC<SelectProjectProps> = ({
           >
             <div className="flex flex-col gap-y-2">
               <button
-                className={`flex items-center justify-between p-2 text-sm ${
-                  sortOption === "Recent" ? "font-bold text-blue-600" : ""
-                }`}
+                className={`flex items-center justify-between p-2 text-sm ${sortOption === "Recent" ? "font-bold text-blue-600" : ""
+                  }`}
                 onClick={() => applySort("Recent")}
               >
                 Sort by Recent
@@ -286,9 +286,8 @@ const ShowProject: React.FC<SelectProjectProps> = ({
                 )}
               </button>
               <button
-                className={`flex items-center justify-between p-2 text-sm ${
-                  sortOption === "Alphabetical" ? "font-bold text-blue-600" : ""
-                }`}
+                className={`flex items-center justify-between p-2 text-sm ${sortOption === "Alphabetical" ? "font-bold text-blue-600" : ""
+                  }`}
                 onClick={() => applySort("Alphabetical")}
               >
                 Sort by Alphabetical

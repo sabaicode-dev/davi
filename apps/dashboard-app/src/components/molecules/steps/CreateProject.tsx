@@ -37,7 +37,6 @@ const CreateProject: React.FC<Step2Props> = ({
     description: "",
   });
   const [isLoading, setIsLoading] = useState(false);
-  const [projectId, setProjectId] = useState<string>("");
 
   const navigate = useNavigate();
   const goBackToGetStart = () => {
@@ -91,11 +90,7 @@ const CreateProject: React.FC<Step2Props> = ({
         },
       });
       const newProjectId = response.data._id;
-      console.log("Project Id: ", newProjectId);
-      setProjectId(newProjectId);
-      navigate(`pick-datasource?projectId=${newProjectId}`);
-
-      console.log("Project creation response:", response);
+      navigate(`/projects/${newProjectId}/data-sources`);
 
       if (response.success || response.status === 201) {
         setErrorMessages({ projectName: "", description: "" });

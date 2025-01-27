@@ -17,8 +17,7 @@ export const SourceCSV: React.FC<{ projectId?: string | null }> = ({
     imageSrc={CSV}
     bgColor="bg-blue-100"
     hoverColor="hover:bg-orange-200"
-    navigatePath="/project/pick-datasource/upload-csv"
-    projectId={projectId}
+    navigatePath={`/projects/${projectId}/data-sources/csv`}
     type="csv"
   />
 );
@@ -32,8 +31,7 @@ export const SourceWeb: React.FC<{ projectId?: string | null }> = ({
     imageSrc={URL}
     bgColor="bg-gray-100"
     hoverColor="hover:bg-cyan-200"
-    navigatePath="/project/pick-datasource/import"
-    projectId={projectId}
+    navigatePath={`/projects/${projectId}/data-sources/web`}
     type="query"
   />
 );
@@ -47,8 +45,7 @@ export const SourceMySQL: React.FC<{ projectId?: string | null }> = ({
     imageSrc={MySqlImage}
     bgColor="bg-blue-100"
     hoverColor="hover:bg-green-200"
-    navigatePath="/project/pick-datasource/MySQL_Connection"
-    projectId={projectId}
+    navigatePath={`/projects/${projectId}/data-sources/mysql`}
     type="query"
   />
 );
@@ -62,8 +59,7 @@ export const SourceMongoDB: React.FC<{ projectId?: string | null }> = ({
     imageSrc={MongoImage}
     bgColor="bg-gray-100"
     hoverColor="hover:bg-yellow-200"
-    navigatePath="/project/pick-datasource/mongoDB_Connection"
-    projectId={projectId}
+    navigatePath={`/projects/${projectId}/data-sources/mongo-db`}
     type="query"
   />
 );
@@ -77,13 +73,12 @@ export const SourceSQLServer: React.FC<{ projectId?: string | null }> = ({
     imageSrc={SQLServerImage}
     bgColor="bg-blue-100"
     hoverColor="hover:bg-purple-200"
-    navigatePath="/project/pick-datasource/SQLServer_Connection"
-    projectId={projectId}
+    navigatePath={`/projects/${projectId}/data-sources/sql-server`}
     type="sql"
   />
 );
 
-// usage for PosgresSQL
+// usage for PostgresSQL
 export const SourcePosgresSQL: React.FC<{ projectId?: string | null }> = ({
   projectId,
 }) => (
@@ -92,8 +87,7 @@ export const SourcePosgresSQL: React.FC<{ projectId?: string | null }> = ({
     imageSrc={PosgresSQLImage}
     bgColor="bg-gray-100"
     hoverColor="hover:bg-light-blue-200"
-    navigatePath="/project/pick-datasource/PosgresSQL_connection"
-    projectId={projectId}
+    navigatePath={`/projects/${projectId}/data-sources/postgre-sql`}
     type="sql"
   />
 );
@@ -107,8 +101,7 @@ export const SourceMariaDB: React.FC<{ projectId?: string | null }> = ({
     imageSrc={MariaDBImage}
     bgColor="bg-blue-100"
     hoverColor="hover:bg-pink-200"
-    navigatePath="/project/pick-datasource/MariaDB_connection"
-    projectId={projectId}
+    navigatePath={`/projects/${projectId}/data-sources/maria-db`}
     type="sql"
   />
 );

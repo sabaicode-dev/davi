@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import icon from "@/public/images/icon-cleaning.png";
 import Button from "@/src/components/atoms/Button";
-import { DeleteIcon, DownloadIcon, V } from "@/src/components/atoms/icons/Icon";
+import { DeleteIcon, DownloadIcon } from "@/src/components/atoms/icons/Icon";
 import { useNavigate, useParams } from "react-router-dom";
 import Table from "@/src/components/molecules/tables/Table";
 import Spinner from "@/src/components/molecules/loading/Spinner";
@@ -12,7 +12,7 @@ import { AutoCleaningModal } from "../modals/AutoCleaningModal";
 import axios from "axios";
 import download from "downloadjs";
 import { API_ENDPOINTS } from "@/src/utils/const/apiEndpoint";
-// Prop descripe the data response from api
+
 interface ApiResponse {
   count: number;
   next: boolean;
@@ -38,7 +38,7 @@ interface TableProps {
   total_column?: number;
   filename?: string;
 }
-// Define Cleaning project page
+
 const CleaningProject: React.FC = () => {
   const [fileDetails, setFileDetails] = useState({
     filename: "Employee Survey.CSV",
@@ -97,8 +97,7 @@ const CleaningProject: React.FC = () => {
       return;
     }
 
-    console.log("Navigating to FinalScreen with metadataId:", metadataId);
-    navigate(`/project/${projectId}/file/${fileId}/finalscreen`, {
+    navigate(`/projects/${projectId}/files/${fileId}/finalscreen`, {
       state: { metadataId }, // Pass metadataId in navigation state
     });
   };
@@ -121,7 +120,7 @@ const CleaningProject: React.FC = () => {
   useEffect(() => {
     fetchData();
   }, [projectId, fileId]);
-  
+
   const fetchData = async () => {
     if (!projectId || !fileId) {
       setError("Project ID or File ID is missing");
@@ -208,8 +207,8 @@ const CleaningProject: React.FC = () => {
           onDownloadProgress: (ProgressEvent) => {
             console.log(
               "Download Progress: " +
-                Math.round(ProgressEvent.loaded / (ProgressEvent.total ?? 1)) *
-                  100
+              Math.round(ProgressEvent.loaded / (ProgressEvent.total ?? 1)) *
+              100
             ) + "%";
           },
         }

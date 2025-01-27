@@ -29,12 +29,11 @@ const DataSourceDetail: React.FC = () => {
   const navigate = useNavigate();
   const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] =
     useState(false);
-  const [fileIdToDelete, setFileIdToDelete] = useState<string | null>(null);
 
   const handleDeleteFile = async (fileId: string) => {
     try {
       await request({
-        url: `${API_ENDPOINTS.API_URL}/project/${projectId}/file/${fileId}/delete/`,
+        url: `${API_ENDPOINTS.API_URL}/projects/${projectId}/file/${fileId}/delete/`,
         method: "DELETE",
       });
       console.log("File deleted successfully");
@@ -47,18 +46,17 @@ const DataSourceDetail: React.FC = () => {
       console.error("Error Delete file:", error);
     }
   };
+
   const handleDeleteButtonClick = (fileId: string) => {
-    setFileIdToDelete(fileId); // Store the file ID to delete
     setIsDeleteConfirmationOpen(true);
   };
 
-  // Handle Close Delete Confirmation
   const handleCloseDeleteConfirmation = () => {
     setIsDeleteConfirmationOpen(false);
   };
 
-  const handleCardClick = (fileId: string) => {
-    navigate(`/project/${projectId}/file/${fileId}/cleaning`);
+  const hanldeSelectFile = (fileId: string) => {
+    navigate(`/projects/${projectId}/files/${fileId}/cleaning`);
   };
 
   useEffect(() => {
@@ -90,6 +88,7 @@ const DataSourceDetail: React.FC = () => {
 
     fetchProjectFiles();
   }, [projectId]);
+  
   if (error) {
     return (
       <div className="text-red-500 p-4 bg-red-50 rounded-lg">
@@ -109,7 +108,7 @@ const DataSourceDetail: React.FC = () => {
   return (
     <div className="flex flex-col space-y-6">
       <div className="flex flex-col space-y-6">
-        {projectFiles.length === 0? (
+        {projectFiles.length === 0 ? (
           <div className="text-center p-8 bg-gray-50 rounded-xl">
             No files found
           </div>
@@ -118,7 +117,7 @@ const DataSourceDetail: React.FC = () => {
             <div
               key={file._id}
               onClick={() => {
-                handleCardClick(file._id);
+                hanldeSelectFile(file._id);
               }}
               className="flex justify-between items-center p-2  bg-[#f2f5fd] shadow-lg rounded-md cursor-pointer ring-1 hover:ring-blue-500 transition-all"
             >

@@ -3,11 +3,11 @@ import Button from "@/src/components/atoms/Button";
 import { FaPlus } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
 
-export const GetStart = function () {
+export default function GetStarted() {
   const navigate = useNavigate();
 
   const goToCreateProject = () => {
-    navigate("/project/create");
+    navigate("/new-project");
   };
 
   return (
@@ -37,7 +37,7 @@ export const GetStart = function () {
             <Button
               className="ml-auto py-3 !px-4 flex flex-row"
               // onClick={goToCreateProject}
-              onClick={ goToCreateProject}
+              onClick={goToCreateProject}
               startContent={<FaPlus />}
               children="Start New Project"
               size="small"

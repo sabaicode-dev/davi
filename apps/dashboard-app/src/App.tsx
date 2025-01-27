@@ -23,35 +23,35 @@ import { ConfirmFiles } from "./components/molecules/steps/ConfirmFiles";
 import { PosgresSQLConnection } from "./components/molecules/steps/PosgresSQLConnection";
 import { MariaDBConnection } from "./components/molecules/steps/MariaDBConnection";
 import DetailVisualize from "./components/molecules/visualize/DetailVisualize";
+import GetStarted from "@/src/components/pages/GetStarted";
 
 const ProjectFlow = () => {
   return (
     <Routes>
-      {/* <Route path="/project/create" element={<CreateProject />} /> */}
-      <Route path="/pick-datasource" element={<PickDataSource />} />
+      <Route path="/" element={<PickDataSource />} />
       <Route
-        path="pick-datasource/upload-csv/:projectId"
+        path="/csv"
         element={<UploadCsv />}
       />
-      <Route path="pick-datasource/import/:projectId" element={<ImportUrl />} />
+      <Route path="/web" element={<ImportUrl />} />
       <Route
-        path="pick-datasource/mongoDB_Connection/:projectId"
+        path="/mongo-db"
         element={<MongoConnection />}
       />
       <Route
-        path="pick-datasource/MySQL_connection/:projectId"
+        path="/mysql"
         element={<MySQLConnection />}
       />
       <Route
-        path="pick-datasource/SQLServer_connection/:projectId"
+        path="/sql-server"
         element={<SQLServerConnection />}
       />
       <Route
-        path="pick-datasource/PosgresSQL_connection/:projectId"
+        path="/postgre-sql"
         element={<PosgresSQLConnection />}
       />
       <Route
-        path="pick-datasource/MariaDB_connection/:projectId"
+        path="maria-db"
         element={<MariaDBConnection />}
       />
     </Routes>
@@ -61,41 +61,39 @@ const ProjectFlow = () => {
 const routes = [
   {
     path: "/",
-    element: <Navigate to="/project" replace />,
+    element: <Navigate to="/projects" replace />,
   },
-  { path: "/project", element: <Project /> },
-  { path: "/project/create", element: <CreateProject /> },
-  { path: "/project/:projectId", element: <ProjectDetail /> },
+  { path: "/get-started", element: <GetStarted /> },
+  { path: "/new-project", element: <CreateProject /> },
+  { path: "/projects", element: <Project /> },
+  { path: "/projects/:projectId", element: <ProjectDetail /> },
+  { path: "/projects/:projectId/data-sources/*", element: <ProjectFlow /> },
   {
-    path: "/project/:projectId/pick-datasource/import/selectTable",
+    path: "/projects/:projectId/files/:fileId/cleaning",
+    element: <CleaningProject />,
+  },
+  {
+    path: "/projects/:projectId/files/:fileId/finalscreen",
+    element: <FinalScreen />,
+  },
+
+  {
+    path: "/project/:projectId/data-sources/import/selectTable",
     element: <SelectTable />,
   },
   {
-    path: "/project/:projectId/pick-datasource/query/confirmFiles",
+    path: "/project/:projectId/data-sources/query/confirmFiles",
     element: <ConfirmFiles />,
   },
   { path: "/select-project", element: <ShowProject /> },
-  { path: "/project/*", element: <ProjectFlow /> },
-  { path: "/project/create/pick-datasource", element: <PickDataSource /> },
+  { path: "/project/create/data-sources", element: <PickDataSource /> },
   { path: "/visualize", element: <Visualize /> },
   { path: "/dataset", element: <Dataset /> },
   { path: "/helps", element: <Helps /> },
   { path: "/accountsetting", element: <AccountSettings /> },
   { path: "/cleaning", element: <AccountSettings /> },
   { path: "/template-table", element: <CleaningProject /> },
-  {
-    path: "/project/:projectId/file/:fileId/cleaning",
-    element: <CleaningProject />,
-  },
 
-  {
-    path: "/project/:projectId/file/:fileId/finalscreen",
-    element: <FinalScreen />,
-  },
-  {
-    path: "/project/:projectId/file/:fileId/finalscreen",
-    element: <FinalScreen />,
-  },
   {
     path: "/visualize/:visualizationId/detail",
     element: <DetailVisualize />,

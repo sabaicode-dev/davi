@@ -1,5 +1,5 @@
 import React from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 interface DataSourceCardProps {
   title: string; // Title of the data source (e.g., MySQL, SQLServer, MongoDB)
@@ -7,7 +7,6 @@ interface DataSourceCardProps {
   bgColor: string; // Background color of the header
   hoverColor: string; // Hover color for the header
   navigatePath: string; // Navigation path for the data source
-  projectId?: string | null; // Project ID (optional)
   type: string;
 }
 
@@ -17,22 +16,12 @@ const DataSourceCard: React.FC<DataSourceCardProps> = ({
   bgColor,
   hoverColor,
   navigatePath,
-  projectId: propProjectId,
   type,
 }) => {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const urlProjectId = searchParams.get("projectId");
-
-  // Determine the projectId to use
-  const projectId = propProjectId || urlProjectId;
 
   const handleClick = () => {
-    if (!projectId) {
-      console.error("No project ID available");
-      return;
-    }
-    navigate(`${navigatePath}/${projectId}`);
+    navigate(`${navigatePath}`);
   };
 
   return (

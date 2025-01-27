@@ -59,11 +59,11 @@ const Modal: React.FC<ICreateProjectModalProps> = ({
     visible: {
       opacity: 1,
       y: 0,
-      scale: 1, 
+      scale: 1,
       transition: {
         type: "spring",
         damping: 12,
-        stiffness: 100, 
+        stiffness: 100,
         duration: 0.3,
         delayChildren: 0.1,
         staggerChildren: 0.1,
@@ -136,7 +136,7 @@ const Modal: React.FC<ICreateProjectModalProps> = ({
 
     try {
       const response = await request({
-        url: `${API_ENDPOINTS.API_URL}/project/${projectId}/update/`,
+        url: `${API_ENDPOINTS.API_URL}/projects/${projectId}/`,
         method: "PUT",
         withCredentials: false,
         data: {
@@ -146,7 +146,6 @@ const Modal: React.FC<ICreateProjectModalProps> = ({
       });
 
       if (response.success) {
-        // Call the update method passed from parent component
         onUpdateProject?.(projectId, projectName, description);
 
         setProjectName("");
@@ -175,7 +174,7 @@ const Modal: React.FC<ICreateProjectModalProps> = ({
       <dialog
         ref={dialogRef}
         id="modal_project"
-        className="modal fixed top-1/2 left-1/3 transform -translate-x-1/2 -translate-y-1/4 flex flex-col justify-center items-center w-1/2 xl:w-1/2 2xl:w-1/3 p-5 rounded-xl shadow-xl border-[1px] z-50"
+        className="modal fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-center items-center w-1/2 xl:w-1/2 2xl:w-1/3 p-5 rounded-xl shadow-xl border-[1px] z-50"
       >
         <motion.div
           initial="hidden"
