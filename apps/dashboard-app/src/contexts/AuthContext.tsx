@@ -36,16 +36,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           credentials: "include", // Include cookies in the request
         });
 
-        console.log("response", response);
-
         if (response.ok) {
           const data = await response.json();
-          console.log("User data", data);
           setUsername(data.username);
           setEmail(data.email);
           setProfile(data.profile);
-        } else {
-          console.error("Failed to fetch user details");
         }
       } catch (error) {
         console.error("Error fetching user details:", error);

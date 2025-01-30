@@ -14,7 +14,6 @@ export const API_ENDPOINTS = {
   BEST_URL: `${process.env.API_BEST_URL_DJANGO}`,
 };
 
-console.log(API_ENDPOINTS);
 
 //For Development
 

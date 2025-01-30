@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { renderChart } from "@/src/utils/renderChart";
 
 interface TableProps {
@@ -21,7 +21,9 @@ interface TableProps {
     category: string;
     percentage: number;
     type: string;
-  }) => void; // Add this property
+  }) => void;
+  onScrollEnd?: () => void;
+  isLoading?: boolean;
 }
 
 interface ChartMetadata {
@@ -64,6 +66,8 @@ const Table: React.FC<TableProps> = ({
   onColumnSelect,
   onChartSelect,
   isFullHeight = false,
+  onScrollEnd,
+  isLoading = false
 }) => {
   const [tableData, setTableData] = useState<Array<Record<string, any>>>(data);
   const [editingCell, setEditingCell] = useState<{
@@ -77,23 +81,19 @@ const Table: React.FC<TableProps> = ({
     new Set()
   );
 
-  // Update tableData when data prop changes
-  useEffect(() => {
-    if (Array.isArray(data)) {
-      setTableData(data);
-    }
-  }, [data]);
+  const tableRef = useRef<HTMLDivElement>(null);
+  const scrollThreshold = 100; // pixels from bottom to trigger load more
 
-  // Notify parent component when selected columns change
-  useEffect(() => {
-    // Avoid re-triggering on same column selection
-    if (onColumnSelect) {
-      const selectedColumnData = getDataForSelectedColumns();
-      if (selectedColumns.size > 0) {
-        onColumnSelect(Array.from(selectedColumns), selectedColumnData);
-      }
+  const handleScroll = useCallback(() => {
+    if (!tableRef.current || !onScrollEnd || isLoading) return;
+
+    const { scrollTop, scrollHeight, clientHeight } = tableRef.current;
+    console.log("Remaining scroll:", scrollHeight - scrollTop - clientHeight);
+
+    if (scrollHeight - scrollTop - clientHeight < scrollThreshold) {
+      onScrollEnd();
     }
-  }, [selectedColumns, onColumnSelect]);
+  }, [onScrollEnd, isLoading]);
 
   const capitalizeFirstChar = (word: string) => {
     return word.charAt(0).toUpperCase() + word.slice(1);
@@ -170,6 +170,35 @@ const Table: React.FC<TableProps> = ({
     });
   };
 
+  // Update tableData when data prop changes
+  useEffect(() => {
+    if (Array.isArray(data)) {
+      setTableData(data);
+    }
+  }, [data]);
+
+  // Notify parent component when selected columns change
+  useEffect(() => {
+    // Avoid re-triggering on same column selection
+    if (onColumnSelect) {
+      const selectedColumnData = getDataForSelectedColumns();
+      if (selectedColumns.size > 0) {
+        onColumnSelect(Array.from(selectedColumns), selectedColumnData);
+      }
+    }
+  }, [selectedColumns, onColumnSelect]);
+
+  useEffect(() => {
+    const tableElement = tableRef.current;
+    if (tableElement && onScrollEnd) {
+      tableElement.addEventListener('scroll', handleScroll);
+      return () => {
+        console.log("Removing scroll event listener");
+        tableElement.removeEventListener('scroll', handleScroll);
+      };
+    }
+  }, [handleScroll, onScrollEnd]);
+
   // Guard clause for empty data
   if (!Array.isArray(headers) || !Array.isArray(data) || headers.length === 0) {
     return (
@@ -180,18 +209,16 @@ const Table: React.FC<TableProps> = ({
   const uniqueHeaders = Array.from(new Set(headers)); // Ensure unique headers
   const uniqueMetadata = metadata.filter(
     (value, index, self) => self.findIndex((v) => v.key === value.key) === index
-  ); // Ensure unique metadata by key
-  const deduplicatedMetadata = Array.from(
-    new Map(metadata.map((item) => [item.key, item])).values()
   );
 
   return (
     <div
+      ref={tableRef}
       className="overflow-auto w-full border-[1px] border-gray-400"
       style={{ height: isFullHeight ? "100%" : "95%" }}
     >
       <table
-        className="  border-collapse table-fixed"
+        className="border-collapse table-fixed"
         style={{ tableLayout: "fixed", width: "100%" }}
       >
         <thead className="h-12 sticky top-0 z-10 bg-[#E6EDFF] border-[1px] border-t-0 border-gray-500 ">
@@ -199,9 +226,8 @@ const Table: React.FC<TableProps> = ({
             {uniqueHeaders.map((header, index) => (
               <th
                 key={`${header}-${index}`}
-                className={`border-[1px] border-t-0 border-collapse border-gray-500  py-2 w-[210px] cursor-pointer relative group ${
-                  selectedColumns.has(header) ? "bg-blue-200" : ""
-                }`}
+                className={`border-[1px] border-t-0 border-collapse border-gray-500  py-2 w-[210px] cursor-pointer relative group ${selectedColumns.has(header) ? "bg-blue-200" : ""
+                  }`}
                 onClick={() => handleSelectColumn(header)}
               >
                 <div className="flex items-center justify-center">
@@ -228,8 +254,8 @@ const Table: React.FC<TableProps> = ({
                     {columnMetadata
                       ? renderChart(columnMetadata, onChartSelect) // Dynamically render chart for this column
                       : <div className="w-[209px] h-[149px] bg-red-50 flex items-center justify-center">
-                              No chart Thanks!!
-                            </div>}
+                        No chart Thanks!!
+                      </div>}
                   </td>
                 );
               })}
@@ -242,18 +268,16 @@ const Table: React.FC<TableProps> = ({
 
             return (
               <tr
-                key={`row-${rowId}`}
-                className={`border-[1px] border-gray-500 w-[210px] ${
-                  selectedRows.has(rowId) ? "bg-gray-300" : ""
-                }`}
+                key={`row-${rowId}-${rowIndex}`}
+                className={`border-[1px] border-gray-500 w-[210px] ${selectedRows.has(rowId) ? "bg-gray-300" : ""
+                  }`}
               >
                 {uniqueHeaders.map((header, colIndex) => (
                   <td
                     key={`cell-${rowId}-${header}`}
                     onClick={() => handleCellClick(rowIndex, header)}
-                    className={`border-[1px] border-gray-500 overflow-hidden whitespace-nowrap text-ellipsis px-2 py-[3px] ${
-                      selectedColumns.has(header) ? "bg-blue-50" : ""
-                    }`}
+                    className={`border-[1px] border-gray-500 overflow-hidden whitespace-nowrap text-ellipsis px-2 py-[3px] ${selectedColumns.has(header) ? "bg-blue-50" : ""
+                      }`}
                   >
                     {/* Add checkbox for the first column */}
                     {colIndex === 0 && isCheckBox ? (
@@ -298,6 +322,11 @@ const Table: React.FC<TableProps> = ({
           })}
         </tbody>
       </table>
+      {isLoading && (
+        <div className="w-full py-4 text-center text-gray-500">
+          Loading more data...
+        </div>
+      )}
     </div>
   );
 };

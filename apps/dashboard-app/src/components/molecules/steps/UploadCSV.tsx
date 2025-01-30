@@ -8,13 +8,11 @@ import {
 } from "@/src/components/atoms/icons/Icon";
 import axios, { AxiosRequestConfig } from "axios";
 import { API_ENDPOINTS } from "@/src/utils/const/apiEndpoint";
-interface IUploadCSV {
-  defaultProjectId?: string;
-}
+
 
 const MAX_FILENAME_LENGTH = 30;
 
-const UploadCsv: React.FC<IUploadCSV> = ({ defaultProjectId }) => {
+const UploadCsv: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>();
   const navigate = useNavigate();
 
@@ -119,13 +117,14 @@ const UploadCsv: React.FC<IUploadCSV> = ({ defaultProjectId }) => {
       };
 
       const response = await axios.post(
-        `${API_ENDPOINTS.API_URL}/project/${projectId}/file/upload/`,
+        `${API_ENDPOINTS.API_URL}/projects/${projectId}/files/`,
         formData,
         config
       );
 
 
       if (response.status === 201 || response.status === 200) {
+        console.log('hello', response.data.data)
         const uploadedFileId = response.data.data?._id;
         const metadataId = response.data.data?.metadata_id;
 
