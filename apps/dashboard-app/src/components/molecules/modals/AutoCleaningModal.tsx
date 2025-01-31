@@ -114,7 +114,7 @@ export function AutoCleaningModal({
       setIsLoading(true);
 
       const response = await request({
-        url: `${API_ENDPOINTS.API_URL}/project/${projectId}/file/${fileId}/processing-cleaning-file/`,
+        url: `${API_ENDPOINTS.API_URL}/projects/${projectId}/files/${fileId}/cleaning/`,
         method: "POST",
         data: requestBody,
       });
@@ -133,7 +133,7 @@ export function AutoCleaningModal({
           await fetchMetadata(updatedMetadataId);
 
           // Navigate to the final screen with metadataId
-          navigate(`/project/${projectId}/file/${fileId}/finalscreen`, {
+          navigate(`/projects/${projectId}/files/${fileId}/final-screen`, {
             state: { metadataId: updatedMetadataId },
           });
         } else {
@@ -190,11 +190,10 @@ export function AutoCleaningModal({
               >
                 <div className="relative w-5 h-5">
                   <div
-                    className={`absolute inset-0 ${
-                      checkboxes.outlierValues
-                        ? "bg-blue-600"
-                        : "border-2 border-gray-300"
-                    } rounded transition-colors`}
+                    className={`absolute inset-0 ${checkboxes.outlierValues
+                      ? "bg-blue-600"
+                      : "border-2 border-gray-300"
+                      } rounded transition-colors`}
                   ></div>
                   {checkboxes.outlierValues && (
                     <Check className="absolute inset-0 w-5 h-5 text-white p-1" />
@@ -208,11 +207,10 @@ export function AutoCleaningModal({
               >
                 <div className="relative w-5 h-5">
                   <div
-                    className={`absolute inset-0 ${
-                      checkboxes.deleteDuplicateRow
-                        ? "bg-blue-600"
-                        : "border-2 border-gray-300"
-                    } rounded transition-colors`}
+                    className={`absolute inset-0 ${checkboxes.deleteDuplicateRow
+                      ? "bg-blue-600"
+                      : "border-2 border-gray-300"
+                      } rounded transition-colors`}
                   ></div>
                   {checkboxes.deleteDuplicateRow && (
                     <Check className="absolute inset-0 w-5 h-5 text-white p-1" />
@@ -240,9 +238,8 @@ export function AutoCleaningModal({
                   </p>
                 )}
                 <div
-                  className={`mt-2 space-y-2 ${
-                    isExpanded ? "block" : "hidden"
-                  }`}
+                  className={`mt-2 space-y-2 ${isExpanded ? "block" : "hidden"
+                    }`}
                 >
                   {missingRowOptions.map((option) => (
                     <label
@@ -276,9 +273,8 @@ export function AutoCleaningModal({
               <button
                 onClick={handleAutoClean}
                 disabled={isLoading}
-                className={`px-6 py-2 bg-blue-600 text-white hover:bg-blue-700 transition-colors rounded-[10px] ${
-                  isLoading ? "opacity-50 cursor-not-allowed" : ""
-                }`}
+                className={`px-6 py-2 bg-blue-600 text-white hover:bg-blue-700 transition-colors rounded-[10px] ${isLoading ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
               >
                 {isLoading ? "Cleaning..." : "Auto Clean"}
               </button>

@@ -88,7 +88,6 @@ const Table: React.FC<TableProps> = ({
     if (!tableRef.current || !onScrollEnd || isLoading) return;
 
     const { scrollTop, scrollHeight, clientHeight } = tableRef.current;
-    console.log("Remaining scroll:", scrollHeight - scrollTop - clientHeight);
 
     if (scrollHeight - scrollTop - clientHeight < scrollThreshold) {
       onScrollEnd();

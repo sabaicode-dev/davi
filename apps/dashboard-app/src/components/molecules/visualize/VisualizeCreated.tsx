@@ -49,7 +49,7 @@ const VisualizeCreated: React.FC = () => {
   const handleDelete = async (id: string) => {
     try {
       const response = await axios.delete(
-        `${API_ENDPOINTS.API_URL}/visualizations/${id}/delete/`
+        `${API_ENDPOINTS.API_URL}/visualizations/${id}/`
       );
 
       if (response.status === 200) {
@@ -96,7 +96,7 @@ const VisualizeCreated: React.FC = () => {
   }, []);
 
   const goToCreateProject = () => {
-    navigate("/project/create");
+    navigate("/new-project");
   };
 
   const handleSort = () => {
@@ -175,9 +175,8 @@ const VisualizeCreated: React.FC = () => {
         >
           <div className="flex flex-col gap-y-2">
             <button
-              className={`flex items-center justify-between p-2 text-sm ${
-                sortOption === "Recent" ? "font-bold text-blue-600" : ""
-              }`}
+              className={`flex items-center justify-between p-2 text-sm ${sortOption === "Recent" ? "font-bold text-blue-600" : ""
+                }`}
               onClick={() => applySort("Recent")}
             >
               Sort by Recent
@@ -186,9 +185,8 @@ const VisualizeCreated: React.FC = () => {
               )}
             </button>
             <button
-              className={`flex items-center justify-between p-2 text-sm ${
-                sortOption === "Alphabetical" ? "font-bold text-blue-600" : ""
-              }`}
+              className={`flex items-center justify-between p-2 text-sm ${sortOption === "Alphabetical" ? "font-bold text-blue-600" : ""
+                }`}
               onClick={() => applySort("Alphabetical")}
             >
               Sort by Alphabetical

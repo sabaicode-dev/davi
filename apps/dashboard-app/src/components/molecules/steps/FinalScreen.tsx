@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import icon from "@/public/images/icon-cleaning.png";
 import Button from "../../atoms/Button";
 import { DeleteIcon, DownloadIcon, V } from "../../atoms/icons/Icon";
@@ -86,138 +86,124 @@ const FinalScreen: React.FC = () => {
     headers: [],
     data: [],
   });
-  const [visibleHeaders, setVisibleHeaders] = useState<Set<string>>(new Set()); // Tracks visible headers
+  const [visibleHeaders, setVisibleHeaders] = useState<Set<string>>(new Set());
   const [metadata, setMetadata] = useState<any[]>([]);
   const [selectedColumns, setSelectedColumns] = useState<string[]>([]);
-  const [selectedChartType, setSelectedChartType] =
-    useState<string>("pie_chart");
   const [showRightSide, setShowRightSide] = useState(false);
-  const [chartData, setChartData] = useState<
-    Array<{ chartType: string; img: string }>
-  >([]);
-  const [selectedColumnData, setSelectedColumnData] = useState<
-    Record<string, any>[] | null
-  >(null);
+  const [chartData, setChartData] = useState<Array<{ chartType: string; img: string }>>([]);
 
-  const [descriptionMap, setDescriptionMap] = useState<{
-    [key: string]: string;
-  }>({});
-
-  const [showPopup, setShowPopup] = useState(false); // Tracks popup visibility
+  const [showPopup, setShowPopup] = useState(false);
   const { projectId, fileId } = useParams();
   const [isLoadingVisualize, setIsLoadingVisualize] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+
+  // --- PAGINATION STATES ---
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasMore, setHasMore] = useState(false);
+  const [isLoadingData, setIsLoadingData] = useState(true);    // For the main fetch
+  const [isFetchingMore, setIsFetchingMore] = useState(false); // For "load more" calls
   const [error, setError] = useState<string | null>(null);
 
-  const handleFileDetailsUpdate = (details: {
-    filename: string;
-    totalRows: number;
-    totalColumns: number;
-  }) => {
-    setFileDetails(details);
-  };
+  // If you have an existing metadataId from location or localStorage
+  const location = useLocation();
+  const metadataId = location.state?.metadataId || localStorage.getItem("metadataId");
 
+  // For optional analysis panel
   const [selectedAnalysis, setSelectedAnalysis] = useState<{
     category: string;
     percentage: number;
     type: string;
     name: string;
   } | null>(null);
-  const location = useLocation(); // Access state passed from CleaningProject
-  // const metadataId = location.state?.metadataId; // Retrieve metadataId from navigation state
-  const metadataId =
-    location.state?.metadataId || localStorage.getItem("metadataId");
-
-  useEffect(() => {
-    if (!metadataId) {
-      console.error("metadataId is missing in FinalScreen.");
-    } else {
-      console.log("FinalScreen metadataId:", metadataId);
-    }
-  }, [metadataId]);
-
-  useEffect(() => {
-    if (!metadataId || !projectId || !fileId) {
-      setError(
-        "Missing required parameters (metadataId, projectId, or fileId)."
-      );
-      return;
-    }
-    fetchData();
-  }, [metadataId, projectId, fileId]);
 
   // Fetch Table Data and Metadata
-  const fetchData = async () => {
+  const fetchData = async (page = 1, append = false) => {
     try {
-      setIsLoading(true);
+      // Distinguish between the first load and subsequent "load more" calls
+      if (page === 1) {
+        setIsLoadingData(true);
+      } else {
+        setIsFetchingMore(true);
+      }
+      setError(null);
 
-      // Fetch table data
-      const tableResponse = await fetch(
-        `${API_ENDPOINTS.API_URL}/project/${projectId}/file/${fileId}/details/`
-      );
-
+      // Example endpoint with pagination
+      const endpoint = `${API_ENDPOINTS.API_URL}/projects/${projectId}/files/${fileId}/?p=${page}`;
+      const tableResponse = await fetch(endpoint);
       if (!tableResponse.ok) {
         throw new Error(`HTTP error! status: ${tableResponse.status}`);
       }
 
       const tableJsonData: ApiResponse = await tableResponse.json();
-      console.log("Fetched table data:", tableJsonData);
 
-      // Update state with fetched table data
+      // 2) Merge new data with old data if append == true
+      const newData = append
+        ? [...tableData.data, ...tableJsonData.results]
+        : tableJsonData.results;
+
+      // Update table data
       setTableData({
         headers: tableJsonData.headers,
-        data: tableJsonData.results,
+        data: newData,
         total_rows: tableJsonData.dataset_summary?.total_rows,
         total_column: tableJsonData.dataset_summary?.total_columns,
         filename: tableJsonData.filename,
       });
 
-      setVisibleHeaders(new Set(tableJsonData.headers));
-
       // Update file details
       if (tableJsonData.dataset_summary) {
-        handleFileDetailsUpdate({
+        setFileDetails({
           filename: tableJsonData.filename || "",
           totalRows: tableJsonData.dataset_summary.total_rows || 0,
           totalColumns: tableJsonData.dataset_summary.total_columns || 0,
         });
       }
-      // Fetch Metadata
-      const metadataResponse = await fetch(
-        `${API_ENDPOINTS.API_URL}/metadata/${metadataId}/`
-      );
 
-      if (!metadataResponse.ok) {
-        throw new Error(
-          `Failed to fetch metadata. Status: ${metadataResponse.status}`
-        );
+      // 3) Update "hasMore" based on tableJsonData.next
+      //    (This depends on your backend—if next is boolean or a link)
+      setHasMore(!!tableJsonData.next);
+
+      // 4) Record current page
+      setCurrentPage(page);
+
+      // On first load, set visible headers if not already set
+      if (page === 1 && tableJsonData.headers?.length) {
+        setVisibleHeaders(new Set(tableJsonData.headers));
       }
-
-      const metadataJson = await metadataResponse.json();
-      console.log("Fetched metadata:", metadataJson);
-
-      if (metadataJson.metadata) {
-        setMetadata(metadataJson.metadata);
-      } else {
-        setError("No metadata available.");
-      }
-    } catch (error) {
-      setError(
-        error instanceof Error ? error.message : "An unexpected error occurred"
-      );
-      console.error("Error fetching data:", error);
+    } catch (err: any) {
+      setError(err.message || "Error fetching data");
     } finally {
-      setIsLoading(false);
+      setIsLoadingData(false);
+      setIsFetchingMore(false);
     }
   };
+
+  const fetchMetadata = async () => {
+    try {
+      // If you have a separate metadata endpoint
+      const metadataResponse = await fetch(`${API_ENDPOINTS.API_URL}/metadata/${metadataId}/`);
+      if (!metadataResponse.ok) {
+        throw new Error(`Failed to fetch metadata. Status: ${metadataResponse.status}`);
+      }
+      const metadataJson = await metadataResponse.json();
+      if (metadataJson.metadata) {
+        setMetadata(metadataJson.metadata);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const loadMore = useCallback(() => {
+    // Only fetch next page if not already loading/fetching and "hasMore" is true
+    if (!isLoadingData && !isFetchingMore && hasMore) {
+      fetchData(currentPage + 1, true);
+    }
+  }, [currentPage, hasMore, isLoadingData, isFetchingMore]);
 
   const handleChartSelect = (
     metadata: ChartMetadata | ChartMetadata[],
     chartData: ChartSelectionData
   ) => {
-    console.log("Chart Data:", chartData); // Debug chart data
-    console.log("Metadata:", metadata); // Debug metadata
-
     // Ensure metadata is always treated as an array
     const metadataArray = Array.isArray(metadata) ? metadata : [metadata];
 
@@ -226,11 +212,9 @@ const FinalScreen: React.FC = () => {
       (meta) => meta.key === chartData.category
     );
 
-    console.log("Matched Metadata:", matchedMetadata); // Debug matched metadata
-
     if (matchedMetadata) {
       const updatedAnalysis = {
-        name: matchedMetadata.name || "Default Name", // Fallback to a default name
+        name: matchedMetadata.name || "Default Name",
         category: chartData.category,
         percentage: chartData.percentage,
         type: chartData.type,
@@ -248,20 +232,15 @@ const FinalScreen: React.FC = () => {
     }
   };
 
-  const handleColumnSelection = (columns: string[], columnData: any[]) => {
+  const handleColumnSelection = (columns: string[]) => {
     if (JSON.stringify(selectedColumns) !== JSON.stringify(columns)) {
       setSelectedColumns(columns);
-      setSelectedColumnData(columnData);
     }
-  };
-
-  const handleChartTypeChange = (chartType: string) => {
-    setSelectedChartType(chartType);
   };
 
   const handleVisualizeClick = async () => {
     if (selectedColumns.length === 0 || !fileId) return;
-    setIsLoadingVisualize(true); // Set loading to true
+    setIsLoadingVisualize(true);
 
     try {
       // Clear previous chart data to prevent duplicates
@@ -283,7 +262,7 @@ const FinalScreen: React.FC = () => {
           file_id: fileId,
         };
 
-        const response = await fetch(`${API_ENDPOINTS.API_URL}/`, {
+        const response = await fetch(`${API_ENDPOINTS.API_URL}/charts`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
@@ -300,14 +279,13 @@ const FinalScreen: React.FC = () => {
     } catch (error) {
       console.error("Error visualizing chart:", error);
     } finally {
-      setIsLoadingVisualize(false); // Set loading to false
+      setIsLoadingVisualize(false);
     }
   };
 
   const handleCloseRightSide = () => {
     setShowRightSide(false);
     setChartData([]);
-    setSelectedColumnData(null);
   };
 
   // Download Handler
@@ -320,15 +298,9 @@ const FinalScreen: React.FC = () => {
 
     try {
       const res = await axios.get(
-        `${API_ENDPOINTS.API_URL}/project/${projectId}/file/download/${fileDetails.filename}/`,
+        `${API_ENDPOINTS.API_URL}/projects/${projectId}/files/${fileId}/download/`,
         {
-          responseType: "blob", // To ensure the response is treated as a binary blob
-          onDownloadProgress: (progressEvent) => {
-            const progress = Math.round(
-              (progressEvent.loaded / (progressEvent.total || 1)) * 100
-            );
-            console.log(`Download Progress: ${progress}%`);
-          },
+          responseType: "blob",
         }
       );
 
@@ -340,7 +312,6 @@ const FinalScreen: React.FC = () => {
       // Use downloadjs to trigger the file download
       download(res.data, fileDetails.filename, "application/octet-stream");
 
-      console.log("File downloaded successfully.");
     } catch (error) {
       const errorMessage =
         error instanceof Error
@@ -367,82 +338,89 @@ const FinalScreen: React.FC = () => {
     setVisibleHeaders(updatedHeaders);
   };
 
-  const handleCloseAnalysis = () => {
-    setSelectedAnalysis(null);
-  };
+  useEffect(() => {
+    if (!metadataId || !projectId || !fileId) {
+      setError("Missing required parameters (metadataId, projectId, or fileId).");
+      setIsLoadingData(false);
+      return;
+    }
 
-  if (isLoading)
+    // Fetch table data page=1
+    fetchData(1, false);
+
+    // (Optional) fetch metadata in parallel
+    fetchMetadata();
+  }, [metadataId, projectId, fileId]);
+
+  if (error) return <div className="p-4 text-red-500">Error: {error}</div>;
+  if (isLoadingData)
     return (
       <div className="flex w-full justify-center items-center h-full">
         <Spinner />
       </div>
     );
-
-  if (error) return <div className="p-4 text-red-500">Error: {error}</div>;
-  if (isLoading)
-    return (
-      <div className="flex w-full justify-center items-center h-full">
-        <Spinner />
-      </div>
-    );
-
-  if (error) return <div className="p-4 text-red-500">Error: {error}</div>;
 
   return (
-    <div
-      className="flex flex-col overflow-hidden mt-8 h-[200px]"
-      style={{ width: "100%", height: "30%" }}
-    >
-      <div className="flex flex-row justify-between items-center mb-3">
-        <div className="flex flex-row gap-x-3 justify-center items-center">
-          <div className="flex rounded-full bg-[#F4EBFF] w-12 h-12 justify-center items-center">
-            <img src={icon} alt="" className="w-5 h-6" />
-          </div>
-          <div className="flex flex-col">
-            <h2 className="font-bold mb-1">{fileDetails.filename}</h2>
-            <div className="bg-[#E6EDFF] border-2 border-[#E6EDFF] flex flex-row justify-between rounded-lg px-4 min-w-56 max-w-64">
-              <div className="flex flex-row min-w-20 max-w-28 px-4">
-                <p className="text-sm">{fileDetails.totalRows}</p>
-                <p className="ml-3 text-sm"> Rows</p>
-              </div>
-              <p className="border-[1px] border-gray-700" />
-              <div className="flex flex-row min-w-20 max-w-28 px-4">
-                <p className="text-sm">{fileDetails.totalColumns}</p>
-                <p className="ml-3 text-sm"> Columns</p>
+    <div className="h-[calc(100vh-5rem)] flex flex-col overflow-hidden">
+      {/* -- HEADER SECTION (fixed height) -- */}
+      <div className="flex flex-col p-4">
+        <div className="flex flex-row justify-between items-center mb-3">
+          {/* Left side */}
+          <div className="flex flex-row gap-x-3 items-center">
+            <div className="flex rounded-full bg-[#F4EBFF] w-12 h-12 justify-center items-center">
+              <img src={icon} alt="" className="w-5 h-6" />
+            </div>
+            <div className="flex flex-col">
+              <h2 className="font-bold mb-1">{fileDetails.filename}</h2>
+              <div className="bg-[#E6EDFF] border-2 border-[#E6EDFF] flex flex-row justify-between rounded-lg px-4 min-w-56 max-w-64">
+                <div className="flex flex-row min-w-20 max-w-28 px-2">
+                  <p className="text-sm">{fileDetails.totalRows}</p>
+                  <p className="ml-1 text-sm">Rows</p>
+                </div>
+                <p className="border-[1px] border-gray-700 mx-2" />
+                <div className="flex flex-row min-w-20 max-w-28 px-2">
+                  <p className="text-sm">{fileDetails.totalColumns}</p>
+                  <p className="ml-1 text-sm">Columns</p>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        <div>
-          <Button
-            children={"Download"}
-            size="medium"
-            radius="2xl"
-            isLoading={false}
-            color="outline"
-            startContent={<DownloadIcon />}
-            onClick={handleDownLoadFile}
-            className="mr-2"
-          />
-          <Button
-            children={"Visualize"}
-            size="medium"
-            radius="2xl"
-            isLoading={isLoadingVisualize}
-            color="primary"
-            onClick={handleVisualizeClick}
-            startContent={<V />}
-            isDisabled={selectedColumns.length === 0 || isLoadingVisualize}
-            className=" border-blue-500"
-          />
-        </div>
-      </div>
 
-      <div className="flex flex-row justify-between items-center border-t-2 border-[#443DFF]">
-        <div
-          className="flex justify-between items-center gap-x-4 my-4"
-          style={{ width: "60%" }}
-        >
+          {/* Right side */}
+          <div className="flex items-center">
+            <Button
+              children={"Download"}
+              size="medium"
+              radius="2xl"
+              isLoading={false}
+              color="outline"
+              startContent={<DownloadIcon />}
+              className="mr-2"
+              onClick={handleDownLoadFile}
+            />
+            <Button
+              children={"Visualize"}
+              size="medium"
+              radius="2xl"
+              isLoading={isLoadingVisualize}
+              color="primary"
+              onClick={handleVisualizeClick}
+              startContent={<V />}
+              isDisabled={selectedColumns.length === 0 || isLoadingVisualize}
+              className="border-blue-500 mr-2"
+            />
+            <Button
+              children={"Delete"}
+              size="medium"
+              radius="2xl"
+              isLoading={false}
+              color="danger"
+              startContent={<DeleteIcon />}
+            />
+          </div>
+        </div>
+        {/* Some bottom border or second row */}
+        <div className="flex flex-row items-center gap-2">
           <Input
             type="text"
             label=""
@@ -469,20 +447,11 @@ const FinalScreen: React.FC = () => {
             onClick={handleFilterClick}
           />
         </div>
-        <div>
-          <Button
-            children={"Delete"}
-            size="medium"
-            radius="2xl"
-            isLoading={false}
-            color="danger"
-            startContent={<DeleteIcon />}
-          />
-        </div>
       </div>
 
-      <div className="">
-        <div className="responsive-table-height">
+      {/* -- MAIN CONTENT (flex-1 = remaining space) -- */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <div className="flex-1 min-h-0">
           <Table
             headers={tableData.headers.filter((header) =>
               visibleHeaders.has(header)
@@ -493,14 +462,15 @@ const FinalScreen: React.FC = () => {
             isEditCell={false}
             isSelectColumn={true}
             onColumnSelect={handleColumnSelection}
-            isFullHeight={true}
+            isFullHeight={false}
             showChart={true}
             onChartSelect={handleChartSelect}
+            onScrollEnd={loadMore}
+            isLoading={isFetchingMore}
           />
         </div>
       </div>
 
-      {/* Analysis sidebar */}
       {selectedAnalysis && (
         <Analysis
           selectedData={{
@@ -516,7 +486,6 @@ const FinalScreen: React.FC = () => {
         <RightSide
           chartData={chartData}
           selectedColumns={selectedColumns}
-          onSelectChart={handleChartTypeChange}
           onClose={handleCloseRightSide}
         />
       )}

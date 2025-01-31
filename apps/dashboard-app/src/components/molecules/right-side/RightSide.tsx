@@ -10,14 +10,12 @@ import { API_ENDPOINTS } from "@/src/utils/const/apiEndpoint";
 interface RightSideProps {
   chartData: Array<{ chartType: string; img: string }>; // Chart data with type and image URL
   selectedColumns: string[];
-  onSelectChart: (chartType: string) => void; // Callback for selecting a chart type
   onClose: () => void;
 }
 
 const RightSide: React.FC<RightSideProps> = ({
   chartData,
   selectedColumns,
-  onSelectChart,
   onClose,
 }) => {
   const [selectedChart, setSelectedChart] = useState<string | null>(
@@ -69,7 +67,6 @@ const RightSide: React.FC<RightSideProps> = ({
   // Handle Chart Selection
   const handleChartSelection = (chartType: string) => {
     setSelectedChart(chartType);
-    onSelectChart(chartType); // Trigger parent callback
   };
 
   const generateCacheKey = (columns: string[], chartType: string | null) => {
@@ -167,7 +164,7 @@ const RightSide: React.FC<RightSideProps> = ({
       const selectedChartData = chartData.find(
         (chart) => chart.chartType === chartType
       );
-  
+
       const visualizationData = {
         name: name,
         charts: [
@@ -179,9 +176,9 @@ const RightSide: React.FC<RightSideProps> = ({
           },
         ],
       };
-  
+
       console.log("Visualization data:", visualizationData); // Debug log
-  
+
       const response = await axios.post(
         `${API_ENDPOINTS.API_URL}/visualizations/`,
         visualizationData,
@@ -191,14 +188,14 @@ const RightSide: React.FC<RightSideProps> = ({
           },
         }
       );
-  
+
       if (response.status === 201) {
         setSavedVisualizations((prev) => [...prev, response.data]);
         setIsDialogOpen(false); // Close SaveDialog
         setIsModalOpen(false); // Close Modal if open
-  
+
         console.log("Visualization saved successfully:", response.data);
-  
+
         // Create a notification for the saved visualization
         await createNotification(response.data.name);
       }
@@ -206,16 +203,16 @@ const RightSide: React.FC<RightSideProps> = ({
       console.error("Error saving visualization:", error);
     }
   };
-  
+
   const handleSaveExisting = async (name: string) => {
     try {
       const existingViz = savedVisualizations.find((viz) => viz.name === name);
-  
+
       if (!existingViz) {
         console.error("Visualization not found:", name);
         return;
       }
-  
+
       const updatedCharts = [
         {
           chart_type: selectedChart,
@@ -224,7 +221,7 @@ const RightSide: React.FC<RightSideProps> = ({
           selectedColumns,
         },
       ];
-  
+
       const response = await axios.put(
         `${API_ENDPOINTS.API_URL}/visualizations/${existingViz.id}/`,
         {
@@ -237,15 +234,15 @@ const RightSide: React.FC<RightSideProps> = ({
           },
         }
       );
-  
+
       if (response.status === 200) {
         setSavedVisualizations((prev) =>
           prev.map((viz) => (viz.id === existingViz.id ? response.data : viz))
         );
         setIsModalOpen(false);
-  
+
         console.log("Visualization updated successfully:", response.data);
-  
+
         // Create a notification for the updated visualization
         await createNotification(response.data.name);
       }
@@ -253,7 +250,7 @@ const RightSide: React.FC<RightSideProps> = ({
       console.error("Error updating visualization:", error);
     }
   };
-  
+
   // Function to create a notification
   const createNotification = async (fileName: string) => {
     try {
@@ -263,7 +260,7 @@ const RightSide: React.FC<RightSideProps> = ({
           "Content-Type": "application/json",
         },
       });
-  
+
       if (response.status === 201) {
         console.log("Notification created successfully:", response.data);
       }
@@ -271,15 +268,15 @@ const RightSide: React.FC<RightSideProps> = ({
       console.error("Error creating notification:", error);
     }
   };
-  
+
   const handleModalSaveNew = () => {
     // Close Modal and open SaveDialog for creating a new visualization
     setIsModalOpen(false);
     setTimeout(() => setIsDialogOpen(true), 100); // Delay to ensure smooth UI transition
   };
-  
+
   return (
-    <div className="flex flex-col w-[450px] h-full fixed top-16 right-0 bg-white shadow-2xl z-40 overflow-y-scroll">
+    <div className="flex flex-col w-[450px] h-full fixed top-16 right-0 bg-white shadow-2xl shadow-l-2 shadow-t-0 shadow-r-0 shadow-b-0 z-40 overflow-y-scroll -px-6">
       {/* Header */}
       <div className="flex flex-row justify-between items-center px-6 py-4 border-b">
         <h1 className="text-[16px] font-bold">Recommend Chart</h1>
@@ -298,9 +295,8 @@ const RightSide: React.FC<RightSideProps> = ({
           <button
             key={chart.chartType}
             onClick={() => handleChartSelection(chart.chartType)}
-            className={`flex flex-col items-center rounded-md p-2 ${
-              selectedChart === chart.chartType ? "ring-2 ring-blue-500" : ""
-            } hover:bg-gray-100`}
+            className={`flex flex-col items-center rounded-md p-2 ${selectedChart === chart.chartType ? "ring-2 ring-blue-500" : ""
+              } hover:bg-gray-100`}
           >
             <img
               src={chart.img}

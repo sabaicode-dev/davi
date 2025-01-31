@@ -5,12 +5,10 @@ import PickDataSource from "@/src/components/molecules/steps/PickDataSource";
 import UploadCsv from "@/src/components/molecules/steps/UploadCSV";
 import ImportUrl from "@/src/components/molecules/steps/ImportUrl";
 import Visualize from "@/src/components/pages/Visualize";
-import Dataset from "./components/pages/Dataset";
 import Helps from "@/src/components/pages/Helps";
 import AccountSettings from "@/src/components/templates/AccountSettings";
 import Project from "@/src/components/pages/Project";
 import { AuthProvider } from "@/src/contexts/AuthContext";
-import ShowProject from "@/src/components/molecules/steps/ShowProject";
 import ProjectDetail from "@/src/components/molecules/project/ProjectDetail";
 import FinalScreen from "./components/molecules/steps/FinalScreen";
 import CleaningProject from "./components/molecules/steps/CleaningProject";
@@ -73,31 +71,28 @@ const routes = [
     element: <CleaningProject />,
   },
   {
-    path: "/projects/:projectId/files/:fileId/finalscreen",
+    path: "/projects/:projectId/files/:fileId/final-screen",
     element: <FinalScreen />,
   },
-
-  {
-    path: "/project/:projectId/data-sources/import/selectTable",
-    element: <SelectTable />,
-  },
-  {
-    path: "/project/:projectId/data-sources/query/confirmFiles",
-    element: <ConfirmFiles />,
-  },
-  { path: "/select-project", element: <ShowProject /> },
-  { path: "/project/create/data-sources", element: <PickDataSource /> },
   { path: "/visualize", element: <Visualize /> },
-  { path: "/dataset", element: <Dataset /> },
-  { path: "/helps", element: <Helps /> },
-  { path: "/accountsetting", element: <AccountSettings /> },
-  { path: "/cleaning", element: <AccountSettings /> },
-  { path: "/template-table", element: <CleaningProject /> },
-
   {
     path: "/visualize/:visualizationId/detail",
     element: <DetailVisualize />,
   },
+  { path: "/helps", element: <Helps /> },
+  { path: "/accountsetting", element: <AccountSettings /> },
+
+  // HAVENT REVIEWD YET
+  {
+    path: "/project/:projectId/data-sources/query/confirmFiles",
+    element: <ConfirmFiles />,
+  },
+  {
+    path: "/project/:projectId/data-sources/import/selectTable",
+    element: <SelectTable />,
+  },
+  { path: "/project/create/data-sources", element: <PickDataSource /> },
+  { path: "/template-table", element: <CleaningProject /> },
 ];
 
 export const App = () => {

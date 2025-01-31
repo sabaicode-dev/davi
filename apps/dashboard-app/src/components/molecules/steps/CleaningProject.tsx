@@ -107,7 +107,7 @@ const CleaningProject: React.FC = () => {
       return;
     }
 
-    navigate(`/projects/${projectId}/files/${fileId}/finalscreen`, {
+    navigate(`/projects/${projectId}/files/${fileId}/final-screen`, {
       state: { metadataId },
     });
   };

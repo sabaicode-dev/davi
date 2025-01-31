@@ -128,9 +128,6 @@ export function PreviewCleaningModal({
   // Render nothing if modal not open
   if (!isOpen) return null;
 
-  console.log('data::: ', combinedIssuesData)
-  console.log('isLoading::: ', isLoading)
-
   return (
     <div className="fixed inset-0 bg-black bg-opacity-55 flex items-center justify-center z-50">
       <div className="flex flex-col space-y-3 bg-white rounded-2xl w-3/4 max-h-[90vh] shadow-2xl">

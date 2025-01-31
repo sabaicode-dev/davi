@@ -59,7 +59,7 @@ const DetailVisualize: React.FC = () => {
       if (visualization.charts.length === 1) {
         // If only one chart remains, delete the entire visualization
         const response = await axios.delete(
-          `${API_ENDPOINTS.API_URL}/visualizations/${visualization.id}/delete/`
+          `${API_ENDPOINTS.API_URL}/visualizations/${visualization.id}/`
         );
 
         if (response.status === 200 || response.status === 204) {
