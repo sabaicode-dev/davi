@@ -386,7 +386,7 @@ const FinalScreen: React.FC = () => {
             </div>
           </div>
 
-          {/* Right side */}
+          {/* Right side buttons */}
           <div className="flex items-center">
             <Button
               children={"Download"}
@@ -409,15 +409,26 @@ const FinalScreen: React.FC = () => {
               isDisabled={selectedColumns.length === 0 || isLoadingVisualize}
               className="border-blue-500 mr-2"
             />
-            <Button
-              children={"Delete"}
-              size="medium"
-              radius="2xl"
-              isLoading={false}
-              color="danger"
-              startContent={<DeleteIcon />}
-            />
+
+            <div className="relative group flex flex-col items-center">
+              <Button
+                children={"Delete"}
+                size="medium"
+                radius="2xl"
+                isLoading={false}
+                color="danger"
+                startContent={<DeleteIcon />}
+                className="cursor-not-allowed text-gray-400 relative"
+                aria-disabled="true"
+                disabled={true}
+              />
+              {/* Tooltip (Now Positioned Below the Button) */}
+              <div className="absolute bottom-[-3.2rem] bg-black text-white text-xs font-bold px-3 py-2 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                Feature Coming Soon
+              </div>
+            </div>
           </div>
+
         </div>
         {/* Some bottom border or second row */}
         <div className="flex flex-row items-center gap-2">

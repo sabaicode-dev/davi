@@ -32,6 +32,7 @@ const ProjectFlow = () => {
         element={<UploadCsv />}
       />
       <Route path="/web" element={<ImportUrl />} />
+
       <Route
         path="/mongo-db"
         element={<MongoConnection />}
@@ -52,6 +53,7 @@ const ProjectFlow = () => {
         path="maria-db"
         element={<MariaDBConnection />}
       />
+      <Route path="/web/select-table" element={<SelectTable />} />
     </Routes>
   );
 };
@@ -86,10 +88,6 @@ const routes = [
   {
     path: "/project/:projectId/data-sources/query/confirmFiles",
     element: <ConfirmFiles />,
-  },
-  {
-    path: "/project/:projectId/data-sources/import/selectTable",
-    element: <SelectTable />,
   },
   { path: "/project/create/data-sources", element: <PickDataSource /> },
   { path: "/template-table", element: <CleaningProject /> },

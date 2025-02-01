@@ -5,30 +5,15 @@ import request from "@/src/utils/helper";
 import { useNavigate, useParams } from "react-router-dom";
 import { API_ENDPOINTS } from "@/src/utils/const/apiEndpoint";
 
-interface IImportURL {
-  defaultProjectId?: string;
-}
 
-const ImportUrl: React.FC<IImportURL> = ({ defaultProjectId }) => {
+const ImportUrl: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>();
   const navigate = useNavigate();
 
   const [url, setUrl] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [scrapedData, setScrapedData] = useState<any>(null);
-  const [progress, setProgress] = useState(0);
 
-  const simulateProgress = () => {
-    setProgress(0);
-    const interval = setInterval(() => {
-      setProgress((prev) => {
-        if (prev < 100) return prev + 1;
-        clearInterval(interval);
-        return 100;
-      });
-    }, 50);
-  };
 
   const handleScrapeUrl = async () => {
     const urlPattern = new RegExp(
@@ -50,24 +35,21 @@ const ImportUrl: React.FC<IImportURL> = ({ defaultProjectId }) => {
 
     setError("");
     setIsLoading(true);
-    simulateProgress();
 
     try {
       const response = await request({
-        url: `${API_ENDPOINTS.API_URL}/project/${projectId}/scrape/url/`,
+        url: `${API_ENDPOINTS.API_URL}/projects/${projectId}/scrape/`,
         method: "POST",
         data: {
           url,
           project_id: projectId,
         },
       });
-      console.log("Project Id in Scraping: ", projectId);
 
       if (response.success || response.status === 201) {
-        setScrapedData(response.data);
         console.log("Scraped Data:", response.data);
         // Pass scrapedData via navigate to DisplayTable
-        navigate(`/project/${projectId}/pick-datasource/import/selectTable`, {
+        navigate(`/projects/${projectId}/data-sources/web/select-table`, {
           state: { scrapedData: response.data },
         });
         // navigate(`/project/import?projectId=${projectId}`, {

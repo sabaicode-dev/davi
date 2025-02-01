@@ -7,20 +7,24 @@ import request from "@/src/utils/helper";
 import { useLocation, useNavigate } from "react-router-dom";
 import LoadModal from "../molecules/modals/LoadModal";
 import { API_ENDPOINTS } from "@/src/utils/const/apiEndpoint";
+
 const ShowScraping = () => {
+  const { projectId } = useParams();
   const location = useLocation();
   const scrapedData = location.state?.scrapedData.filename; // Retrieve scraped data
-  const [selectedItemId, setSelectedItemId] = useState<number | null>(null);
   const navigate = useNavigate();
 
-  const handleItemClick = useCallback((index: number) => {
-    setSelectedItemId(index); // Update the selected item ID
-  }, []);
-  console.log("Table:::::::::::::", selectedItemId);
-
+  const [selectedItemId, setSelectedItemId] = useState<number | null>(null);
   const [selectedCheckedFiles, setSelectedCheckedFiles] = useState<number[]>(
     []
-  ); // Store selected file indices as an array
+  );
+  const [showModal, setShowModal] = useState(false);
+
+
+  const handleItemClick = useCallback((index: number) => {
+    setSelectedItemId(index);
+  }, []);
+
   const handleCheckClick = useCallback((index: number) => {
     setSelectedCheckedFiles((prevSelected) => {
       if (prevSelected.includes(index)) {
@@ -32,9 +36,7 @@ const ShowScraping = () => {
       }
     });
   }, []);
-  console.log("AcceptFile::::::::::::::", selectedCheckedFiles);
 
-  const { projectId } = useParams();
   const handleLoad = async () => {
     const confirmFileNames = selectedCheckedFiles ?? [];
     const rejectFilenames = scrapedData.filter(
@@ -42,9 +44,6 @@ const ShowScraping = () => {
     );
 
     try {
-      // if (response) {
-      //   console.log("File confirm successfully");
-      // }
       const response = await request({
         url: `${API_ENDPOINTS.API_URL}/project/${projectId}/scrape/confirm-dataset/`,
         method: "POST",
@@ -53,17 +52,12 @@ const ShowScraping = () => {
           rejected_filename: rejectFilenames,
         },
       });
-      console.log("confirmFile::::::::::::", confirmFileNames);
-      console.log("Attempting to navigate");
-      navigate(`/project/${projectId}/`);
-      console.log("Navigation successful");
-      console.log(response);
+
+      navigate(`/projects/${projectId}/`);
     } catch (error) {
       console.error("Navigation error:", error);
     }
   };
-  // Modal state management
-  const [showModal, setShowModal] = useState(false);
 
   const handleConfirm = () => {
     setShowModal(false); // Close modal
