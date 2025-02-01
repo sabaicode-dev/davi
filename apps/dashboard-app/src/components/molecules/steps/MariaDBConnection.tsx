@@ -89,7 +89,7 @@ export const MariaDBConnection = () => {
       payload.table_names = tableNames.split(",").map((name) => name.trim());
     }
 
-    const endpoint = `${API_ENDPOINTS.BEST_URL}/loadMariadb/api/v1/load/mariadb_data/`;
+    const endpoint = `${API_ENDPOINTS.BEST_URL}/api/v1/datasets/load-mariadb/`
 
     try {
       setLoading(true);
@@ -116,14 +116,15 @@ export const MariaDBConnection = () => {
 
       const errors = Object.entries(data.data || {})
         .filter(([_, value]) => (value as any).error)
-        .map(([key, value]) => `${key}: ${(value as any).error}`);
+        .map(([key, value]) => `${key}: ${(value as any).error
+          }`);
 
       if (errors.length > 0) {
         setShowPopup({ visible: true, errors });
         return;
       }
 
-      navigate(`/project/${projectId}/pick-datasource/query/confirmFiles`, {
+      navigate(`/projects/${projectId}/data-sources/maria-db/confirm-files`, {
         state: { scrapedData: data },
       });
     } catch (err: any) {
@@ -137,13 +138,13 @@ export const MariaDBConnection = () => {
   };
 
   const handleBack = () => {
-    navigate(`/project/create/pick-datasource?projectId=${projectId}`);
+    navigate(`/projects/${projectId}/data-sources`);
   };
 
   const handlePopupConfirm = () => {
     setShowPopup({ visible: false, errors: [] });
     if (response) {
-      navigate(`/project/${projectId}/pick-datasource/query/confirmFiles`, {
+      navigate(`/projects/${projectId}/data-sources/maria-db/confirm-files`, {
         state: { scrapedData: response },
       });
     }

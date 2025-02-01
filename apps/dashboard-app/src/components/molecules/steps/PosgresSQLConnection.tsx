@@ -90,7 +90,7 @@ export const PosgresSQLConnection = () => {
       payload.table = tableNames.split(",").map((name) => name.trim());
     }
 
-    const endpoint = `${API_ENDPOINTS.BEST_URL}/loadPostgresSQL/api/v1/fetch-data/`;
+    const endpoint = `${API_ENDPOINTS.BEST_URL}/api/v1/datasets/load-postgresql/`;
 
     try {
       setLoading(true);
@@ -111,7 +111,6 @@ export const PosgresSQLConnection = () => {
       }
 
       const data = await res.json();
-      console.log(data);
 
       setResponse(data);
 
@@ -124,7 +123,7 @@ export const PosgresSQLConnection = () => {
         return;
       }
 
-      navigate(`/project/${projectId}/pick-datasource/query/confirmFiles`, {
+      navigate(`/projects/${projectId}/data-sources/postgre-sql/confirm-files`, {
         state: { scrapedData: data },
       });
     } catch (err: any) {
@@ -138,13 +137,13 @@ export const PosgresSQLConnection = () => {
   };
 
   const handleBack = () => {
-    navigate(`/project/create/pick-datasource?projectId=${projectId}`);
+    navigate(`/projects/${projectId}/data-sources`);
   };
 
   const handlePopupConfirm = () => {
     setShowPopup({ visible: false, errors: [] });
     if (response) {
-      navigate(`/project/${projectId}/pick-datasource/query/confirmFiles`, {
+      navigate(`/project/${projectId}/data-sources/postgre-sql/confirm-files`, {
         state: { scrapedData: response },
       });
     }

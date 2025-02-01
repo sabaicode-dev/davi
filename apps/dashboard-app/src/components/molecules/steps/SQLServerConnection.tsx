@@ -73,7 +73,7 @@ export const SQLServerConnection = () => {
       payload.table_name = tableNames;
     }
 
-    const endpoint = `${API_ENDPOINTS.BEST_URL}/load_SQLServer/api/v1/fetch-database-data/`;
+    const endpoint = `${API_ENDPOINTS.BEST_URL}/api/v1/datasets/load-sql-server/`;
 
     try {
       setLoading(true);
@@ -94,7 +94,6 @@ export const SQLServerConnection = () => {
       }
 
       const data = await res.json();
-      console.log(data);
 
       setResponse(data);
 
@@ -109,7 +108,7 @@ export const SQLServerConnection = () => {
       }
 
       // Navigate to the next page if fetch success
-      navigate(`/project/${projectId}/pick-datasource/query/confirmFiles`, {
+      navigate(`/projects/${projectId}/data-sources/sql-server/confirm-files`, {
         state: { scrapedData: data },
       });
     } catch (err: any) {
@@ -123,13 +122,13 @@ export const SQLServerConnection = () => {
   };
 
   const handleBack = () => {
-    navigate(`/project/create/pick-datasource?projectId=${projectId}`);
+    navigate(`/projects/${projectId}/data-sources`);
   };
 
   const handlePopupConfirm = () => {
     setShowPopup({ visible: false, errors: [] });
     if (response) {
-      navigate(`/project/${projectId}/pick-datasource/query/confirmFiles`, {
+      navigate(`/projects/${projectId}/data-sources/sql-server/confirm-files`, {
         state: { scrapedData: response },
       });
     }
