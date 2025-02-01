@@ -36,7 +36,7 @@ export const MongoConnection = () => {
       return;
     }
 
-    const mongoConnectionEndpoint = `${API_ENDPOINTS.BEST_URL}/readData_MongoDB/api/v1/load/mongo_data/`;
+    const mongoConnectionEndpoint = `${API_ENDPOINTS.BEST_URL}/api/v1/datasets/load/`;
 
     try {
       setLoading(true);
@@ -66,7 +66,6 @@ export const MongoConnection = () => {
       }
 
       const data = await res.json();
-      console.log(data);
 
       setResponse(data);
 
@@ -89,7 +88,7 @@ export const MongoConnection = () => {
 
       // Navigate to the next page only if fetch is successful
       if (res.ok) {
-        navigate(`/project/${projectId}/pick-datasource/query/confirmFiles`, {
+        navigate(`/projects/${projectId}/data-sources/mongo-db/confirm-files`, {
           state: { scrapedData: data },
         });
       }
@@ -102,7 +101,7 @@ export const MongoConnection = () => {
 
   const handlePopupConfirm = () => {
     setShowPopup({ visible: false, errors: [] });
-    navigate(`/project/${projectId}/pick-datasource/query/confirmFiles`, {
+    navigate(`/project/${projectId}/data-sources/mongo-db/confirm-files`, {
       state: { scrapedData: response },
     });
   };
@@ -112,7 +111,7 @@ export const MongoConnection = () => {
   };
 
   const handleBack = () => {
-    navigate(`/project/create/pick-datasource?projectId=${projectId}`);
+    navigate(`/projects/${projectId}/data-sources`);
   };
 
   return (

@@ -2,26 +2,21 @@ import { useState, useEffect } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import LoadingButton from "../../atoms/LoadingButton";
 import { API_ENDPOINTS } from "@/src/utils/const/apiEndpoint";
-import { FaExclamationTriangle } from "react-icons/fa"; // Import a warning icon from react-icons
+import { FaExclamationTriangle } from "react-icons/fa";
 import SuccessPopup from "../forms/SuccessPopup";
 
 interface ScrapedData {
-  [key: string]: string | { error: string }; // Adjusted the type to handle both strings and objects with errors
+  [key: string]: string | { error: string };
 }
 
 export const ConfirmFiles = () => {
   const { state } = useLocation();
-  const navigate = useNavigate();
   const { projectId } = useParams<{ projectId: string }>();
   const [confirmedFiles, setConfirmedFiles] = useState<string[]>([]);
   const [rejectedFiles, setRejectedFiles] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
-
-  useEffect(() => {
-    console.log("Fetched Data:", state?.scrapedData);
-  }, [state]);
 
   const handleConfirm = (filename: string) => {
     setConfirmedFiles((prev) => {
@@ -58,7 +53,7 @@ export const ConfirmFiles = () => {
         rejected_filename: allRejectedFiles,
       };
 
-      const endpoint = `${API_ENDPOINTS.BEST_URL}/readData_MongoDB/api/v1/project/${projectId}/comfirmData/mongo_data/`;
+      const endpoint = `${API_ENDPOINTS.BEST_URL}/api/v1/projects/${projectId}/datasets/confirm/`;
 
       const res = await fetch(endpoint, {
         method: "POST",
@@ -137,9 +132,8 @@ export const ConfirmFiles = () => {
               return (
                 <div
                   key={index}
-                  className={`flex items-center justify-between bg-white border rounded-lg mx-6 p-4 mb-2 hover:shadow-lg ${
-                    error ? "border-red-500" : "border-blue-500"
-                  }`}
+                  className={`flex items-center justify-between bg-white border rounded-lg mx-6 p-4 mb-2 hover:shadow-lg ${error ? "border-red-500" : "border-blue-500"
+                    }`}
                 >
                   <div className="truncate max-w-[70%] flex flex-col">
                     {/* Display full name here */}
@@ -153,13 +147,12 @@ export const ConfirmFiles = () => {
                   </div>
                   <div className="flex gap-3">
                     <button
-                      className={`py-1 px-3 rounded ${
-                        error
-                          ? "bg-gray-400 text-gray-700 cursor-not-allowed"
-                          : confirmedFiles.includes(filename)
+                      className={`py-1 px-3 rounded ${error
+                        ? "bg-gray-400 text-gray-700 cursor-not-allowed"
+                        : confirmedFiles.includes(filename)
                           ? "bg-green-500 text-white"
                           : "bg-gray-200 text-gray-700"
-                      }`}
+                        }`}
                       onClick={() => handleConfirm(filename)}
                       disabled={!!error} // Disable if there's an error
                     >
@@ -171,7 +164,6 @@ export const ConfirmFiles = () => {
                 </div>
               );
             })}
-          {/* <p>scrapedFiles: {JSON.stringify(scrapedFiles, null, 2)}</p> */}
         </main>
       </div>
 
@@ -191,7 +183,7 @@ export const ConfirmFiles = () => {
       {showSuccessPopup && (
         <SuccessPopup
           message="Files successfully confirmed!"
-          navigateTo={`/project/${projectId}`}
+          navigateTo={`/projects/${projectId}`}
         />
       )}
     </div>

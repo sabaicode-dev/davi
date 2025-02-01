@@ -54,6 +54,10 @@ const ProjectFlow = () => {
         element={<MariaDBConnection />}
       />
       <Route path="/web/select-table" element={<SelectTable />} />
+      <Route
+        path="/mongo-db/confirm-files"
+        element={<ConfirmFiles />}
+      />
     </Routes>
   );
 };
@@ -85,10 +89,6 @@ const routes = [
   { path: "/accountsetting", element: <AccountSettings /> },
 
   // HAVENT REVIEWD YET
-  {
-    path: "/project/:projectId/data-sources/query/confirmFiles",
-    element: <ConfirmFiles />,
-  },
   { path: "/project/create/data-sources", element: <PickDataSource /> },
   { path: "/template-table", element: <CleaningProject /> },
 ];
