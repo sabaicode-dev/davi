@@ -36,7 +36,7 @@ export const MongoConnection = () => {
       return;
     }
 
-    const mongoConnectionEndpoint = `${API_ENDPOINTS.BEST_URL}/api/v1/datasets/load/`;
+    const mongoConnectionEndpoint = `${API_ENDPOINTS.BEST_URL}/api/v1/datasets/load-mongodb/`;
 
     try {
       setLoading(true);

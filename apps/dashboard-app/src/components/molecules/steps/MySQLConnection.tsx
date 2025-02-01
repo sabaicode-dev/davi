@@ -42,7 +42,7 @@ export const MySQLConnection = () => {
       table_names: tableNames,
     };
 
-    const endpoint = `${API_ENDPOINTS.BEST_URL}/load_MySQL/api/v1/load/mySQl_data/`;
+    const endpoint = `${API_ENDPOINTS.BEST_URL}/api/v1/datasets/load-mysql`;
 
     try {
       setLoading(true);
@@ -63,7 +63,6 @@ export const MySQLConnection = () => {
       }
 
       const data = await res.json();
-      console.log(data);
 
       setResponse(data);
 
@@ -78,7 +77,7 @@ export const MySQLConnection = () => {
       }
 
       // Navigate to the next page if fetch success
-      navigate(`/project/${projectId}/pick-datasource/query/confirmFiles`, {
+      navigate(`/projects/${projectId}/data-sources/mysql/confirm-files`, {
         state: { scrapedData: data },
       });
     } catch (err: any) {
@@ -90,7 +89,7 @@ export const MySQLConnection = () => {
 
   const handlePopupConfirm = () => {
     setShowPopup({ visible: false, errors: [] });
-    navigate(`/project/${projectId}/pick-datasource/query/confirmFiles`, {
+    navigate(`/projects/${projectId}/data-sources/mysql/confirm-files`, {
       state: { scrapedData: response },
     });
   };
@@ -100,7 +99,7 @@ export const MySQLConnection = () => {
   };
 
   const handleBack = () => {
-    navigate(`/project/create/pick-datasource?projectId=${projectId}`);
+    navigate(`/projects/${projectId}/data-sources`);
   };
 
   return (

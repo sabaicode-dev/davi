@@ -58,6 +58,22 @@ const ProjectFlow = () => {
         path="/mongo-db/confirm-files"
         element={<ConfirmFiles />}
       />
+      <Route
+        path="/mysql/confirm-files"
+        element={<ConfirmFiles />}
+      />
+      <Route
+        path="/sql-server/confirm-files"
+        element={<ConfirmFiles />}
+      />
+      <Route
+        path="/postgre-sql/confirm-files"
+        element={<ConfirmFiles />}
+      />
+      <Route
+        path="/maria-db/confirm-files"
+        element={<ConfirmFiles />}
+      />
     </Routes>
   );
 };
