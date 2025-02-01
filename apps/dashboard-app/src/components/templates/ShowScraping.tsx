@@ -45,7 +45,7 @@ const ShowScraping = () => {
 
     try {
       const response = await request({
-        url: `${API_ENDPOINTS.API_URL}/project/${projectId}/scrape/confirm-dataset/`,
+        url: `${API_ENDPOINTS.API_URL}/projects/${projectId}/scrape/confirm-dataset/`,
         method: "POST",
         data: {
           confirmed_filename: confirmFileNames,
