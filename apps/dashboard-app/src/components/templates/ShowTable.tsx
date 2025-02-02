@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { useSearchParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import ViewTable from "../molecules/tables/ViewTable";
+import { API_ENDPOINTS } from "@/src/utils/const/apiEndpoint";
+
 interface ApiResponse {
   count: number;
   next: boolean;
@@ -20,7 +22,6 @@ interface ApiResponse {
 }
 interface ShowTableProps {
   selectedItemId: number | null;
-  selectedIndex: number | null;
 }
 interface TableProps {
   headers: string[];
@@ -29,10 +30,11 @@ interface TableProps {
   total_column?: number;
   filename?: string;
 }
-const ShowTable = ({ selectedItemId, selectedIndex }: ShowTableProps) => {
-  const [searchParams] = useSearchParams();
-  const projectId = searchParams.get("projectId");
-
+const ShowTable = ({ selectedItemId }: ShowTableProps) => {
+  // const [searchParams] = useSearchParams();
+  // const projectId = searchParams.get("projectId");
+  const { projectId } = useParams();
+  // console.log("S:S::S:::::::::::::::::", projectId);
   const [data, setData] = useState<TableProps>({
     headers: [],
     data: [],
@@ -44,7 +46,7 @@ const ShowTable = ({ selectedItemId, selectedIndex }: ShowTableProps) => {
     setLoading(true);
     setError(null); // Clear previous errors
     try {
-      const api = `http://3.24.110.41:8000/api/v1/project/${projectId}/scrape/view-dataset/${selectedItemId}`;
+      const api = `${API_ENDPOINTS.API_URL}/projects/${projectId}/scrape/${selectedItemId}`;
       const response = await axios.get(api);
 
       // Assuming the response contains 'headers' and 'data'
@@ -68,13 +70,13 @@ const ShowTable = ({ selectedItemId, selectedIndex }: ShowTableProps) => {
     if (selectedItemId === null) return; // Don't fetch if no ID is selected
     fetchData();
   }, [selectedItemId, projectId]);
-  console.log("selectedItemId in showTable:::::::::::", selectedItemId);
+  // console.log("selectedItemId in showTable:::::::::::", selectedItemId);
   return (
     <div className="w-full ml-5 border border-[#C4C1D8] rounded-lg">
       <div className="p-5 h-[700px] overflow-hidden">
         <header className="font-medium text-[18px] mb-4">
           {selectedItemId !== null ? (
-            <div>Table {selectedIndex}</div>
+            <div>{selectedItemId}</div>
           ) : (
             "No Table Selected"
           )}

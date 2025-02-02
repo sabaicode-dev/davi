@@ -1,20 +1,20 @@
 "use client";
+
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import axiosInstance from "@/app/utils/axios";
+import axiosInstance, { AxiosErrorResponse } from "@/app/utils/axios";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { RegisterSchema } from "@/app/schema/Register"; // Import the schema
-import { z } from "zod"; // Import zod to infer schema types
+import { RegisterSchema } from "@/app/schema/Register";
+import { z } from "zod";
 import Image from "next/image";
 import { RiEyeCloseFill, RiEyeCloseLine } from "react-icons/ri";
 import { BiArrowBack } from "react-icons/bi";
 import CryptoJS from "crypto-js";
+import { API_ENDPOINT } from "@/app/utils/const/apiEndpoint";
 
 const secretKey = process.env.NEXT_PUBLIC_SECRET_KEY || "";
 
-
-// Infer the type of RegisterFormData from RegisterSchema
 type RegisterFormData = z.infer<typeof RegisterSchema>;
 
 export default function SignUpPage() {
@@ -29,63 +29,52 @@ export default function SignUpPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  // const [secretKey, setSecretKey] = useState<string>("");
 
   const router = useRouter();
-  interface AxiosErrorResponse {
-    response?: {
-      status: number;
-    };
-  }
 
-  // Handle the sign-up process
   const handleSignUp = async (data: RegisterFormData) => {
-    // const secretKey = "kf93!@nF3?/$rJQ2@kT6b%rTYqKq9t1n3F!qL";
     const { email, password, username } = data;
 
-    setIsLoading(true); // Start loading spinner
-    setError(null); // Reset error message
+    setIsLoading(true);
+    setError(null);
 
     try {
       // Call the signup API
-      const response = await axiosInstance.post("/signup", {
+      const response = await axiosInstance.post(`${API_ENDPOINT.SIGN_UP}`, {
         email,
         password,
         username,
       });
 
-      if (response.status === 200) {
-        // Encrypt username and password
-        const encryptedUsername = CryptoJS.AES.encrypt(
-          username,
-          secretKey
-        ).toString();
-        const encryptedPassword = CryptoJS.AES.encrypt(
-          password,
-          secretKey
-        ).toString();
-        console.log("encrypted Username:", encryptedUsername);
-        console.log("encrypted Password:", encryptedPassword);
-
-        localStorage.setItem("username", encryptedUsername);
-        localStorage.setItem("password", encryptedPassword);
-        localStorage.setItem("email", email);
-
-        // const { token } = response.data;
-        // console.log("token:", token);
-        // localStorage.setItem("authToken", token);
-
-        router.push("/signup/verify-email"); // Redirect to the verification page
-      } else {
-        setError("Sign-up failed. Please try again.");
+      // Check if the response status is not 200
+      if (response.status !== 200) {
+        throw new Error(`Sign-up failed with status: ${response.status}`);
       }
+
+      // Encrypt username and password
+      const encryptedUsername = CryptoJS.AES.encrypt(
+        username,
+        secretKey
+      ).toString();
+      const encryptedPassword = CryptoJS.AES.encrypt(
+        password,
+        secretKey
+      ).toString();
+
+      // Store encrypted data in localStorage
+      localStorage.setItem("username", encryptedUsername);
+      localStorage.setItem("password", encryptedPassword);
+      localStorage.setItem("email", email);
+
+      // Redirect to the verification page
+      return router.push("/signup/verify-email");
     } catch (err) {
       const errorResponse = err as AxiosErrorResponse;
       if (errorResponse.response) {
         if (errorResponse.response.status === 409) {
           setError("User already exists. Please try logging in.");
         } else {
-          setError("Sign-up failed. Please try again.");
+          setError(errorResponse.response.data.message);
         }
       } else {
         setError("An unexpected error occurred. Please try again.");
@@ -102,7 +91,7 @@ export default function SignUpPage() {
 
   const handleGoogleSignUp = async () => {
     try {
-      const response = await axiosInstance.get("/google");
+      const response = await axiosInstance.get(`${API_ENDPOINT.SIGN_IN_WITH_GOOGLE}`);
 
       if (response.data && response.data.url) {
         window.location.href = response.data.url; // Redirect to the Google OAuth page
@@ -117,7 +106,7 @@ export default function SignUpPage() {
   };
 
   const handleBack = () => {
-    router.push("/"); // Go back to the homepage
+    router.push("/");
   };
 
   return (

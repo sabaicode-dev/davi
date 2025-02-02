@@ -14,10 +14,11 @@ type Config = {
   awsCognitoIdentityPoolId: string;
   awsCognitoDomain: string;
   awsRedirectUri: string;
-  clientUrl: string;
+  dashboardUrl: string;
   userServiceUrl?: string;
   awsAccessKeyId: string;
   awsSecretAccessKey: string;
+  awsS3BucketName: string;
 };
 
 // Function to load and validate environment variables
@@ -32,9 +33,6 @@ function loadConfig(): Config {
     throw new Error(`Failed to load .env file at ${envPath}: ${result.error}`);
   }
 
-  // Debug log for confirmation
-  console.log(`Loaded environment variables from: ${envPath}`);
-
   // Define schema for environment variables validation using Joi
   const envVarsSchema = Joi.object({
     NODE_ENV: Joi.string().valid("development", "production").required(),
@@ -44,13 +42,12 @@ function loadConfig(): Config {
     AWS_COGNITO_USER_POOL_ID: Joi.string().required(),
     AWS_COGNITO_CLIENT_ID: Joi.string().required(),
     AWS_COGNITO_CLIENT_SECRET: Joi.string().required(),
-    AWS_COGNITO_IDENTITY_POOL_ID: Joi.string().required(),
     AWS_COGNITO_DOMAIN: Joi.string().required(),
     AWS_REDIRECT_URI: Joi.string().required(),
-    CLIENT_URL: Joi.string().required(),
-    USER_SERVICE_URL: Joi.string().optional(), // Optional environment variable
+    DASHBOARD_URL: Joi.string().required(),
     AWS_ACCESS_KEY_ID: Joi.string().required(),
     AWS_SECRET_ACCESS_KEY: Joi.string().required(),
+    AWS_S3_BUCKET_NAME: Joi.string().required(),
   })
     .unknown()
     .required();
@@ -59,29 +56,13 @@ function loadConfig(): Config {
   const { value: envVars, error } = envVarsSchema.validate(process.env, {
     abortEarly: false, // Show all validation errors at once
   });
-0
+
   // Handle validation errors
   if (error) {
     const errorMessages = error.details.map((err) => err.message).join(", ");
     throw new Error(`Config validation error: ${errorMessages}`);
   }
 
-  // Assign clientUrl based on NODE_ENV
-  const clientUrl =
-    envVars.NODE_ENV === "production"
-      ? envVars.CLIENT_URL
-      : "http://localhost:8080/";
-
-  const awsRedirectUri =
-    envVars.NODE_ENV === "production"
-      ? envVars.AWS_REDIRECT_URI
-      : "http://localhost:4001/v1/auth/google/callback/";
-
-  console.log("=======================================");
-
-  console.log(`clientUrl : ${clientUrl}`);
-  console.log(`awsRedirectUri : ${awsRedirectUri}`);
-  console.log("=======================================");
   return {
     env: envVars.NODE_ENV,
     port: envVars.PORT,
@@ -92,16 +73,15 @@ function loadConfig(): Config {
     awsCognitoClientSecret: envVars.AWS_COGNITO_CLIENT_SECRET,
     awsCognitoIdentityPoolId: envVars.AWS_COGNITO_IDENTITY_POOL_ID,
     awsCognitoDomain: envVars.AWS_COGNITO_DOMAIN,
-    // awsRedirectUri: envVars.AWS_REDIRECT_URI,
-    awsRedirectUri,
-    // clientUrl: envVars.CLIENT_URL,
-    clientUrl, // Dynamically assigned clientUrl
-    userServiceUrl: envVars.USER_SERVICE_URL,
+    dashboardUrl: envVars.DASHBOARD_URL, // Dynamically assigned clientUrl
+    awsRedirectUri: envVars.AWS_REDIRECT_URI, // Dynamically
     awsAccessKeyId: envVars.AWS_ACCESS_KEY_ID,
     awsSecretAccessKey: envVars.AWS_SECRET_ACCESS_KEY,
+    awsS3BucketName: envVars.AWS_S3_BUCKET_NAME,
   };
 }
 
 // Export the loaded configuration
 const configs = loadConfig();
+
 export default configs;

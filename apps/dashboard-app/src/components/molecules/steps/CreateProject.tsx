@@ -5,7 +5,7 @@ import Button from "@/src/components/atoms/Button";
 import request from "@/src/utils/helper";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-
+import { API_ENDPOINTS } from "@/src/utils/const/apiEndpoint";
 interface Step2Props {
   onNext?: () => void;
   onBack?: () => void;
@@ -37,7 +37,6 @@ const CreateProject: React.FC<Step2Props> = ({
     description: "",
   });
   const [isLoading, setIsLoading] = useState(false);
-  const [projectId, setProjectId] = useState<string>("");
 
   const navigate = useNavigate();
   const goBackToGetStart = () => {
@@ -80,7 +79,7 @@ const CreateProject: React.FC<Step2Props> = ({
 
     try {
       const response = await request({
-        url: `http://3.24.110.41:8000/api/v1/project/`,
+        url: `${API_ENDPOINTS.API_URL}/projects/`,
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -91,11 +90,7 @@ const CreateProject: React.FC<Step2Props> = ({
         },
       });
       const newProjectId = response.data._id;
-      console.log("Project Id: ", newProjectId);
-      setProjectId(newProjectId);
-      navigate(`pick-datasource?projectId=${newProjectId}`);
-
-      console.log("Project creation response:", response);
+      navigate(`/projects/${newProjectId}/data-sources`);
 
       if (response.success || response.status === 201) {
         setErrorMessages({ projectName: "", description: "" });

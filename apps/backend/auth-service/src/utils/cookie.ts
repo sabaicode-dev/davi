@@ -17,10 +17,10 @@ export function setCookie(
     httpOnly: true,
     secure: process.env.NODE_ENV === "development", // Ensure secure cookies in production
     sameSite: process.env.NODE_ENV === "development" ? "none" : "lax", // Use type assertion
-    maxAge: 3600 * 1000, // Default to 1 hour
+    maxAge: 3600 * 1000 * 24 * 15, // Default to 15 day
     ...options,
   };
 
-  console.log(`Setting cookie: ${name}, value: ${value}`); // Add logging for debugging
+  // console.log(`Setting cookie: ${name}, value: ${value}`); // Add logging for debugging
   res.cookie(name, value, defaultOptions);
 }

@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import Button from "@/src/components/atoms/Button";
 import { CloseIcon } from "@/src/components/atoms/icons/Icon";
 import request from "@/src/utils/helper";
+import { API_ENDPOINTS } from "@/src/utils/const/apiEndpoint";
 
 interface ICreateProjectModalProps {
   onClose?: () => void;
@@ -58,11 +59,11 @@ const Modal: React.FC<ICreateProjectModalProps> = ({
     visible: {
       opacity: 1,
       y: 0,
-      scale: 1, 
+      scale: 1,
       transition: {
         type: "spring",
         damping: 12,
-        stiffness: 100, 
+        stiffness: 100,
         duration: 0.3,
         delayChildren: 0.1,
         staggerChildren: 0.1,
@@ -135,7 +136,7 @@ const Modal: React.FC<ICreateProjectModalProps> = ({
 
     try {
       const response = await request({
-        url: `http://3.24.110.41:8000/api/v1/project/${projectId}/update/`,
+        url: `${API_ENDPOINTS.API_URL}/projects/${projectId}/`,
         method: "PUT",
         withCredentials: false,
         data: {
@@ -145,7 +146,6 @@ const Modal: React.FC<ICreateProjectModalProps> = ({
       });
 
       if (response.success) {
-        // Call the update method passed from parent component
         onUpdateProject?.(projectId, projectName, description);
 
         setProjectName("");
@@ -174,7 +174,7 @@ const Modal: React.FC<ICreateProjectModalProps> = ({
       <dialog
         ref={dialogRef}
         id="modal_project"
-        className="modal bg-red-200 fixed top-1/4 left-1/2 transform -translate-x-1/2 -translate-y-1/4 flex flex-col justify-center items-center w-1/2 xl:w-1/2 2xl:w-1/3 p-5 rounded-xl shadow-xl border-[1px] z-50"
+        className="modal fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-center items-center w-1/2 xl:w-1/2 2xl:w-1/3 p-5 rounded-xl shadow-xl border-[1px] z-50"
       >
         <motion.div
           initial="hidden"

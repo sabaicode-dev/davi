@@ -1,17 +1,9 @@
 // src/context/auth.tsx
 
-import React, {
-  createContext,
-  useContext,
-  useState,
-  ReactNode,
-} from "react";
+import React, { createContext, useContext, useState, ReactNode } from "react";
 import axiosInstance from "@/app/utils/axios";
-import { API_ENDPOINT } from "../utils/const/apiEndpoint";
-import {
-  LoginRequest,
-  SignupRequest,
-} from "@/app/utils/types/auth";
+import { API_ENDPOINT } from "@/app/utils/const/apiEndpoint";
+import { LoginRequest, SignupRequest } from "@/app/utils/types/auth";
 import { useRouter } from "next/navigation";
 
 interface User {

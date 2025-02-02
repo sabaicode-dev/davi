@@ -1,16 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import axiosInstance from "@/app/utils/axios"; // Adjust this import path based on your project structure
+import axiosInstance, { AxiosErrorResponse } from "@/app/utils/axios"; // Adjust this import path based on your project structure
 import { AlertCircle, CheckCircle2 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-
 import CryptoJS from "crypto-js";
 import "dotenv/config";
-
-// require("dotenv").config();
-
+import { API_ENDPOINT } from "@/app/utils/const/apiEndpoint";
 
 export default function EmailVerification() {
   const [verificationCode, setVerificationCode] = useState([
@@ -27,7 +24,6 @@ export default function EmailVerification() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [countdown, setCountdown] = useState(60);
-  // const [secretKey, setSecretKey] = useState<string>("");
 
   const router = useRouter();
 
@@ -49,8 +45,6 @@ export default function EmailVerification() {
           encryptedPassword,
           String(secretKey)
         ).toString(CryptoJS.enc.Utf8);
-
-        console.log("Decrypted Username:", decryptedUsername);
 
         setEmail(storedEmail);
         setPassword(decryptedPassword);
@@ -118,21 +112,31 @@ export default function EmailVerification() {
     setSuccess(false);
 
     try {
-      const response = await axiosInstance.post("/confirm", {
-        email, // Include email from localStorage
-        confirmationCode: code, // 6-digit code entered by the user
-        password, // Include password from localStorage
+      const response = await axiosInstance.post(`${API_ENDPOINT.CONFIRM_CODE}`, {
+        email,
+        confirmationCode: code,
+        password,
       });
 
-      if (response.status === 200) {
-        setSuccess(true);
-        router.push (process.env.NEXT_PUBLIC_URL_PDASHBOARD || "")// Redirect to dashboard
-      } else {
-        setError("Verification failed. Please try again.");
+      if (response.status !== 200) {
+        throw new Error(`Verify email failed with status: ${response.status}`);
       }
+
+      setSuccess(true);
+      router.push(process.env.NEXT_PUBLIC_URL_DASHBOARD!); // Redirect to dashboard
     } catch (err) {
+      const errorResponse = err as AxiosErrorResponse;
+      if (errorResponse.response) {
+        const backendErrorMessage = errorResponse.response.data?.message;
+        if (backendErrorMessage) {
+          setError(backendErrorMessage);
+        } else {
+          setError("Verification failed. Please try again.");
+        }
+      } else {
+        setError("An unexpected error occurred. Please try again.");
+      }
       console.error("Verification error:", err);
-      setError("Verification failed. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -143,11 +147,27 @@ export default function EmailVerification() {
     setError(null);
 
     try {
-      await axiosInstance.post("/v1/auth/resend-code", { email });
+      const response = await axiosInstance.post(`${API_ENDPOINT.RESEND_CODE}`, { email });
+
+      if (response.status !== 200) {
+        throw new Error(`Resend code failed with status: ${response.status}`);
+      }
+
       setCountdown(60);
       setError("A new verification code has been sent to your email.");
     } catch (err) {
-      setError("Failed to resend the code. Please try again.");
+      const errorResponse = err as AxiosErrorResponse;
+      if (errorResponse.response) {
+        // Use backend error message if available
+        const backendErrorMessage = errorResponse.response.data?.message;
+        if (backendErrorMessage) {
+          setError(backendErrorMessage);
+        } else {
+          setError("Failed to resend the code. Please try again.");
+        }
+      } else {
+        setError("An unexpected error occurred. Please try again.");
+      }
       console.error("Resend code error:", err);
     } finally {
       setIsLoading(false);
@@ -224,9 +244,8 @@ export default function EmailVerification() {
           {`Didn't receive the code? `}
           <button
             onClick={handleResendCode}
-            className={`text-blue-400 ${
-              isLoading || countdown > 0 ? "opacity-50 cursor-not-allowed" : ""
-            }`}
+            className={`text-blue-400 ${isLoading || countdown > 0 ? "opacity-50 cursor-not-allowed" : ""
+              }`}
             disabled={isLoading || countdown > 0}
           >
             Resend

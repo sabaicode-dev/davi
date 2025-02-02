@@ -1,20 +1,67 @@
 import React, { useEffect, useState } from "react";
 import Logo from "@/public/images/header/logo.png";
-import ProfileUser from "@/public/images/header/roem-reaksmey.jpeg";
 import FileImg from "@/public/images/header/status-up.png";
 import { AiOutlineLogout } from "react-icons/ai";
 import { FiUser } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/src/contexts/AuthContext";
 import { API_ENDPOINTS } from "@/src/utils/const/apiEndpoint";
-import { API_URL_AUTH } from "@/src/utils/const/apiEndpoint";
+import axios from "axios";
+import { formatDistanceToNow } from "date-fns";
 
 const Header: React.FC = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
-  const { setUsername, username, setEmail, email } = useAuth();
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const { setUsername, username, setEmail, email, setProfile, profile } =
+    useAuth();
 
   const navigate = useNavigate();
+
+  // Fetch notifications from the API
+  const fetchNotifications = async () => {
+    try {
+      const response = await axios.get(
+        `${API_ENDPOINTS.API_URL}/notifications/list/`
+      );
+      if (response.status === 200) {
+        setNotifications(response.data.results || []);
+        const unread = response.data.results.filter(
+          (notif: any) => !notif.is_read
+        ).length;
+        setUnreadCount(unread);
+      }
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
+    }
+  };
+
+  // Mark a notification as read
+  const markAsRead = async (id: string) => {
+    try {
+      await axios.patch(
+        `${API_ENDPOINTS.API_URL}/notifications/mark-as-read/${id}/`
+      );
+      setNotifications((prev) =>
+        prev.map((notif) =>
+          notif.id === id ? { ...notif, is_read: true } : notif
+        )
+      );
+      setUnreadCount((prev) => Math.max(prev - 1, 0));
+    } catch (error) {
+      console.error("Error marking notification as read:", error);
+    }
+  };
+
+  // Fetch notifications on component mount
+  useEffect(() => {
+    fetchNotifications(); 
+  }, []); 
+
+  const formatDate = (date: string) => {
+    return formatDistanceToNow(new Date(date), { addSuffix: true });
+  };
 
   const handleProfileClick = () => {
     navigate("/accountsetting");
@@ -23,43 +70,22 @@ const Header: React.FC = () => {
 
   const handleLogout = async () => {
     try {
-      // Retrieve tokens from localStorage
-      const authToken = localStorage.getItem("authToken");
-      const refreshToken = localStorage.getItem("refreshToken"); // Replace "dummyRefreshToken" with the real token
-
-      // Check if tokens are available
-      if (!authToken || !refreshToken) {
-        console.warn("No tokens found. Redirecting to login...");
-        window.location.href = API_URL_AUTH.SIGN_IN ;
-        return;
-      }
-
       // Call the logout API with the refresh token
       const response = await fetch(API_ENDPOINTS.SIGN_OUT, {
         method: "PUT",
-        credentials: "include", // Include cookies if necessary
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${authToken}`, // Include authToken in the header
         },
-        body: JSON.stringify({
-          refreshToken, // Send the refreshToken in the body
-        }),
+        credentials: "include",
       });
 
       if (response.ok) {
         console.log("User logged out successfully");
 
-        // Clear tokens and user state from the frontend
-        localStorage.removeItem("authToken");
-        localStorage.removeItem("refreshToken");
-
         // Clear any additional user-related state (if necessary)
         setUsername && setUsername(null);
         setEmail && setEmail(null);
-
-        // Redirect to the login or signup page
-        window.location.href = API_URL_AUTH.SIGN_IN ;
+        setProfile && setProfile(null);
       } else {
         const errorData = await response.json();
         console.error("Failed to log out:", errorData);
@@ -112,13 +138,17 @@ const Header: React.FC = () => {
               fill="black"
             />
           </svg>
-          {/* Notification badge */}
-          <span className="absolute -top-0 -right-[1px] inline-flex items-center justify-center w-[6px] h-[6px] text-xs font-bold leading-none text-white rounded-full"></span>
+          {/* Notification Badge */}
+          {unreadCount > 0 && (
+            <span className="absolute -top-1 -right-1 inline-flex items-center justify-center w-4 h-4 text-xs font-bold text-white bg-red-600 rounded-full">
+              {unreadCount}
+            </span>
+          )}
         </button>
 
         {/* Notification Dropdown */}
         {isDropdownOpen && (
-          <div className="absolute right-4 mt-[300px] w-80 bg-white shadow-lg rounded-md z-10 p-4">
+          <div className="absolute right-4 mt-[250px] w-80 bg-white shadow-lg rounded-md z-50 p-4">
             <div className="flex justify-between items-center">
               <span className="text-lg font-semibold">Notification</span>
               <button
@@ -131,35 +161,48 @@ const Header: React.FC = () => {
             <div className="pb-1 border-b border-[#BDBBCB] mt-3">
               <span className="text-xs font-medium text-[#3F4655]">Today</span>
             </div>
-            <div className="flex flex-row space-x-16 items-center mt-5">
-              <div className="flex space-x-3">
-                <div className="relative bg-[#F4EBFF] rounded-full p-2">
-                  <span className="absolute top-1 left-1 inline-flex items-center justify-center w-[6px] h-[6px] text-xs font-bold leading-none text-white bg-red-600 rounded-full"></span>
-                  <img src={FileImg} alt="fileImage" width={26} height={26} />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-800">
-                    Tech requirements
+            {notifications.length > 0 ? (
+              notifications.map((notif: any) => (
+                <div
+                  key={notif.id}
+                  className="flex flex-row justify-between items-center mt-4 cursor-pointer"
+                  onClick={() => markAsRead(notif.id)}
+                >
+                  <div className="flex items-center space-x-3">
+                    <div
+                      className={`relative bg-purple-100 rounded-full p-2 ${
+                        notif.is_read ? "" : "border-red-500 border"
+                      }`}
+                    >
+                      {!notif.is_read && (
+                        <span className="absolute top-1 left-1 w-2 h-2 bg-red-600 rounded-full"></span>
+                      )}
+                      <img
+                        src={FileImg}
+                        alt="fileImage"
+                        width={26}
+                        height={26}
+                      />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-800">
+                        {notif.file_name}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {notif.is_read ? "Read" : "Unread"}
+                      </p>
+                    </div>
+                  </div>
+                  <p className="text-xs text-gray-500">
+                    {formatDate(notif.created_at)}
                   </p>
-                  <p className="text-xs text-gray-500">New File</p>
                 </div>
-              </div>
-              <p className="text-xs text-gray-500">6 hr ago</p>
-            </div>
-            <div className="flex flex-row space-x-16 items-center mt-5">
-              <div className="flex space-x-3">
-                <div className="bg-[#F4EBFF] rounded-full p-2">
-                  <img src={FileImg} alt="fileImage" width={26} height={26} />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-800">
-                    Tech requirements
-                  </p>
-                  <p className="text-xs text-gray-500">New File</p>
-                </div>
-              </div>
-              <p className="text-xs text-gray-500">6 hr ago</p>
-            </div>
+              ))
+            ) : (
+              <p className="text-gray-500 text-sm mt-4">
+                No notifications available.
+              </p>
+            )}
           </div>
         )}
 
@@ -169,7 +212,8 @@ const Header: React.FC = () => {
           onClick={toggleProfileDropdown}
         >
           <img
-            src={ProfileUser}
+            src={profile || undefined}
+            height={200}
             alt="Profile"
             className="size-8 rounded-full"
           />
@@ -198,8 +242,8 @@ const Header: React.FC = () => {
             <div className="flex justify-between items-center pb-2 border-b">
               <div className="flex items-center">
                 <img
-                  src={ProfileUser}
-                  alt="User"
+                  src={profile || undefined}
+                  alt="Profile"
                   className="w-14 h-14 rounded-full"
                 />
                 <div className="ml-3">

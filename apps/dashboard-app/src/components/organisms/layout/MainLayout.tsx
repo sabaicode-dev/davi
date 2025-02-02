@@ -8,7 +8,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       <Sidebar />
       <div className="w-full">
         <Header />
-        <main className="px-6 mt-[70px] ml-28">{children}</main>
+        <main className="px-6 mt-[68px] ml-28">{children}</main>
       </div>
     </div>
   );

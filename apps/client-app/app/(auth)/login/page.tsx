@@ -1,61 +1,78 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import axiosInstance from "@/app/utils/axios";
+import axiosInstance, { AxiosErrorResponse } from "@/app/utils/axios";
 import LoginForm from "@/app/(auth)/login/Components/LoginFrom";
 import Image from "next/image";
 import { BiArrowBack } from "react-icons/bi";
+import { API_ENDPOINT } from "@/app/utils/const/apiEndpoint";
 
 export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
-
   const handleLogin = async (email: string, password: string) => {
-    setError(null);
+    setError(null); // Clear any previous errors
+
     try {
-      const response = await axiosInstance.post("/signin", {
+      const response = await axiosInstance.post(`${API_ENDPOINT.SIGN_IN}`, {
         email,
         password,
       });
 
-      console.log("Response:::", response);
-
-      if (response.status === 200) {
-        // On successful login, navigate to your dashboard page
-        // router.push("http://localhost:8080");
-        // const { token } = response.data;
-        // localStorage.setItem("authToken", token);
-
-        window.location.href =(process.env.NEXT_PUBLIC_URL_PDASHBOARD || "");
-      } else {
-        setError("Login failed. Please try again.");
+      if (response.status !== 200) {
+        throw new Error(`Login failed with status: ${response.status}`);
       }
+
+      // Redirect to the dashboard on successful login
+      window.location.href = process.env.NEXT_PUBLIC_URL_DASHBOARD!;
     } catch (err) {
-      setError("Login failed. Please try again.");
+      const errorResponse = err as AxiosErrorResponse;
+      if (errorResponse.response) {
+        // Use backend error message if available
+        const backendErrorMessage = errorResponse.response.data?.message;
+        if (backendErrorMessage) {
+          setError(backendErrorMessage);
+        } else if (errorResponse.response.status === 404) {
+          setError("Account does not exist. Would you like to sign up?");
+        } else {
+          setError(errorResponse.response.data.message);
+        }
+      } else {
+        setError("An unexpected error occurred. Please try again.");
+      }
       console.error("Login error:", err);
     }
   };
 
   const handleGoogleSignUp = async () => {
     try {
-      const response = await axiosInstance.get("/google");
+      const response = await axiosInstance.get(`${API_ENDPOINT.SIGN_IN_WITH_GOOGLE}`);
 
       // Check if the response contains the redirect URL
       if (response.data && response.data.url) {
         // Redirect the browser to Google's OAuth URL
         window.location.href = response.data.url;
       } else {
+        setError("An error occurred during Google login. Please try again.");
         console.error("Google Sign-in URL not found in response.");
-        alert("And error occurred during Google login.");
       }
     } catch (err) {
+      const errorResponse = err as AxiosErrorResponse;
+      if (errorResponse.response) {
+        // Use backend error message if available
+        const backendErrorMessage = errorResponse.response.data?.message;
+        if (backendErrorMessage) {
+          setError(backendErrorMessage);
+        } else {
+          setError("An error occurred during Google login. Please try again.");
+        }
+      } else {
+        setError("An unexpected error occurred. Please try again.");
+      }
       console.error("Google Sign-up error:", err);
-      alert("An error occurred during Google login.");
     }
   };
-
-  console.log(error);
 
   const handleBack = () => router.push("/");
 
@@ -80,13 +97,13 @@ export default function LoginPage() {
               {error}{" "}
               {error ===
                 "Account does not exist. Would you like to sign up?" && (
-                <button
-                  onClick={() => router.push("/signup")}
-                  className="text-blue-500 underline ml-2"
-                >
-                  Sign Up
-                </button>
-              )}
+                  <button
+                    onClick={() => router.push("/signup")}
+                    className="text-blue-500 underline ml-2"
+                  >
+                    Sign Up
+                  </button>
+                )}
             </div>
           )}
 

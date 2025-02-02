@@ -10,8 +10,10 @@ import { API_ENDPOINTS } from "@/src/utils/const/apiEndpoint";
 interface AuthContextType {
   username: string | null;
   email: string | null;
+  profile: string | null;
   setUsername: (value: string | null) => void;
   setEmail: (value: string | null) => void;
+  setProfile: (value: string | null) => void;
 }
 
 interface AuthProviderProps {
@@ -24,6 +26,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [username, setUsername] = useState<string | null>(null);
   const [email, setEmail] = useState<string | null>(null);
   const [isLoading, setLoading] = useState<boolean>(true);
+  const [profile, setProfile] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchUserDetails = async () => {
@@ -33,15 +36,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           credentials: "include", // Include cookies in the request
         });
 
-        console.log("response", response);
-
         if (response.ok) {
           const data = await response.json();
-          console.log("User data", data);
           setUsername(data.username);
           setEmail(data.email);
-        } else {
-          console.error("Failed to fetch user details");
+          setProfile(data.profile);
         }
       } catch (error) {
         console.error("Error fetching user details:", error);
@@ -54,7 +53,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ username, email, setUsername, setEmail }}>
+    <AuthContext.Provider
+      value={{ username, email, profile, setUsername, setEmail, setProfile }}
+    >
       {isLoading ? "loading..." : children}
     </AuthContext.Provider>
   );

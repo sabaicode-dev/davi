@@ -20,6 +20,7 @@ import { setCookie } from "@/src/utils/cookie";
 import { jwtDecode } from "jwt-decode";
 import { saveUserToDB } from "../database/services/user.service"; // MongoDB service function to save user data
 import configs from "../config";
+import { getUserByCognitoId } from "@/src/services/adminOption.service";
 
 /**
  * Controller for handling Google authentication.
@@ -38,7 +39,6 @@ export class GoogleAuthController extends Controller {
   ): Promise<void> {
     try {
       const signInUrl = googleSignIn();
-      console.log("Redirecting to Google Sign-In URL:", signInUrl);
       // Send a 302 redirect to the frontend with the URL
       redirect(200, { url: signInUrl });
     } catch (error: any) {
@@ -58,7 +58,7 @@ export class GoogleAuthController extends Controller {
   public async googleCallback(
     @Query() code: string,
     @Request() request: express.Request,
-    @Res() errorResponse: TsoaResponse<500, { error: string }>
+    @Res() errorResponse: TsoaResponse<500 | 409, { error: string }>
   ): Promise<void> {
     try {
       if (!code) {
@@ -78,34 +78,34 @@ export class GoogleAuthController extends Controller {
         throw new Error("Email not verified by Google");
       }
 
+      const email = decodedIdToken.email;
+
       // Extract cognitoUserId from ID token
       const cognitoUserId = decodedIdToken.sub;
 
-      // Save the user in MongoDB or another database
-      const username = decodedIdToken.email.split("@")[0];
-      await saveUserToDB({
-        username,
-        email: decodedIdToken.email,
-        cognitoUserId,
-        confirmed: true,
-      });
+      const foundUser = await getUserByCognitoId(cognitoUserId)
+
+      if (!foundUser) {
+        // Extract user's first and last name from the ID token
+        const profileUrl = decodedIdToken.profile || "https://img.freepik.com/premium-vector/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-vector-illustration_561158-3407.jpg";
+        const fullName = decodedIdToken.name || `user_${Math.random() < 0.5 ? Math.random().toString(36).substring(2, 8) : Math.floor(Math.random() * 1000)}`;;
+
+        await saveUserToDB({
+          username: fullName,
+          email: email,
+          cognitoUserId,
+          profile: profileUrl,
+          confirmed: true,
+        });
+      }
 
       // Set cookies securely for tokens and cognitoUserId
-      console.log("Setting cookies...");
       setCookie(response, "idToken", tokens.id_token);
       setCookie(response, "accessToken", tokens.access_token);
       setCookie(response, "refreshToken", tokens.refresh_token);
       setCookie(response, "cognitoUserId", cognitoUserId);
 
-      console.log(`configs.clientUrl : ${configs.clientUrl}`);
-
-      response.redirect(configs.clientUrl);
-      // Respond with success
-      response.status(200).json({
-        message: "User authenticated and data saved successfully",
-        tokens,
-        cognitoUserId,
-      });
+      response.redirect(configs.dashboardUrl);
     } catch (error: any) {
       console.error("Error during Google callback:", error.message || error);
       errorResponse(500, { error: error.message || "Internal server error" });

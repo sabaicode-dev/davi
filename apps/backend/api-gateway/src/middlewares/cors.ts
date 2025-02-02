@@ -6,6 +6,5 @@ const corsOptions = {
   methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
 };
 
-console.log('corsOption:::', corsOptions)
 
 export default corsOptions;

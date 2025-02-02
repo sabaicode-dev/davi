@@ -7,12 +7,12 @@ import {
   UploadFile,
 } from "@/src/components/atoms/icons/Icon";
 import axios, { AxiosRequestConfig } from "axios";
+import { API_ENDPOINTS } from "@/src/utils/const/apiEndpoint";
 
-interface IUploadCSV {
-  defaultProjectId?: string;
-}
 
-const UploadCsv: React.FC<IUploadCSV> = ({ defaultProjectId }) => {
+const MAX_FILENAME_LENGTH = 30;
+
+const UploadCsv: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>();
   const navigate = useNavigate();
 
@@ -25,7 +25,6 @@ const UploadCsv: React.FC<IUploadCSV> = ({ defaultProjectId }) => {
   const [error, setError] = useState<string>("");
   const [isDragOver, setIsDragOver] = useState<boolean>(false);
 
-  const MAX_FILENAME_LENGTH = 30;
 
   const handleFileUpload = () => {
     fileInputRef.current?.click();
@@ -118,19 +117,26 @@ const UploadCsv: React.FC<IUploadCSV> = ({ defaultProjectId }) => {
       };
 
       const response = await axios.post(
-        `http://3.24.110.41:8000/api/v1/project/${projectId}/file/upload/`,
+        `${API_ENDPOINTS.API_URL}/projects/${projectId}/files/`,
         formData,
         config
       );
 
+
       if (response.status === 201 || response.status === 200) {
-        const uploadedFileId = response.data?._id; // Adjust based on your response structure
+        console.log('hello', response.data.data)
+        const uploadedFileId = response.data.data?._id;
+        const metadataId = response.data.data?.metadata_id;
+
         if (uploadedFileId) {
           setUploadSuccess(true);
           setFileId(uploadedFileId);
-        } else {
-          setError("File ID not returned in response.");
         }
+
+        if (metadataId) {
+          localStorage.setItem("metadataId", metadataId); // Save to localStorage
+        }
+
       } else {
         setError("Failed to upload file. Please try again.");
       }
@@ -138,6 +144,7 @@ const UploadCsv: React.FC<IUploadCSV> = ({ defaultProjectId }) => {
       setError("Failed to upload file. Please try again.");
     }
   };
+
 
   const truncateFileName = (name: string) => {
     const extension = name.split(".").pop();
@@ -149,12 +156,12 @@ const UploadCsv: React.FC<IUploadCSV> = ({ defaultProjectId }) => {
   };
 
   const handleBack = () => {
-    navigate(`/project/create/pick-datasource?projectId=${projectId}`);
+    navigate(`/projects/${projectId}/data-sources`);
   };
 
   const handleNext = () => {
     if (uploadSuccess && fileId) {
-      window.location.href = `/project/${projectId}/file/${fileId}/cleaning`;
+      window.location.href = `/projects/${projectId}/files/${fileId}/cleaning`;
     }
   };
 
@@ -173,9 +180,8 @@ const UploadCsv: React.FC<IUploadCSV> = ({ defaultProjectId }) => {
               Upload and attach files to this project.
             </p>
             <div
-              className={`border-2 border-dashed ${
-                isDragOver ? "border-blue-500" : "border-[#E4E7EC]"
-              } bg-[#FFFFFF] p-3 rounded-lg text-center cursor-pointer shadow-sm`}
+              className={`border-2 border-dashed ${isDragOver ? "border-blue-500" : "border-[#E4E7EC]"
+                } bg-[#FFFFFF] p-3 rounded-lg text-center cursor-pointer shadow-sm`}
               onClick={handleFileUpload}
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
@@ -251,9 +257,8 @@ const UploadCsv: React.FC<IUploadCSV> = ({ defaultProjectId }) => {
               </button>
               <button
                 onClick={handleNext}
-                className={`px-4 py-2 bg-blue-600 text-white rounded-md font-semibold hover:bg-blue-700 ${
-                  !uploadSuccess ? "cursor-not-allowed opacity-50" : ""
-                }`}
+                className={`px-4 py-2 bg-blue-600 text-white rounded-md font-semibold hover:bg-blue-700 ${!uploadSuccess ? "cursor-not-allowed opacity-50" : ""
+                  }`}
                 disabled={!uploadSuccess}
               >
                 Next

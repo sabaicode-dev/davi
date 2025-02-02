@@ -17,7 +17,7 @@ lerna-debug.log*
 # Just testing
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
-
+apps/backend/ai-query/*
 # Runtime data
 pids
 *.pid
@@ -82,6 +82,7 @@ web_modules/
 
 # dotenv environment variable files
 .env
+.env.development
 .env.development.local
 .env.test.local
 .env.production.local
@@ -137,3 +138,7 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+
+# Artifact Folder
+build

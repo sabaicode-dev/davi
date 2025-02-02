@@ -5,27 +5,23 @@ import DataSourceDetail from "../data-sources/DataSourceDetail";
 import { useLocation, useNavigate } from "react-router-dom";
 
 const ProjectDetail: React.FC = () => {
-  // Use navigate
   const navigate = useNavigate();
   const location = useLocation();
   const { projectName, projectDescription } = location.state || {};
+
   const goToPickDataSource = () => {
-    const projectId = location.pathname.split('/').pop();
-    
-    navigate(`/project/create/pick-datasource?projectId=${projectId}`, {
-      state: { projectId }
+    const projectId = location.pathname.split("/").pop();
+    navigate(`/projects/${projectId}/data-sources`, {
+      state: { projectId },
     });
   };
+
   return (
     <div className="flex flex-col p-6 px-40 ">
       <div className="flex justify-between items-center w-full">
-      <div>
-          <h1 className="font-bold text-lg">
-            {projectName || "Title"}
-          </h1>
-          <p className="text-gray-700">
-            {projectDescription || "Description"}
-          </p>
+        <div>
+          <h1 className="font-bold text-lg">{projectName || "Title"}</h1>
+          <p className="text-gray-700">{projectDescription || "Description"}</p>
         </div>
         <div className="justify-end items-end">
           <Button

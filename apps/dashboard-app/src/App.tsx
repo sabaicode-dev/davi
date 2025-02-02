@@ -5,65 +5,108 @@ import PickDataSource from "@/src/components/molecules/steps/PickDataSource";
 import UploadCsv from "@/src/components/molecules/steps/UploadCSV";
 import ImportUrl from "@/src/components/molecules/steps/ImportUrl";
 import Visualize from "@/src/components/pages/Visualize";
-import Dataset from "@/src/components/pages/Dataset";
 import Helps from "@/src/components/pages/Helps";
 import AccountSettings from "@/src/components/templates/AccountSettings";
 import Project from "@/src/components/pages/Project";
 import { AuthProvider } from "@/src/contexts/AuthContext";
-import ShowProject from "@/src/components/molecules/steps/ShowProject";
 import ProjectDetail from "@/src/components/molecules/project/ProjectDetail";
 import FinalScreen from "./components/molecules/steps/FinalScreen";
 import CleaningProject from "./components/molecules/steps/CleaningProject";
 import PrivateRoute from "./ProtectedRoute/PrivateRoute";
-import SelectTable from "./components/molecules/steps/SelectTable";
+import SelectTable from "./components/molecules/steps/selectTable";
+import { MongoConnection } from "./components/molecules/steps/MongoConnection";
+import { MySQLConnection } from "./components/molecules/steps/MySQLConnection";
+import { SQLServerConnection } from "./components/molecules/steps/SQLServerConnection";
+import { ConfirmFiles } from "./components/molecules/steps/ConfirmFiles";
+import { PosgresSQLConnection } from "./components/molecules/steps/PosgresSQLConnection";
+import { MariaDBConnection } from "./components/molecules/steps/MariaDBConnection";
+import DetailVisualize from "./components/molecules/visualize/DetailVisualize";
+import GetStarted from "@/src/components/pages/GetStarted";
+
 const ProjectFlow = () => {
   return (
     <Routes>
-      {/* <Route path="/project/create" element={<CreateProject />} /> */}
-      <Route path="/pick-datasource" element={<PickDataSource />} />
+      <Route path="/" element={<PickDataSource />} />
       <Route
-        path="pick-datasource/upload-csv/:projectId"
+        path="/csv"
         element={<UploadCsv />}
       />
-      <Route path="pick-datasource/import/:projectId" element={<ImportUrl />} />
+      <Route path="/web" element={<ImportUrl />} />
+
+      <Route
+        path="/mongo-db"
+        element={<MongoConnection />}
+      />
+      <Route
+        path="/mysql"
+        element={<MySQLConnection />}
+      />
+      <Route
+        path="/sql-server"
+        element={<SQLServerConnection />}
+      />
+      <Route
+        path="/postgre-sql"
+        element={<PosgresSQLConnection />}
+      />
+      <Route
+        path="maria-db"
+        element={<MariaDBConnection />}
+      />
+      <Route path="/web/select-table" element={<SelectTable />} />
+      <Route
+        path="/mongo-db/confirm-files"
+        element={<ConfirmFiles />}
+      />
+      <Route
+        path="/mysql/confirm-files"
+        element={<ConfirmFiles />}
+      />
+      <Route
+        path="/sql-server/confirm-files"
+        element={<ConfirmFiles />}
+      />
+      <Route
+        path="/postgre-sql/confirm-files"
+        element={<ConfirmFiles />}
+      />
+      <Route
+        path="/maria-db/confirm-files"
+        element={<ConfirmFiles />}
+      />
     </Routes>
   );
 };
-// project/projectId/pick-datasource/import/
-// http://localhost:8080/project/pick-datasource/import/6752655b6b20191452f44cb4
+
 const routes = [
   {
     path: "/",
-    element: <Navigate to="/project" replace />,
+    element: <Navigate to="/projects" replace />,
   },
-  { path: "/project", element: <Project /> },
-  { path: "/project/create", element: <CreateProject /> },
-  { path: "/project/:projectId", element: <ProjectDetail /> },
+  { path: "/get-started", element: <GetStarted /> },
+  { path: "/new-project", element: <CreateProject /> },
+  { path: "/projects", element: <Project /> },
+  { path: "/projects/:projectId", element: <ProjectDetail /> },
+  { path: "/projects/:projectId/data-sources/*", element: <ProjectFlow /> },
   {
-    path: "/project/:projectId/pick-datasource/import/selectTable",
-    element: <SelectTable />,
-  },
-  { path: "/select-project", element: <ShowProject /> },
-  { path: "/project/*", element: <ProjectFlow /> },
-  { path: "/project/create/pick-datasource", element: <PickDataSource /> },
-  { path: "/visualize", element: <Visualize /> },
-  { path: "/dataset", element: <Dataset /> },
-  { path: "/helps", element: <Helps /> },
-  { path: "/accountsetting", element: <AccountSettings /> },
-  { path: "/cleaning", element: <AccountSettings /> },
-  { path: "/template-table", element: <CleaningProject /> },
-  {
-    path: "/project/:projectId/file/:fileId/cleaning",
+    path: "/projects/:projectId/files/:fileId/cleaning",
     element: <CleaningProject />,
   },
   {
-    path: "/project/:projectId/file/:fileId/finalscreen",
+    path: "/projects/:projectId/files/:fileId/final-screen",
     element: <FinalScreen />,
   },
+  { path: "/visualize", element: <Visualize /> },
   {
-    path: "/project/:projectId/file/:fileId/finalscreen",
-    element: <FinalScreen />,
+    path: "/visualize/:visualizationId/detail",
+    element: <DetailVisualize />,
   },
+  { path: "/helps", element: <Helps /> },
+  { path: "/accountsetting", element: <AccountSettings /> },
+
+  // HAVENT REVIEWD YET
+  { path: "/project/create/data-sources", element: <PickDataSource /> },
+  { path: "/template-table", element: <CleaningProject /> },
 ];
 
 export const App = () => {
@@ -71,17 +114,17 @@ export const App = () => {
     <AuthProvider>
       <BrowserRouter>
         <PrivateRoute>
-        <Layout>
-          <Routes>
-            {routes.map((route) => (
-              <Route
-                key={route.path}
-                path={route.path}
-                element={route.element}
-              />
-            ))}
-          </Routes>
-        </Layout>
+          <Layout>
+            <Routes>
+              {routes.map((route) => (
+                <Route
+                  key={route.path}
+                  path={route.path}
+                  element={route.element}
+                />
+              ))}
+            </Routes>
+          </Layout>
         </PrivateRoute>
       </BrowserRouter>
     </AuthProvider>
